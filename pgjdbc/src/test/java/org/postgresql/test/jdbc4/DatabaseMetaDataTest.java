@@ -17,31 +17,37 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DatabaseMetaDataTest extends TestCase {
+public class DatabaseMetaDataTest extends TestCase
+{
 
   private Connection _conn;
 
-  public DatabaseMetaDataTest(String name) {
+  public DatabaseMetaDataTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     TestUtil.dropSequence(_conn, "sercoltest_a_seq");
     TestUtil.createTable(_conn, "sercoltest", "a serial, b int");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropSequence(_conn, "sercoltest_a_seq");
     TestUtil.dropTable(_conn, "sercoltest");
     TestUtil.closeDB(_conn);
   }
 
-  public void testGetClientInfoProperties() throws Exception {
+  public void testGetClientInfoProperties() throws Exception
+  {
     DatabaseMetaData dbmd = _conn.getMetaData();
 
     ResultSet rs = dbmd.getClientInfoProperties();
-    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0")) {
+    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0"))
+    {
       assertTrue(!rs.next());
       return;
     }
@@ -50,7 +56,8 @@ public class DatabaseMetaDataTest extends TestCase {
     assertEquals("ApplicationName", rs.getString("NAME"));
   }
 
-  public void testGetColumnsForAutoIncrement() throws Exception {
+  public void testGetColumnsForAutoIncrement() throws Exception
+  {
     DatabaseMetaData dbmd = _conn.getMetaData();
 
     ResultSet rs = dbmd.getColumns("%", "%", "sercoltest", "%");
@@ -65,12 +72,14 @@ public class DatabaseMetaDataTest extends TestCase {
     assertTrue(!rs.next());
   }
 
-  public void testGetSchemas() throws SQLException {
+  public void testGetSchemas() throws SQLException
+  {
     DatabaseMetaData dbmd = _conn.getMetaData();
 
     ResultSet rs = dbmd.getSchemas("", "publ%");
 
-    if (!TestUtil.haveMinimumServerVersion(_conn, "7.3")) {
+    if (!TestUtil.haveMinimumServerVersion(_conn, "7.3"))
+    {
       assertTrue(!rs.next());
       return;
     }

@@ -27,26 +27,31 @@ import java.util.TimeZone;
  * help prevent previous problems from re-occuring ;-)
  *
  */
-public class TimeTest extends TestCase {
+public class TimeTest extends TestCase
+{
 
   private Connection con;
   private boolean testSetTime = false;
 
-  public TimeTest(String name) {
+  public TimeTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTempTable(con, "testtime", "tm time, tz time with time zone");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, "testtime");
     TestUtil.closeDB(con);
   }
 
-  private long extractMillis(long time) {
+  private long extractMillis(long time)
+  {
     return (time >= 0) ? (time % 1000) : (time % 1000 + 1000);
   }
 
@@ -54,7 +59,8 @@ public class TimeTest extends TestCase {
   *
   * Test use of calendar
   */
-  public void testGetTimeZone() throws Exception {
+  public void testGetTimeZone() throws Exception
+  {
     final Time midnight = new Time(0, 0, 0);
     Statement stmt = con.createStatement();
     Calendar cal = Calendar.getInstance();
@@ -97,9 +103,11 @@ public class TimeTest extends TestCase {
 
     // Pre 1.4 JVM's considered the nanos field completely separate
     // and wouldn't return it in getTime()
-    if (TestUtil.haveMinimumJVMVersion("1.4")) {
+    if (TestUtil.haveMinimumJVMVersion("1.4"))
+    {
       assertEquals(100, extractMillis(timestamp.getTime()));
-    } else {
+    } else
+    {
       assertEquals(100, extractMillis(timestamp.getTime() + timestamp.getNanos() / 1000000));
     }
     assertEquals(100000000, timestamp.getNanos());
@@ -112,9 +120,11 @@ public class TimeTest extends TestCase {
 
     // Pre 1.4 JVM's considered the nanos field completely separate
     // and wouldn't return it in getTime()
-    if (TestUtil.haveMinimumJVMVersion("1.4")) {
+    if (TestUtil.haveMinimumJVMVersion("1.4"))
+    {
       assertEquals(10, extractMillis(timestamptz.getTime()));
-    } else {
+    } else
+    {
       assertEquals(10, extractMillis(timestamptz.getTime() + timestamptz.getNanos() / 1000000));
     }
     assertEquals(10000000, timestamptz.getNanos());
@@ -135,7 +145,8 @@ public class TimeTest extends TestCase {
   /*
    * Tests the time methods in ResultSet
    */
-  public void testGetTime() throws SQLException {
+  public void testGetTime() throws SQLException
+  {
     Statement stmt = con.createStatement();
 
     assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testtime", "'01:02:03'")));
@@ -158,7 +169,8 @@ public class TimeTest extends TestCase {
   /*
    * Tests the time methods in PreparedStatement
    */
-  public void testSetTime() throws SQLException {
+  public void testSetTime() throws SQLException
+  {
     PreparedStatement ps = con.prepareStatement(TestUtil.insertSQL("testtime", "?"));
     Statement stmt = con.createStatement();
 
@@ -206,7 +218,8 @@ public class TimeTest extends TestCase {
   /*
    * Helper for the TimeTests. It tests what should be in the db
    */
-  private void timeTest() throws SQLException {
+  private void timeTest() throws SQLException
+  {
     Statement st = con.createStatement();
     ResultSet rs;
     java.sql.Time t;
@@ -255,7 +268,8 @@ public class TimeTest extends TestCase {
     assertEquals(makeTime(8, 46, 44), t);
 
     // If we're checking for timezones.
-    if (testSetTime) {
+    if (testSetTime)
+    {
       assertTrue(rs.next());
       t = rs.getTime(1);
       assertNotNull(t);
@@ -280,7 +294,8 @@ public class TimeTest extends TestCase {
     rs.close();
   }
 
-  private java.sql.Time makeTime(int h, int m, int s) {
+  private java.sql.Time makeTime(int h, int m, int s)
+  {
     return java.sql.Time.valueOf(TestUtil.fix(h, 2) + ":"
         + TestUtil.fix(m, 2) + ":"
         + TestUtil.fix(s, 2));

@@ -16,19 +16,23 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class CustomizeDefaultFetchSizeTest {
+public class CustomizeDefaultFetchSizeTest
+{
 
   private Connection connection;
 
   @After
-  public void tearDown() throws Exception {
-    if (connection != null) {
+  public void tearDown() throws Exception
+  {
+    if (connection != null)
+    {
       TestUtil.closeDB(connection);
     }
   }
 
   @Test
-  public void testSetPredefineDefaultFetchSizeOnStatement() throws Exception {
+  public void testSetPredefineDefaultFetchSizeOnStatement() throws Exception
+  {
     final int waitFetchSize = 13;
     Properties properties = new Properties();
     PGProperty.DEFAULT_ROW_FETCH_SIZE.set(properties, waitFetchSize);
@@ -49,7 +53,8 @@ public class CustomizeDefaultFetchSizeTest {
 
 
   @Test
-  public void testSetPredefineDefaultFetchSizeOnPreparedStatement() throws Exception {
+  public void testSetPredefineDefaultFetchSizeOnPreparedStatement() throws Exception
+  {
     final int waitFetchSize = 14;
 
     Properties properties = new Properties();
@@ -68,7 +73,8 @@ public class CustomizeDefaultFetchSizeTest {
   }
 
   @Test(expected = SQLException.class)
-  public void testNotAvailableSpecifyNegativeFetchSize() throws Exception {
+  public void testNotAvailableSpecifyNegativeFetchSize() throws Exception
+  {
     Properties properties = new Properties();
     PGProperty.DEFAULT_ROW_FETCH_SIZE.set(properties, Integer.MIN_VALUE);
 

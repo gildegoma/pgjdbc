@@ -1,8 +1,10 @@
 package org.postgresql.util;
 
-public class PGJDBCMain {
+public class PGJDBCMain
+{
 
-  public static void main(String[] args) {
+  public static void main(String[] args)
+  {
 
     PSQLDriverVersion.main(args);
 

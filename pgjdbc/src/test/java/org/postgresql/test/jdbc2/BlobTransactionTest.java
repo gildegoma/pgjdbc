@@ -28,16 +28,19 @@ import javax.sql.rowset.serial.SerialBlob;
  * Test that oid/lob are accessible in concurrent connection, in presence of the lo_manage trigger
  * Require the lo module accessible in $libdir
  */
-public class BlobTransactionTest extends TestCase {
+public class BlobTransactionTest extends TestCase
+{
 
   private Connection con;
   private Connection con2;
 
-  public BlobTransactionTest(String name) {
+  public BlobTransactionTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
     con2 = TestUtil.openDB();
@@ -54,20 +57,24 @@ public class BlobTransactionTest extends TestCase {
  */
     Connection privilegedCon = TestUtil.openPrivilegedDB();
     st = privilegedCon.createStatement();
-    try {
+    try
+    {
       sql =
           "CREATE OR REPLACE FUNCTION lo_manage() RETURNS pg_catalog.trigger AS '$libdir/lo' LANGUAGE C";
       st.executeUpdate(sql);
-    } finally {
+    } finally
+    {
       st.close();
     }
 
     st = privilegedCon.createStatement();
-    try {
+    try
+    {
       sql =
           "CREATE TRIGGER testblob_lomanage BEFORE UPDATE OR DELETE ON testblob FOR EACH ROW EXECUTE PROCEDURE lo_manage(lo)";
       st.executeUpdate(sql);
-    } finally {
+    } finally
+    {
       st.close();
     }
 
@@ -75,40 +82,52 @@ public class BlobTransactionTest extends TestCase {
     con2.setAutoCommit(false);
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.closeDB(con2);
 
     con.setAutoCommit(true);
-    try {
+    try
+    {
       Statement stmt = con.createStatement();
-      try {
+      try
+      {
         stmt.execute("SELECT lo_unlink(lo) FROM testblob");
-      } finally {
-        try {
+      } finally
+      {
+        try
+        {
           stmt.close();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
         }
       }
-    } finally {
+    } finally
+    {
       TestUtil.dropTable(con, "testblob");
       TestUtil.closeDB(con);
     }
   }
 
-  private byte[] randomData() {
+  private byte[] randomData()
+  {
     byte[] data = new byte[64 * 1024 * 8];
-    for (int i = 0; i < data.length; ++i) {
+    for (int i = 0; i < data.length; ++i)
+    {
       data[i] = (byte) (Math.random() * 256);
     }
     return data;
   }
 
-  private byte[] readInputStream(InputStream is) throws IOException {
+  private byte[] readInputStream(InputStream is) throws IOException
+  {
     byte[] result = new byte[1024];
     int readPos = 0;
     int d;
-    while ((d = is.read()) != -1) {
-      if (readPos == result.length) {
+    while ((d = is.read()) != -1)
+    {
+      if (readPos == result.length)
+      {
         result = Arrays.copyOf(result, result.length * 2);
       }
       result[readPos++] = (byte) d;
@@ -117,7 +136,8 @@ public class BlobTransactionTest extends TestCase {
     return Arrays.copyOf(result, readPos);
   }
 
-  public void testConcurrentReplace() throws SQLException, IOException {
+  public void testConcurrentReplace() throws SQLException, IOException
+  {
 //        Statement stmt = con.createStatement();
 //        stmt.execute("INSERT INTO testblob(id,lo) VALUES ('1', lo_creat(-1))");
 //        ResultSet rs = stmt.executeQuery("SELECT lo FROM testblob");
@@ -153,7 +173,8 @@ public class BlobTransactionTest extends TestCase {
     Blob initContentBlob = rs2.getBlob(1);
     byte[] initialContentReRead = readInputStream(initContentBlob.getBinaryStream());
     assertEquals(initialContentReRead.length, initialData.length);
-    for (int i = 0; i < initialContentReRead.length; ++i) {
+    for (int i = 0; i < initialContentReRead.length; ++i)
+    {
       assertEquals(initialContentReRead[i], initialData[i]);
     }
 
@@ -170,7 +191,8 @@ public class BlobTransactionTest extends TestCase {
     initContentBlob = rs2.getBlob(1);
     initialContentReRead = readInputStream(initContentBlob.getBinaryStream());
     assertEquals(initialContentReRead.length, initialData.length);
-    for (int i = 0; i < initialContentReRead.length; ++i) {
+    for (int i = 0; i < initialContentReRead.length; ++i)
+    {
       assertEquals(initialContentReRead[i], initialData[i]);
     }
 

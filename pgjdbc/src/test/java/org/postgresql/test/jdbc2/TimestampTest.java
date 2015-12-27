@@ -32,22 +32,26 @@ import java.util.TimeZone;
  * timestamp without time zone datatypes
  *
  */
-public class TimestampTest extends TestCase {
+public class TimestampTest extends TestCase
+{
 
   private Connection con;
 
-  public TimestampTest(String name) {
+  public TimestampTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, TSWTZ_TABLE, "ts timestamp with time zone");
     TestUtil.createTable(con, TSWOTZ_TABLE, "ts timestamp without time zone");
     TestUtil.createTable(con, DATE_TABLE, "ts date");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, TSWTZ_TABLE);
     TestUtil.dropTable(con, TSWOTZ_TABLE);
     TestUtil.dropTable(con, DATE_TABLE);
@@ -57,7 +61,8 @@ public class TimestampTest extends TestCase {
   /**
    * Ensure the driver doesn't modify a Calendar that is passed in.
    */
-  public void testCalendarModification() throws SQLException {
+  public void testCalendarModification() throws SQLException
+  {
     Calendar cal = Calendar.getInstance();
     Calendar origCal = (Calendar) cal.clone();
     PreparedStatement ps = con.prepareStatement("INSERT INTO " + TSWOTZ_TABLE + " VALUES (?)");
@@ -94,27 +99,32 @@ public class TimestampTest extends TestCase {
     stmt.close();
   }
 
-  public void testInfinity() throws SQLException {
+  public void testInfinity() throws SQLException
+  {
     runInfinityTests(TSWTZ_TABLE, PGStatement.DATE_POSITIVE_INFINITY);
     runInfinityTests(TSWTZ_TABLE, PGStatement.DATE_NEGATIVE_INFINITY);
     runInfinityTests(TSWOTZ_TABLE, PGStatement.DATE_POSITIVE_INFINITY);
     runInfinityTests(TSWOTZ_TABLE, PGStatement.DATE_NEGATIVE_INFINITY);
-    if (TestUtil.haveMinimumServerVersion(con, "8.4")) {
+    if (TestUtil.haveMinimumServerVersion(con, "8.4"))
+    {
       runInfinityTests(DATE_TABLE, PGStatement.DATE_POSITIVE_INFINITY);
       runInfinityTests(DATE_TABLE, PGStatement.DATE_NEGATIVE_INFINITY);
     }
   }
 
-  private void runInfinityTests(String table, long value) throws SQLException {
+  private void runInfinityTests(String table, long value) throws SQLException
+  {
     GregorianCalendar cal = new GregorianCalendar();
     // Pick some random timezone that is hopefully different than ours
     // and exists in this JVM.
     cal.setTimeZone(TimeZone.getTimeZone("Europe/Warsaw"));
 
     String strValue;
-    if (value == PGStatement.DATE_POSITIVE_INFINITY) {
+    if (value == PGStatement.DATE_POSITIVE_INFINITY)
+    {
       strValue = "infinity";
-    } else {
+    } else
+    {
       strValue = "-infinity";
     }
 
@@ -131,7 +141,8 @@ public class TimestampTest extends TestCase {
 
     stmt = con.createStatement();
     ResultSet rs = stmt.executeQuery("select ts from " + table);
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals(strValue, rs.getString(1));
 
       Timestamp ts = rs.getTimestamp(1);
@@ -154,7 +165,8 @@ public class TimestampTest extends TestCase {
     * we insert a known string value (don't use setTimestamp) then see that
     * we get back the same value from getTimestamp
    */
-  public void testGetTimestampWTZ() throws SQLException {
+  public void testGetTimestampWTZ() throws SQLException
+  {
     Statement stmt = con.createStatement();
     TimestampUtils tsu = ((BaseConnection) con).getTimestampUtils();
 
@@ -215,7 +227,8 @@ public class TimestampTest extends TestCase {
     * we get back the same value from getTimestamp (which we know works as it was tested
     * independently of setTimestamp
    */
-  public void testSetTimestampWTZ() throws SQLException {
+  public void testSetTimestampWTZ() throws SQLException
+  {
     Statement stmt = con.createStatement();
     PreparedStatement pstmt = con.prepareStatement(TestUtil.insertSQL(TSWTZ_TABLE, "?"));
 
@@ -284,7 +297,8 @@ public class TimestampTest extends TestCase {
     * we insert a known string value (don't use setTimestamp) then see that
     * we get back the same value from getTimestamp
    */
-  public void testGetTimestampWOTZ() throws SQLException {
+  public void testGetTimestampWOTZ() throws SQLException
+  {
     Statement stmt = con.createStatement();
     TimestampUtils tsu = ((BaseConnection) con).getTimestampUtils();
 
@@ -364,7 +378,8 @@ public class TimestampTest extends TestCase {
     * we get back the same value from getTimestamp (which we know works as it was tested
     * independently of setTimestamp
    */
-  public void testSetTimestampWOTZ() throws SQLException {
+  public void testSetTimestampWOTZ() throws SQLException
+  {
     Statement stmt = con.createStatement();
     PreparedStatement pstmt = con.prepareStatement(TestUtil.insertSQL(TSWOTZ_TABLE, "?"));
 
@@ -453,7 +468,8 @@ public class TimestampTest extends TestCase {
   /*
    * Helper for the TimestampTests. It tests what should be in the db
    */
-  private void timestampTestWTZ() throws SQLException {
+  private void timestampTestWTZ() throws SQLException
+  {
     Statement stmt = con.createStatement();
     ResultSet rs;
     java.sql.Timestamp t;
@@ -461,7 +477,8 @@ public class TimestampTest extends TestCase {
     rs = stmt.executeQuery("select ts from " + TSWTZ_TABLE); //removed the order by ts
     assertNotNull(rs);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
       assertTrue(rs.next());
       t = rs.getTimestamp(1);
       assertNotNull(t);
@@ -534,7 +551,8 @@ public class TimestampTest extends TestCase {
   /*
    * Helper for the TimestampTests. It tests what should be in the db
    */
-  private void timestampTestWOTZ() throws SQLException {
+  private void timestampTestWOTZ() throws SQLException
+  {
     Statement stmt = con.createStatement();
     ResultSet rs;
     java.sql.Timestamp t;
@@ -542,7 +560,8 @@ public class TimestampTest extends TestCase {
     rs = stmt.executeQuery("select ts from " + TSWOTZ_TABLE); //removed the order by ts
     assertNotNull(rs);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
       assertTrue(rs.next());
       t = rs.getTimestamp(1);
       assertNotNull(t);
@@ -643,10 +662,12 @@ public class TimestampTest extends TestCase {
   }
 
   private static java.sql.Timestamp getTimestamp(int y, int m, int d, int h, int mn, int se, int f,
-      String tz) {
+      String tz)
+  {
     java.sql.Timestamp l_return = null;
     java.text.DateFormat l_df;
-    try {
+    try
+    {
       String l_ts;
       l_ts = TestUtil.fix(y, 4) + "-"
           + TestUtil.fix(m, 2) + "-"
@@ -655,16 +676,19 @@ public class TimestampTest extends TestCase {
           + TestUtil.fix(mn, 2) + ":"
           + TestUtil.fix(se, 2) + " ";
 
-      if (tz == null) {
+      if (tz == null)
+      {
         l_df = new java.text.SimpleDateFormat("y-M-d H:m:s");
-      } else {
+      } else
+      {
         l_ts = l_ts + tz;
         l_df = new java.text.SimpleDateFormat("y-M-d H:m:s z");
       }
       java.util.Date l_date = l_df.parse(l_ts);
       l_return = new java.sql.Timestamp(l_date.getTime());
       l_return.setNanos(f);
-    } catch (Exception ex) {
+    } catch (Exception ex)
+    {
       fail(ex.getMessage());
     }
     return l_return;

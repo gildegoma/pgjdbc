@@ -17,23 +17,28 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class SchemaTest extends TestCase {
+public class SchemaTest extends TestCase
+{
 
   private Connection _conn;
 
   private boolean dropUserSchema;
 
-  public SchemaTest(String name) {
+  public SchemaTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     Statement stmt = _conn.createStatement();
-    try {
+    try
+    {
       stmt.execute("CREATE SCHEMA " + TestUtil.getUser());
       dropUserSchema = true;
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
             /* assume schema existed */
     }
     stmt.execute("CREATE SCHEMA schema1");
@@ -48,10 +53,12 @@ public class SchemaTest extends TestCase {
     TestUtil.createTable(_conn, "\"UpperCase\".table3", "id integer");
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     _conn.setSchema(null);
     Statement stmt = _conn.createStatement();
-    if (dropUserSchema) {
+    if (dropUserSchema)
+    {
       stmt.execute("DROP SCHEMA " + TestUtil.getUser() + " CASCADE");
     }
     stmt.execute("DROP SCHEMA schema1 CASCADE");
@@ -67,7 +74,8 @@ public class SchemaTest extends TestCase {
   /**
    * Test that what you set is what you get
    */
-  public void testGetSetSchema() throws SQLException {
+  public void testGetSetSchema() throws SQLException
+  {
     _conn.setSchema("schema1");
     assertEquals("schema1", _conn.getSchema());
     _conn.setSchema("schema2");
@@ -86,46 +94,59 @@ public class SchemaTest extends TestCase {
    * Test that setting the schema allows to access objects of this schema without prefix, hide
    * objects from other schemas but doesn't prevent to prefix-access to them.
    */
-  public void testUsingSchema() throws SQLException {
+  public void testUsingSchema() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
-    try {
-      try {
+    try
+    {
+      try
+      {
         _conn.setSchema("schema1");
         stmt.executeQuery(TestUtil.selectSQL("table1", "*"));
         stmt.executeQuery(TestUtil.selectSQL("schema2.table2", "*"));
-        try {
+        try
+        {
           stmt.executeQuery(TestUtil.selectSQL("table2", "*"));
           fail("Objects of schema2 should not be visible without prefix");
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
           // expected
         }
 
         _conn.setSchema("schema2");
         stmt.executeQuery(TestUtil.selectSQL("table2", "*"));
         stmt.executeQuery(TestUtil.selectSQL("schema1.table1", "*"));
-        try {
+        try
+        {
           stmt.executeQuery(TestUtil.selectSQL("table1", "*"));
           fail("Objects of schema1 should not be visible without prefix");
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
           // expected
         }
 
         _conn.setSchema("UpperCase");
         stmt.executeQuery(TestUtil.selectSQL("table3", "*"));
         stmt.executeQuery(TestUtil.selectSQL("schema1.table1", "*"));
-        try {
+        try
+        {
           stmt.executeQuery(TestUtil.selectSQL("table1", "*"));
           fail("Objects of schema1 should not be visible without prefix");
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
           // expected
         }
-      } catch (SQLException e) {
+      } catch (SQLException e)
+      {
         fail("Could not find expected schema elements: " + e.getMessage());
       }
-    } finally {
-      try {
+    } finally
+    {
+      try
+      {
         stmt.close();
-      } catch (SQLException e) {
+      } catch (SQLException e)
+      {
       }
     }
   }
@@ -133,7 +154,8 @@ public class SchemaTest extends TestCase {
   /**
    * Test that get schema returns the schema with the highest priority in the search path
    */
-  public void testMultipleSearchPath() throws SQLException {
+  public void testMultipleSearchPath() throws SQLException
+  {
     execute("SET search_path TO schema1,schema2");
     assertEquals("schema1", _conn.getSchema());
 
@@ -141,40 +163,51 @@ public class SchemaTest extends TestCase {
     assertEquals("schema ,6", _conn.getSchema());
   }
 
-  public void testSchemaInProperties() throws Exception {
+  public void testSchemaInProperties() throws Exception
+  {
     Properties properties = new Properties();
     properties.setProperty("currentSchema", "schema1");
     Connection conn = TestUtil.openDB(properties);
-    try {
+    try
+    {
       assertEquals("schema1", conn.getSchema());
 
       Statement stmt = conn.createStatement();
       stmt.executeQuery(TestUtil.selectSQL("table1", "*"));
       stmt.executeQuery(TestUtil.selectSQL("schema2.table2", "*"));
-      try {
+      try
+      {
         stmt.executeQuery(TestUtil.selectSQL("table2", "*"));
         fail("Objects of schema2 should not be visible without prefix");
-      } catch (SQLException e) {
+      } catch (SQLException e)
+      {
         // expected
       }
-    } finally {
+    } finally
+    {
       TestUtil.closeDB(conn);
     }
   }
 
-  public void testSchemaPath$User() throws Exception {
+  public void testSchemaPath$User() throws Exception
+  {
     execute("SET search_path TO \"$user\",public,schema2");
     assertEquals(TestUtil.getUser(), _conn.getSchema());
   }
 
-  private void execute(String sql) throws SQLException {
+  private void execute(String sql) throws SQLException
+  {
     Statement stmt = _conn.createStatement();
-    try {
+    try
+    {
       stmt.execute(sql);
-    } finally {
-      try {
+    } finally
+    {
+      try
+      {
         stmt.close();
-      } catch (SQLException e) {
+      } catch (SQLException e)
+      {
       }
     }
   }

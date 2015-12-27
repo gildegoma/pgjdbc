@@ -11,7 +11,8 @@ package org.postgresql.hostchooser;
 /**
  * Known state of a server.
  */
-public enum HostStatus {
+public enum HostStatus
+{
   ConnectFail,
   ConnectOK,
   Master,

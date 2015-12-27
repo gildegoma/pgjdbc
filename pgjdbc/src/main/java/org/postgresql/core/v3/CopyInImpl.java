@@ -29,17 +29,21 @@ import java.sql.SQLException;
  * ReadyForQuery unlock() connection for use by other operations &lt;-return:
  * CopyInImpl.getUpdatedRowCount()
  */
-public class CopyInImpl extends CopyOperationImpl implements CopyIn {
+public class CopyInImpl extends CopyOperationImpl implements CopyIn
+{
 
-  public void writeToCopy(byte[] data, int off, int siz) throws SQLException {
+  public void writeToCopy(byte[] data, int off, int siz) throws SQLException
+  {
     queryExecutor.writeToCopy(this, data, off, siz);
   }
 
-  public void flushCopy() throws SQLException {
+  public void flushCopy() throws SQLException
+  {
     queryExecutor.flushCopy(this);
   }
 
-  public long endCopy() throws SQLException {
+  public long endCopy() throws SQLException
+  {
     return queryExecutor.endCopy(this);
   }
 }

@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class TypeInfoCache implements TypeInfo {
+public class TypeInfoCache implements TypeInfo
+{
 
   // pgname (String) -> java.sql.Types (Integer)
   private Map<String, Integer> _pgNameToSQLType;
@@ -100,7 +101,8 @@ public class TypeInfoCache implements TypeInfo {
    */
   private final static HashMap<String, String> typeAliases;
 
-  static {
+  static
+  {
     typeAliases = new HashMap<String, String>();
     typeAliases.put("smallint", "int2");
     typeAliases.put("integer", "int4");
@@ -111,7 +113,8 @@ public class TypeInfoCache implements TypeInfo {
     typeAliases.put("decimal", "numeric");
   }
 
-  public TypeInfoCache(BaseConnection conn, int unknownLength) {
+  public TypeInfoCache(BaseConnection conn, int unknownLength)
+  {
     _conn = conn;
     _unknownLength = unknownLength;
     _oidToPgName = new HashMap<Integer, String>();
@@ -125,7 +128,8 @@ public class TypeInfoCache implements TypeInfo {
     // from getPGTypeNamesWithSQLTypes()
     _pgNameToSQLType = Collections.synchronizedMap(new HashMap<String, Integer>());
 
-    for (Object[] type : types) {
+    for (Object[] type : types)
+    {
       String pgTypeName = (String) type[0];
       Integer oid = (Integer) type[1];
       Integer sqlType = (Integer) type[2];
@@ -139,7 +143,8 @@ public class TypeInfoCache implements TypeInfo {
   }
 
   public synchronized void addCoreType(String pgTypeName, Integer oid, Integer sqlType,
-      String javaClass, Integer arrayOid) {
+      String javaClass, Integer arrayOid)
+  {
     _pgNameToJavaClass.put(pgTypeName, javaClass);
     _pgNameToOid.put(pgTypeName, oid);
     _oidToPgName.put(oid, pgTypeName);
@@ -157,7 +162,8 @@ public class TypeInfoCache implements TypeInfo {
     _pgNameToJavaClass.put(pgArrayTypeName, "java.sql.Array");
     _pgNameToSQLType.put(pgArrayTypeName, Types.ARRAY);
     pgArrayTypeName = "_" + pgTypeName;
-    if (!_pgNameToJavaClass.containsKey(pgArrayTypeName)) {
+    if (!_pgNameToJavaClass.containsKey(pgArrayTypeName))
+    {
       _pgNameToJavaClass.put(pgArrayTypeName, "java.sql.Array");
       _pgNameToSQLType.put(pgArrayTypeName, Types.ARRAY);
     }
@@ -165,35 +171,43 @@ public class TypeInfoCache implements TypeInfo {
 
 
   public synchronized void addDataType(String type, Class<? extends PGobject> klass)
-      throws SQLException {
+      throws SQLException
+  {
     _pgNameToPgObject.put(type, klass);
     _pgNameToJavaClass.put(type, klass.getName());
   }
 
-  public Iterator<String> getPGTypeNamesWithSQLTypes() {
+  public Iterator<String> getPGTypeNamesWithSQLTypes()
+  {
     return _pgNameToSQLType.keySet().iterator();
   }
 
-  public int getSQLType(int oid) throws SQLException {
+  public int getSQLType(int oid) throws SQLException
+  {
     return getSQLType(getPGType(oid));
   }
 
-  public synchronized int getSQLType(String pgTypeName) throws SQLException {
-    if (pgTypeName.endsWith("[]")) {
+  public synchronized int getSQLType(String pgTypeName) throws SQLException
+  {
+    if (pgTypeName.endsWith("[]"))
+    {
       return Types.ARRAY;
     }
     Integer i = _pgNameToSQLType.get(pgTypeName);
-    if (i != null) {
+    if (i != null)
+    {
       return i;
     }
 
-    if (_getTypeInfoStatement == null) {
+    if (_getTypeInfoStatement == null)
+    {
       // There's no great way of telling what's an array type.
       // People can name their own types starting with _.
       // Other types use typelem that aren't actually arrays, like box.
       //
       String sql;
-      if (_conn.haveMinimumServerVersion(ServerVersion.v8_0)) {
+      if (_conn.haveMinimumServerVersion(ServerVersion.v8_0))
+      {
         // in case of multiple records (in different schemas) choose the one from the current schema,
         // otherwise take the last version of a type that is at least more deterministic then before
         // (keeping old behaviour of finding types, that should not be found without correct search path)
@@ -210,10 +224,12 @@ public class TypeInfoCache implements TypeInfo {
             + "    ON sp.nspoid = typnamespace "
             + " WHERE typname = ? "
             + " ORDER BY sp.r, pg_type.oid DESC LIMIT 1;";
-      } else if (_conn.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      } else if (_conn.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql =
             "SELECT typinput='array_in'::regproc, typtype FROM pg_catalog.pg_type WHERE typname = ? ORDER BY oid DESC LIMIT 1";
-      } else {
+      } else
+      {
         sql = "SELECT typinput='array_in'::regproc, typtype FROM pg_type WHERE typname = ? LIMIT 1";
       }
 
@@ -224,47 +240,59 @@ public class TypeInfoCache implements TypeInfo {
 
     // Go through BaseStatement to avoid transaction start.
     if (!((BaseStatement) _getTypeInfoStatement).executeWithFlags(
-        QueryExecutor.QUERY_SUPPRESS_BEGIN)) {
+        QueryExecutor.QUERY_SUPPRESS_BEGIN))
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
     ResultSet rs = _getTypeInfoStatement.getResultSet();
 
     Integer type = null;
-    if (rs.next()) {
+    if (rs.next())
+    {
       boolean isArray = rs.getBoolean(1);
       String typtype = rs.getString(2);
-      if (isArray) {
+      if (isArray)
+      {
         type = Types.ARRAY;
-      } else if ("c".equals(typtype)) {
+      } else if ("c".equals(typtype))
+      {
         type = Types.STRUCT;
-      } else if ("d".equals(typtype)) {
+      } else if ("d".equals(typtype))
+      {
         type = Types.DISTINCT;
-      } else if ("e".equals(typtype)) {
+      } else if ("e".equals(typtype))
+      {
         type = Types.VARCHAR;
       }
     }
 
-    if (type == null) {
+    if (type == null)
+    {
       type = Types.OTHER;
     }
     rs.close();
 
-    if (pgTypeName != null) {
+    if (pgTypeName != null)
+    {
       _pgNameToSQLType.put(pgTypeName, type);
     }
     return type;
   }
 
-  private PreparedStatement getOidStatement(String pgTypeName) throws SQLException {
+  private PreparedStatement getOidStatement(String pgTypeName) throws SQLException
+  {
     boolean isArray = pgTypeName.endsWith("[]");
     boolean hasQuote = pgTypeName.contains("\"");
     int dotIndex = pgTypeName.indexOf('.');
 
-    if (dotIndex == -1 && !hasQuote) {
-      if (_getOidStatementSimple == null) {
+    if (dotIndex == -1 && !hasQuote)
+    {
+      if (_getOidStatementSimple == null)
+      {
         String sql;
-        if (_conn.haveMinimumServerVersion(ServerVersion.v8_0)) {
+        if (_conn.haveMinimumServerVersion(ServerVersion.v8_0))
+        {
           // see comments in @getSQLType()
           sql = "SELECT pg_type.oid "
               + "  FROM pg_catalog.pg_type "
@@ -280,9 +308,11 @@ public class TypeInfoCache implements TypeInfo {
               + "    ON sp.nspoid = typnamespace "
               + " WHERE typname = ? "
               + " ORDER BY sp.r, pg_type.oid DESC LIMIT 1;";
-        } else if (_conn.haveMinimumServerVersion(ServerVersion.v7_3)) {
+        } else if (_conn.haveMinimumServerVersion(ServerVersion.v7_3))
+        {
           sql = "SELECT oid FROM pg_catalog.pg_type WHERE typname = ? ORDER BY oid DESC LIMIT 1";
-        } else {
+        } else
+        {
           sql = "SELECT oid FROM pg_type WHERE typname = ? ORDER BY oid DESC LIMIT 1";
         }
         _getOidStatementSimple = _conn.prepareStatement(sql);
@@ -295,8 +325,10 @@ public class TypeInfoCache implements TypeInfo {
       return _getOidStatementSimple;
     }
     PreparedStatement oidStatementComplex;
-    if (isArray) {
-      if (_getOidStatementComplexArray == null) {
+    if (isArray)
+    {
+      if (_getOidStatementComplexArray == null)
+      {
         String sql = "SELECT t.typarray "
             + "  FROM pg_catalog.pg_type t"
             + "  JOIN pg_catalog.pg_namespace n ON t.typnamespace = n.oid"
@@ -305,8 +337,10 @@ public class TypeInfoCache implements TypeInfo {
         _getOidStatementComplexArray = _conn.prepareStatement(sql);
       }
       oidStatementComplex = _getOidStatementComplexArray;
-    } else {
-      if (_getOidStatementComplexNonArray == null) {
+    } else
+    {
+      if (_getOidStatementComplexNonArray == null)
+      {
         String sql = "SELECT t.oid "
             + "  FROM pg_catalog.pg_type t"
             + "  JOIN pg_catalog.pg_namespace n ON t.typnamespace = n.oid"
@@ -320,33 +354,43 @@ public class TypeInfoCache implements TypeInfo {
     String schema;
     String name;
     //simple use case
-    if (dotIndex == -1) {
+    if (dotIndex == -1)
+    {
       schema = null;
       name = fullName;
-    } else {
-      if (fullName.startsWith("\"")) {
-        if (fullName.endsWith("\"")) {
+    } else
+    {
+      if (fullName.startsWith("\""))
+      {
+        if (fullName.endsWith("\""))
+        {
           String[] parts = fullName.split("\"\\.\"");
           schema = parts.length == 2 ? parts[0] + "\"" : null;
           name = parts.length == 2 ? "\"" + parts[1] : parts[0];
-        } else {
+        } else
+        {
           int lastDotIndex = fullName.lastIndexOf('.');
           name = fullName.substring(lastDotIndex + 1);
           schema = fullName.substring(0, lastDotIndex);
         }
-      } else {
+      } else
+      {
         schema = fullName.substring(0, dotIndex);
         name = fullName.substring(dotIndex + 1);
       }
     }
-    if (schema != null && schema.startsWith("\"") && schema.endsWith("\"")) {
+    if (schema != null && schema.startsWith("\"") && schema.endsWith("\""))
+    {
       schema = schema.substring(1, schema.length() - 1);
-    } else if (schema != null) {
+    } else if (schema != null)
+    {
       schema = schema.toLowerCase();
     }
-    if (name.startsWith("\"") && name.endsWith("\"")) {
+    if (name.startsWith("\"") && name.endsWith("\""))
+    {
       name = name.substring(1, name.length() - 1);
-    } else {
+    } else
+    {
       name = name.toLowerCase();
     }
     oidStatementComplex.setString(1, name);
@@ -355,22 +399,26 @@ public class TypeInfoCache implements TypeInfo {
     return oidStatementComplex;
   }
 
-  public synchronized int getPGType(String pgTypeName) throws SQLException {
+  public synchronized int getPGType(String pgTypeName) throws SQLException
+  {
     Integer oid = _pgNameToOid.get(pgTypeName);
-    if (oid != null) {
+    if (oid != null)
+    {
       return oid;
     }
 
     PreparedStatement oidStatement = getOidStatement(pgTypeName);
 
     // Go through BaseStatement to avoid transaction start.
-    if (!((BaseStatement) oidStatement).executeWithFlags(QueryExecutor.QUERY_SUPPRESS_BEGIN)) {
+    if (!((BaseStatement) oidStatement).executeWithFlags(QueryExecutor.QUERY_SUPPRESS_BEGIN))
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
     oid = Oid.UNSPECIFIED;
     ResultSet rs = oidStatement.getResultSet();
-    if (rs.next()) {
+    if (rs.next())
+    {
       oid = (int) rs.getLong(1);
       _oidToPgName.put(oid, pgTypeName);
     }
@@ -380,22 +428,28 @@ public class TypeInfoCache implements TypeInfo {
     return oid;
   }
 
-  public synchronized String getPGType(int oid) throws SQLException {
-    if (oid == Oid.UNSPECIFIED) {
+  public synchronized String getPGType(int oid) throws SQLException
+  {
+    if (oid == Oid.UNSPECIFIED)
+    {
       return null;
     }
 
     String pgTypeName = _oidToPgName.get(oid);
-    if (pgTypeName != null) {
+    if (pgTypeName != null)
+    {
       return pgTypeName;
     }
 
-    if (_getNameStatement == null) {
+    if (_getNameStatement == null)
+    {
       String sql;
-      if (_conn.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (_conn.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql =
             "SELECT n.nspname = ANY(current_schemas(true)), n.nspname, t.typname FROM pg_catalog.pg_type t JOIN pg_catalog.pg_namespace n ON t.typnamespace = n.oid WHERE t.oid = ?";
-      } else {
+      } else
+      {
         sql =
             "SELECT n.nspname = ANY(current_schemas(true)), n.nspname, t.typname FROM pg_type t JOIN pg_namespace n ON t.typnamespace = n.oid WHERE t.oid = ?";
       }
@@ -406,25 +460,30 @@ public class TypeInfoCache implements TypeInfo {
     _getNameStatement.setInt(1, oid);
 
     // Go through BaseStatement to avoid transaction start.
-    if (!((BaseStatement) _getNameStatement).executeWithFlags(QueryExecutor.QUERY_SUPPRESS_BEGIN)) {
+    if (!((BaseStatement) _getNameStatement).executeWithFlags(QueryExecutor.QUERY_SUPPRESS_BEGIN))
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
     ResultSet rs = _getNameStatement.getResultSet();
-    if (rs.next()) {
+    if (rs.next())
+    {
       boolean onPath = rs.getBoolean(1);
       String schema = rs.getString(2);
       String name = rs.getString(3);
-      if (onPath) {
+      if (onPath)
+      {
         pgTypeName = name;
         _pgNameToOid.put(schema + "." + name, oid);
-      } else {
+      } else
+      {
         //TODO: escaping !?
         pgTypeName = "\"" + schema + "\".\"" + name + "\"";
         //if all is lowercase add special type info
         //TODO: should probably check for all special chars
         if (schema.equals(schema.toLowerCase()) && schema.indexOf('.') == -1
-            && name.equals(name.toLowerCase()) && name.indexOf('.') == -1) {
+            && name.equals(name.toLowerCase()) && name.indexOf('.') == -1)
+        {
           _pgNameToOid.put(schema + "." + name, oid);
         }
       }
@@ -436,7 +495,8 @@ public class TypeInfoCache implements TypeInfo {
     return pgTypeName;
   }
 
-  public int getPGArrayType(String elementTypeName) throws SQLException {
+  public int getPGArrayType(String elementTypeName) throws SQLException
+  {
     elementTypeName = getTypeForAlias(elementTypeName);
     return getPGType(elementTypeName + "[]");
   }
@@ -450,30 +510,38 @@ public class TypeInfoCache implements TypeInfo {
    * @param oid input oid
    * @return oid of the array's base element or the provided oid (if not array)
    */
-  protected synchronized int convertArrayToBaseOid(int oid) {
+  protected synchronized int convertArrayToBaseOid(int oid)
+  {
     Integer i = _pgArrayToPgType.get(oid);
-    if (i == null) {
+    if (i == null)
+    {
       return oid;
     }
     return i;
   }
 
-  public synchronized char getArrayDelimiter(int oid) throws SQLException {
-    if (oid == Oid.UNSPECIFIED) {
+  public synchronized char getArrayDelimiter(int oid) throws SQLException
+  {
+    if (oid == Oid.UNSPECIFIED)
+    {
       return ',';
     }
 
     Character delim = _arrayOidToDelimiter.get(oid);
-    if (delim != null) {
+    if (delim != null)
+    {
       return delim;
     }
 
-    if (_getArrayDelimiterStatement == null) {
+    if (_getArrayDelimiterStatement == null)
+    {
       String sql;
-      if (_conn.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (_conn.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql =
             "SELECT e.typdelim FROM pg_catalog.pg_type t, pg_catalog.pg_type e WHERE t.oid = ? and t.typelem = e.oid";
-      } else {
+      } else
+      {
         sql = "SELECT e.typdelim FROM pg_type t, pg_type e WHERE t.oid = ? and t.typelem = e.oid";
       }
       _getArrayDelimiterStatement = _conn.prepareStatement(sql);
@@ -483,12 +551,14 @@ public class TypeInfoCache implements TypeInfo {
 
     // Go through BaseStatement to avoid transaction start.
     if (!((BaseStatement) _getArrayDelimiterStatement).executeWithFlags(
-        QueryExecutor.QUERY_SUPPRESS_BEGIN)) {
+        QueryExecutor.QUERY_SUPPRESS_BEGIN))
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
     ResultSet rs = _getArrayDelimiterStatement.getResultSet();
-    if (!rs.next()) {
+    if (!rs.next())
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
@@ -502,23 +572,29 @@ public class TypeInfoCache implements TypeInfo {
     return delim;
   }
 
-  public synchronized int getPGArrayElement(int oid) throws SQLException {
-    if (oid == Oid.UNSPECIFIED) {
+  public synchronized int getPGArrayElement(int oid) throws SQLException
+  {
+    if (oid == Oid.UNSPECIFIED)
+    {
       return Oid.UNSPECIFIED;
     }
 
     Integer pgType = _pgArrayToPgType.get(oid);
 
-    if (pgType != null) {
+    if (pgType != null)
+    {
       return pgType;
     }
 
-    if (_getArrayElementOidStatement == null) {
+    if (_getArrayElementOidStatement == null)
+    {
       String sql;
-      if (_conn.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (_conn.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql =
             "SELECT e.oid, n.nspname = ANY(current_schemas(true)), n.nspname, e.typname FROM pg_catalog.pg_type t JOIN pg_catalog.pg_type e ON t.typelem = e.oid JOIN pg_catalog.pg_namespace n ON t.typnamespace = n.oid WHERE t.oid = ?";
-      } else {
+      } else
+      {
         sql =
             "SELECT e.oid, n.nspname = ANY(current_schemas(true)), n.nspname, e.typname FROM pg_type t JOIN pg_type e ON t.typelem = e.oid JOIN pg_namespace n ON t.typnamespace = n.oid WHERE t.oid = ?";
       }
@@ -529,12 +605,14 @@ public class TypeInfoCache implements TypeInfo {
 
     // Go through BaseStatement to avoid transaction start.
     if (!((BaseStatement) _getArrayElementOidStatement).executeWithFlags(
-        QueryExecutor.QUERY_SUPPRESS_BEGIN)) {
+        QueryExecutor.QUERY_SUPPRESS_BEGIN))
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
     ResultSet rs = _getArrayElementOidStatement.getResultSet();
-    if (!rs.next()) {
+    if (!rs.next())
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
@@ -546,10 +624,12 @@ public class TypeInfoCache implements TypeInfo {
     _pgNameToOid.put(schema + "." + name, pgType);
     String fullName = "\"" + schema + "\".\"" + name + "\"";
     _pgNameToOid.put(fullName, pgType);
-    if (onPath && name.equals(name.toLowerCase())) {
+    if (onPath && name.equals(name.toLowerCase()))
+    {
       _oidToPgName.put(pgType, name);
       _pgNameToOid.put(name, pgType);
-    } else {
+    } else
+    {
       _oidToPgName.put(pgType, fullName);
     }
 
@@ -558,19 +638,23 @@ public class TypeInfoCache implements TypeInfo {
     return pgType;
   }
 
-  public synchronized Class<? extends PGobject> getPGobject(String type) {
+  public synchronized Class<? extends PGobject> getPGobject(String type)
+  {
     return _pgNameToPgObject.get(type);
   }
 
-  public synchronized String getJavaClass(int oid) throws SQLException {
+  public synchronized String getJavaClass(int oid) throws SQLException
+  {
     String pgTypeName = getPGType(oid);
 
     String result = _pgNameToJavaClass.get(pgTypeName);
-    if (result != null) {
+    if (result != null)
+    {
       return result;
     }
 
-    if (getSQLType(pgTypeName) == Types.ARRAY) {
+    if (getSQLType(pgTypeName) == Types.ARRAY)
+    {
       result = "java.sql.Array";
       _pgNameToJavaClass.put(pgTypeName, result);
     }
@@ -578,23 +662,29 @@ public class TypeInfoCache implements TypeInfo {
     return result;
   }
 
-  public String getTypeForAlias(String alias) {
+  public String getTypeForAlias(String alias)
+  {
     String type = typeAliases.get(alias);
-    if (type != null) {
+    if (type != null)
+    {
       return type;
     }
-    if (alias.indexOf('"') == -1) {
+    if (alias.indexOf('"') == -1)
+    {
       type = typeAliases.get(alias.toLowerCase());
-      if (type != null) {
+      if (type != null)
+      {
         return type;
       }
     }
     return alias;
   }
 
-  public int getPrecision(int oid, int typmod) {
+  public int getPrecision(int oid, int typmod)
+  {
     oid = convertArrayToBaseOid(oid);
-    switch (oid) {
+    switch (oid)
+    {
       case Oid.INT2:
         return 5;
 
@@ -615,7 +705,8 @@ public class TypeInfoCache implements TypeInfo {
         return 17;
 
       case Oid.NUMERIC:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return 0;
         }
         return ((typmod - 4) & 0xFFFF0000) >> 16;
@@ -626,7 +717,8 @@ public class TypeInfoCache implements TypeInfo {
 
       case Oid.BPCHAR:
       case Oid.VARCHAR:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return _unknownLength;
         }
         return typmod - 4;
@@ -645,7 +737,8 @@ public class TypeInfoCache implements TypeInfo {
         return typmod;
 
       case Oid.VARBIT:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return _unknownLength;
         }
         return typmod;
@@ -657,15 +750,18 @@ public class TypeInfoCache implements TypeInfo {
     }
   }
 
-  public int getScale(int oid, int typmod) {
+  public int getScale(int oid, int typmod)
+  {
     oid = convertArrayToBaseOid(oid);
-    switch (oid) {
+    switch (oid)
+    {
       case Oid.FLOAT4:
         return 8;
       case Oid.FLOAT8:
         return 17;
       case Oid.NUMERIC:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return 0;
         }
         return (typmod - 4) & 0xFFFF;
@@ -673,12 +769,14 @@ public class TypeInfoCache implements TypeInfo {
       case Oid.TIMETZ:
       case Oid.TIMESTAMP:
       case Oid.TIMESTAMPTZ:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return 6;
         }
         return typmod;
       case Oid.INTERVAL:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return 6;
         }
         return typmod & 0xFFFF;
@@ -687,9 +785,11 @@ public class TypeInfoCache implements TypeInfo {
     }
   }
 
-  public boolean isCaseSensitive(int oid) {
+  public boolean isCaseSensitive(int oid)
+  {
     oid = convertArrayToBaseOid(oid);
-    switch (oid) {
+    switch (oid)
+    {
       case Oid.OID:
       case Oid.INT2:
       case Oid.INT4:
@@ -712,9 +812,11 @@ public class TypeInfoCache implements TypeInfo {
     }
   }
 
-  public boolean isSigned(int oid) {
+  public boolean isSigned(int oid)
+  {
     oid = convertArrayToBaseOid(oid);
-    switch (oid) {
+    switch (oid)
+    {
       case Oid.INT2:
       case Oid.INT4:
       case Oid.INT8:
@@ -727,9 +829,11 @@ public class TypeInfoCache implements TypeInfo {
     }
   }
 
-  public int getDisplaySize(int oid, int typmod) {
+  public int getDisplaySize(int oid, int typmod)
+  {
     oid = convertArrayToBaseOid(oid);
-    switch (oid) {
+    switch (oid)
+    {
       case Oid.INT2:
         return 6; // -32768 to +32767
       case Oid.INT4:
@@ -756,7 +860,8 @@ public class TypeInfoCache implements TypeInfo {
       case Oid.TIMESTAMPTZ:
         // Calculate the number of decimal digits + the decimal point.
         int secondSize;
-        switch (typmod) {
+        switch (typmod)
+        {
           case -1:
             secondSize = 6 + 1;
             break;
@@ -778,7 +883,8 @@ public class TypeInfoCache implements TypeInfo {
         // date = '294276-11-20' = 12 --enable-integer-datetimes
         // zone = '+11:30' = 6;
 
-        switch (oid) {
+        switch (oid)
+        {
           case Oid.TIME:
             return 8 + secondSize;
           case Oid.TIMETZ:
@@ -792,12 +898,14 @@ public class TypeInfoCache implements TypeInfo {
         return 49; // SELECT LENGTH('-123456789 years 11 months 33 days 23 hours 10.123456 seconds'::interval);
       case Oid.VARCHAR:
       case Oid.BPCHAR:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return _unknownLength;
         }
         return typmod - 4;
       case Oid.NUMERIC:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return 131089; // SELECT LENGTH(pow(10::numeric,131071)); 131071 = 2^17-1
         }
         int precision = (typmod - 4 >> 16) & 0xffff;
@@ -807,7 +915,8 @@ public class TypeInfoCache implements TypeInfo {
       case Oid.BIT:
         return typmod;
       case Oid.VARBIT:
-        if (typmod == -1) {
+        if (typmod == -1)
+        {
           return _unknownLength;
         }
         return typmod;
@@ -819,9 +928,11 @@ public class TypeInfoCache implements TypeInfo {
     }
   }
 
-  public int getMaximumPrecision(int oid) {
+  public int getMaximumPrecision(int oid)
+  {
     oid = convertArrayToBaseOid(oid);
-    switch (oid) {
+    switch (oid)
+    {
       case Oid.NUMERIC:
         return 1000;
       case Oid.TIME:
@@ -844,9 +955,11 @@ public class TypeInfoCache implements TypeInfo {
     }
   }
 
-  public boolean requiresQuoting(int oid) throws SQLException {
+  public boolean requiresQuoting(int oid) throws SQLException
+  {
     int sqlType = getSQLType(oid);
-    switch (sqlType) {
+    switch (sqlType)
+    {
       case Types.BIGINT:
       case Types.DOUBLE:
       case Types.FLOAT:

@@ -14,7 +14,8 @@ import java.sql.SQLException;
  * PGBinaryObject is a inteface that classes extending {@link PGobject} can use to take advantage of
  * more optimal binary encoding of the data type.
  */
-public interface PGBinaryObject {
+public interface PGBinaryObject
+{
   /**
    * This method is called to set the value of this object.
    *

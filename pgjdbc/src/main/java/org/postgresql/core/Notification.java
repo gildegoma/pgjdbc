@@ -10,12 +10,15 @@ package org.postgresql.core;
 
 import org.postgresql.PGNotification;
 
-public class Notification implements PGNotification {
-  public Notification(String p_name, int p_pid) {
+public class Notification implements PGNotification
+{
+  public Notification(String p_name, int p_pid)
+  {
     this(p_name, p_pid, "");
   }
 
-  public Notification(String p_name, int p_pid, String p_parameter) {
+  public Notification(String p_name, int p_pid, String p_parameter)
+  {
     m_name = p_name;
     m_pid = p_pid;
     m_parameter = p_parameter;
@@ -24,18 +27,21 @@ public class Notification implements PGNotification {
   /*
    * Returns name of this notification
    */
-  public String getName() {
+  public String getName()
+  {
     return m_name;
   }
 
   /*
    * Returns the process id of the backend process making this notification
    */
-  public int getPID() {
+  public int getPID()
+  {
     return m_pid;
   }
 
-  public String getParameter() {
+  public String getParameter()
+  {
     return m_parameter;
   }
 

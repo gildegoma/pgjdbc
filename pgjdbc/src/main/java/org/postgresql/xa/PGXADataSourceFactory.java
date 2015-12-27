@@ -19,7 +19,8 @@ import javax.naming.Reference;
  * An ObjectFactory implementation for PGXADataSource-objects.
  */
 
-public class PGXADataSourceFactory extends PGObjectFactory {
+public class PGXADataSourceFactory extends PGObjectFactory
+{
   /* All the other PostgreSQL DataSource use PGObjectFactory directly, but we
    * can't do that with PGXADataSource because referencing PGXADataSource
    * from PGObjectFactory would break "JDBC2 Enterprise" edition build which
@@ -27,17 +28,21 @@ public class PGXADataSourceFactory extends PGObjectFactory {
    */
 
   public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-      Hashtable<?, ?> environment) throws Exception {
+      Hashtable<?, ?> environment) throws Exception
+  {
     Reference ref = (Reference) obj;
     String className = ref.getClassName();
-    if (className.equals("org.postgresql.xa.PGXADataSource")) {
+    if (className.equals("org.postgresql.xa.PGXADataSource"))
+    {
       return loadXADataSource(ref);
-    } else {
+    } else
+    {
       return null;
     }
   }
 
-  private Object loadXADataSource(Reference ref) {
+  private Object loadXADataSource(Reference ref)
+  {
     PGXADataSource ds = new PGXADataSource();
     return loadBaseDataSource(ds, ref);
   }

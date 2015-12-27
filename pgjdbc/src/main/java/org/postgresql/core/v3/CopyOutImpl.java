@@ -26,16 +26,19 @@ import java.sql.SQLException;
  * CopyDone, CommandComplete, ReadyForQuery -&gt;unlock() connection for use by other operations
  * &lt;-returned: byte array of data received from server or null at end.
  */
-public class CopyOutImpl extends CopyOperationImpl implements CopyOut {
+public class CopyOutImpl extends CopyOperationImpl implements CopyOut
+{
   private byte[] currentDataRow;
 
-  public byte[] readFromCopy() throws SQLException {
+  public byte[] readFromCopy() throws SQLException
+  {
     currentDataRow = null;
     queryExecutor.readFromCopy(this);
     return currentDataRow;
   }
 
-  void handleCopydata(byte[] data) {
+  void handleCopydata(byte[] data)
+  {
     currentDataRow = data;
   }
 }

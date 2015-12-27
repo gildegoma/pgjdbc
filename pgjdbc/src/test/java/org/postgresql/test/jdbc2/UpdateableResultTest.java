@@ -26,19 +26,24 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.TimeZone;
 
-public class UpdateableResultTest extends TestCase {
+public class UpdateableResultTest extends TestCase
+{
   private Connection con;
 
-  public UpdateableResultTest(String name) {
+  public UpdateableResultTest(String name)
+  {
     super(name);
-    try {
+    try
+    {
       Class.forName("org.postgresql.Driver");
-    } catch (Exception ex) {
+    } catch (Exception ex)
+    {
     }
 
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, "updateable",
         "id int primary key, name text, notselected text, ts timestamp with time zone, intarr int[]",
@@ -56,14 +61,16 @@ public class UpdateableResultTest extends TestCase {
 
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, "updateable");
     TestUtil.dropTable(con, "second");
     TestUtil.dropTable(con, "stream");
     TestUtil.closeDB(con);
   }
 
-  public void testDeleteRows() throws SQLException {
+  public void testDeleteRows() throws SQLException
+  {
     Statement st = con.createStatement();
     st.executeUpdate("INSERT INTO second values (2,'two')");
     st.executeUpdate("INSERT INTO second values (3,'three')");
@@ -89,7 +96,8 @@ public class UpdateableResultTest extends TestCase {
   }
 
 
-  public void testCancelRowUpdates() throws Exception {
+  public void testCancelRowUpdates() throws Exception
+  {
     Statement st =
         con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = st.executeQuery("select * from second");
@@ -129,33 +137,43 @@ public class UpdateableResultTest extends TestCase {
     st.close();
   }
 
-  private void checkPositioning(ResultSet rs) throws SQLException {
-    try {
+  private void checkPositioning(ResultSet rs) throws SQLException
+  {
+    try
+    {
       rs.getInt(1);
       fail("Can't use an incorrectly positioned result set.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
-    try {
+    try
+    {
       rs.updateInt(1, 2);
       fail("Can't use an incorrectly positioned result set.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
-    try {
+    try
+    {
       rs.updateRow();
       fail("Can't use an incorrectly positioned result set.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
-    try {
+    try
+    {
       rs.deleteRow();
       fail("Can't use an incorrectly positioned result set.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  public void testPositioning() throws SQLException {
+  public void testPositioning() throws SQLException
+  {
     Statement stmt =
         con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = stmt.executeQuery("SELECT id1,name1 FROM second");
@@ -183,9 +201,11 @@ public class UpdateableResultTest extends TestCase {
     stmt.close();
   }
 
-  public void testUpdateTimestamp() throws SQLException {
+  public void testUpdateTimestamp() throws SQLException
+  {
     TimeZone origTZ = TimeZone.getDefault();
-    try {
+    try
+    {
       // We choose a timezone which has a partial hour portion
       // Asia/Tehran is +3:30
       TimeZone.setDefault(TimeZone.getTimeZone("Asia/Tehran"));
@@ -200,12 +220,14 @@ public class UpdateableResultTest extends TestCase {
       rs.insertRow();
       rs.first();
       assertEquals(ts, rs.getTimestamp(2));
-    } finally {
+    } finally
+    {
       TimeZone.setDefault(origTZ);
     }
   }
 
-  public void testUpdateStreams() throws SQLException, UnsupportedEncodingException {
+  public void testUpdateStreams() throws SQLException, UnsupportedEncodingException
+  {
     String string = "Hello";
     byte[] bytes = new byte[]{0, '\\', (byte) 128, (byte) 255};
 
@@ -264,7 +286,8 @@ public class UpdateableResultTest extends TestCase {
     stmt.close();
   }
 
-  public void testZeroRowResult() throws SQLException {
+  public void testZeroRowResult() throws SQLException
+  {
     Statement st =
         con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = st.executeQuery("select * from updateable WHERE 0 > 1");
@@ -273,7 +296,8 @@ public class UpdateableResultTest extends TestCase {
     rs.moveToCurrentRow();
   }
 
-  public void testUpdateable() throws SQLException {
+  public void testUpdateable() throws SQLException
+  {
     Statement st =
         con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = st.executeQuery("select * from updateable");
@@ -300,10 +324,12 @@ public class UpdateableResultTest extends TestCase {
 
     rs.insertRow();
 
-    try {
+    try
+    {
       rs.refreshRow();
       fail("Can't refresh when on the insert row.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
     assertEquals(3, rs.getInt("id"));
@@ -313,8 +339,10 @@ public class UpdateableResultTest extends TestCase {
     rs.close();
 
     rs = st.executeQuery("select id1, id, name, name1 from updateable, second");
-    try {
-      while (rs.next()) {
+    try
+    {
+      while (rs.next())
+      {
         rs.updateInt("id", 2);
         rs.updateString("name", "dave");
         rs.updateRow();
@@ -322,7 +350,8 @@ public class UpdateableResultTest extends TestCase {
 
 
       fail("should not get here, update should fail");
-    } catch (SQLException ex) {
+    } catch (SQLException ex)
+    {
     }
 
     rs = st.executeQuery("select oid,* from updateable");
@@ -358,42 +387,52 @@ public class UpdateableResultTest extends TestCase {
     st.close();
   }
 
-  public void testInsertRowIllegalMethods() throws Exception {
+  public void testInsertRowIllegalMethods() throws Exception
+  {
     Statement st =
         con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = st.executeQuery("select * from updateable");
     assertNotNull(rs);
     rs.moveToInsertRow();
 
-    try {
+    try
+    {
       rs.cancelRowUpdates();
       fail("expected an exception when calling cancelRowUpdates() on the insert row");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
     }
 
-    try {
+    try
+    {
       rs.updateRow();
       fail("expected an exception when calling updateRow() on the insert row");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
     }
 
-    try {
+    try
+    {
       rs.deleteRow();
       fail("expected an exception when calling deleteRow() on the insert row");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
     }
 
-    try {
+    try
+    {
       rs.refreshRow();
       fail("expected an exception when calling refreshRow() on the insert row");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
     }
 
     rs.close();
     st.close();
   }
 
-  public void testUpdateablePreparedStatement() throws Exception {
+  public void testUpdateablePreparedStatement() throws Exception
+  {
     // No args.
     PreparedStatement st = con.prepareStatement("select * from updateable",
         ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -414,7 +453,8 @@ public class UpdateableResultTest extends TestCase {
     st.close();
   }
 
-  public void testUpdateSelectOnly() throws Exception {
+  public void testUpdateSelectOnly() throws Exception
+  {
     Statement st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
         ResultSet.CONCUR_UPDATABLE);
 
@@ -424,40 +464,51 @@ public class UpdateableResultTest extends TestCase {
     rs.updateRow();
   }
 
-  public void testUpdateReadOnlyResultSet() throws Exception {
+  public void testUpdateReadOnlyResultSet() throws Exception
+  {
     Statement st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
         ResultSet.CONCUR_READ_ONLY);
     ResultSet rs = st.executeQuery("select * from updateable");
-    try {
+    try
+    {
       rs.moveToInsertRow();
       fail("expected an exception when calling moveToInsertRow() on a read-only resultset");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
     }
   }
 
-  public void testBadColumnIndexes() throws Exception {
+  public void testBadColumnIndexes() throws Exception
+  {
     Statement st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
         ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = st.executeQuery("select * from updateable");
     rs.moveToInsertRow();
-    try {
+    try
+    {
       rs.updateInt(0, 1);
       fail("Should have thrown an exception on bad column index.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
-    try {
+    try
+    {
       rs.updateString(1000, "hi");
       fail("Should have thrown an exception on bad column index.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
-    try {
+    try
+    {
       rs.updateNull(1000);
       fail("Should have thrown an exception on bad column index.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  public void testArray() throws SQLException {
+  public void testArray() throws SQLException
+  {
     Statement stmt =
         con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
     stmt.executeUpdate("INSERT INTO updateable (id, intarr) VALUES (1, '{1,2,3}'::int4[])");
@@ -489,19 +540,23 @@ public class UpdateableResultTest extends TestCase {
     stmt.close();
   }
 
-  public void testMultiColumnUpdateWithoutAllColumns() throws Exception {
+  public void testMultiColumnUpdateWithoutAllColumns() throws Exception
+  {
     Statement st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
         ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = st.executeQuery("select id1,val from multicol");
-    try {
+    try
+    {
       rs.moveToInsertRow();
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
       // Ensure we're reporting that the RS is not updatable.
       assertEquals("24000", sqle.getSQLState());
     }
   }
 
-  public void testMultiColumnUpdate() throws Exception {
+  public void testMultiColumnUpdate() throws Exception
+  {
     Statement st = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
         ResultSet.CONCUR_UPDATABLE);
     st.executeUpdate("INSERT INTO multicol (id1,id2,val) VALUES (1,2,'val')");

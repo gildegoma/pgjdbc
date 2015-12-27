@@ -17,7 +17,8 @@ import java.lang.reflect.Field;
 /**
  * Provides constants for well-known backend OIDs for the types we commonly use.
  */
-public class Oid {
+public class Oid
+{
   public static final int UNSPECIFIED = 0;
   public static final int INT2 = 21;
   public static final int INT2_ARRAY = 1005;
@@ -81,34 +82,46 @@ public class Oid {
    * @return The name of the oid or {@code "<unknown>"} if oid no constant for oid value has been
    * defined.
    */
-  public static String toString(int oid) {
-    try {
+  public static String toString(int oid)
+  {
+    try
+    {
       Field[] fields = Oid.class.getFields();
-      for (Field field : fields) {
-        if (field.getInt(null) == oid) {
+      for (Field field : fields)
+      {
+        if (field.getInt(null) == oid)
+        {
           return field.getName();
         }
       }
-    } catch (IllegalAccessException e) {
+    } catch (IllegalAccessException e)
+    {
       // never happens
     }
     return "<unknown:" + oid + ">";
   }
 
-  public static int valueOf(String oid) throws PSQLException {
-    try {
+  public static int valueOf(String oid) throws PSQLException
+  {
+    try
+    {
       return (int) Long.parseLong(oid);
-    } catch (NumberFormatException ex) {
+    } catch (NumberFormatException ex)
+    {
     }
-    try {
+    try
+    {
       oid = oid.toUpperCase();
       Field[] fields = Oid.class.getFields();
-      for (Field field : fields) {
-        if (field.getName().toUpperCase().equals(oid)) {
+      for (Field field : fields)
+      {
+        if (field.getName().toUpperCase().equals(oid))
+        {
           return field.getInt(null);
         }
       }
-    } catch (IllegalAccessException e) {
+    } catch (IllegalAccessException e)
+    {
       // never happens
     }
     throw new PSQLException(GT.tr("oid type {0} not known and not a number", oid),

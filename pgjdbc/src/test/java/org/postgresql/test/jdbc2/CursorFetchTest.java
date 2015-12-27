@@ -18,19 +18,24 @@ import java.sql.Statement;
 /*
  *  Tests for using non-zero setFetchSize().
  */
-public class CursorFetchTest extends BaseTest {
-  public CursorFetchTest(String name) {
+public class CursorFetchTest extends BaseTest
+{
+  public CursorFetchTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     super.setUp();
     TestUtil.createTable(con, "test_fetch", "value integer");
     con.setAutoCommit(false);
   }
 
-  protected void tearDown() throws SQLException {
-    if (!con.getAutoCommit()) {
+  protected void tearDown() throws SQLException
+  {
+    if (!con.getAutoCommit())
+    {
       con.rollback();
     }
 
@@ -39,21 +44,25 @@ public class CursorFetchTest extends BaseTest {
     super.tearDown();
   }
 
-  protected void createRows(int count) throws Exception {
+  protected void createRows(int count) throws Exception
+  {
     PreparedStatement stmt = con.prepareStatement("insert into test_fetch(value) values(?)");
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i)
+    {
       stmt.setInt(1, i);
       stmt.executeUpdate();
     }
   }
 
   // Test various fetchsizes.
-  public void testBasicFetch() throws Exception {
+  public void testBasicFetch() throws Exception
+  {
     createRows(100);
 
     PreparedStatement stmt = con.prepareStatement("select * from test_fetch order by value");
     int[] testSizes = {0, 1, 49, 50, 51, 99, 100, 101};
-    for (int i = 0; i < testSizes.length; ++i) {
+    for (int i = 0; i < testSizes.length; ++i)
+    {
       stmt.setFetchSize(testSizes[i]);
       assertEquals(testSizes[i], stmt.getFetchSize());
 
@@ -61,7 +70,8 @@ public class CursorFetchTest extends BaseTest {
       assertEquals(testSizes[i], rs.getFetchSize());
 
       int count = 0;
-      while (rs.next()) {
+      while (rs.next())
+      {
         assertEquals("query value error with fetch size " + testSizes[i], count, rs.getInt(1));
         ++count;
       }
@@ -72,7 +82,8 @@ public class CursorFetchTest extends BaseTest {
 
 
   // Similar, but for scrollable resultsets.
-  public void testScrollableFetch() throws Exception {
+  public void testScrollableFetch() throws Exception
+  {
     createRows(100);
 
     PreparedStatement stmt = con.prepareStatement("select * from test_fetch order by value",
@@ -80,27 +91,33 @@ public class CursorFetchTest extends BaseTest {
         ResultSet.CONCUR_READ_ONLY);
 
     int[] testSizes = {0, 1, 49, 50, 51, 99, 100, 101};
-    for (int i = 0; i < testSizes.length; ++i) {
+    for (int i = 0; i < testSizes.length; ++i)
+    {
       stmt.setFetchSize(testSizes[i]);
       assertEquals(testSizes[i], stmt.getFetchSize());
 
       ResultSet rs = stmt.executeQuery();
       assertEquals(testSizes[i], rs.getFetchSize());
 
-      for (int j = 0; j <= 50; ++j) {
+      for (int j = 0; j <= 50; ++j)
+      {
         assertTrue("ran out of rows at position " + j + " with fetch size " + testSizes[i],
             rs.next());
         assertEquals("query value error with fetch size " + testSizes[i], j, rs.getInt(1));
       }
 
       int position = 50;
-      for (int j = 1; j < 100; ++j) {
-        for (int k = 0; k < j; ++k) {
-          if (j % 2 == 0) {
+      for (int j = 1; j < 100; ++j)
+      {
+        for (int k = 0; k < j; ++k)
+        {
+          if (j % 2 == 0)
+          {
             ++position;
             assertTrue("ran out of rows doing a forward fetch on iteration " + j + "/" + k
                 + " at position " + position + " with fetch size " + testSizes[i], rs.next());
-          } else {
+          } else
+          {
             --position;
             assertTrue("ran out of rows doing a reverse fetch on iteration " + j + "/" + k
                 + " at position " + position + " with fetch size " + testSizes[i], rs.previous());
@@ -114,7 +131,8 @@ public class CursorFetchTest extends BaseTest {
     }
   }
 
-  public void testScrollableAbsoluteFetch() throws Exception {
+  public void testScrollableAbsoluteFetch() throws Exception
+  {
     createRows(100);
 
     PreparedStatement stmt = con.prepareStatement("select * from test_fetch order by value",
@@ -122,7 +140,8 @@ public class CursorFetchTest extends BaseTest {
         ResultSet.CONCUR_READ_ONLY);
 
     int[] testSizes = {0, 1, 49, 50, 51, 99, 100, 101};
-    for (int i = 0; i < testSizes.length; ++i) {
+    for (int i = 0; i < testSizes.length; ++i)
+    {
       stmt.setFetchSize(testSizes[i]);
       assertEquals(testSizes[i], stmt.getFetchSize());
 
@@ -134,10 +153,13 @@ public class CursorFetchTest extends BaseTest {
           + testSizes[i], rs.absolute(position + 1));
       assertEquals("query value error with fetch size " + testSizes[i], position, rs.getInt(1));
 
-      for (int j = 1; j < 100; ++j) {
-        if (j % 2 == 0) {
+      for (int j = 1; j < 100; ++j)
+      {
+        if (j % 2 == 0)
+        {
           position += j;
-        } else {
+        } else
+        {
           position -= j;
         }
 
@@ -157,7 +179,8 @@ public class CursorFetchTest extends BaseTest {
   //   run query (all rows should be fetched)
   //   set fetchsize = 50 (should have no effect)
   //   process results
-  public void testResultSetFetchSizeOne() throws Exception {
+  public void testResultSetFetchSizeOne() throws Exception
+  {
     createRows(100);
 
     PreparedStatement stmt = con.prepareStatement("select * from test_fetch order by value");
@@ -166,7 +189,8 @@ public class CursorFetchTest extends BaseTest {
     rs.setFetchSize(50); // Should have no effect.
 
     int count = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals(count, rs.getInt(1));
       ++count;
     }
@@ -182,7 +206,8 @@ public class CursorFetchTest extends BaseTest {
   //     process 25 rows
   //     should do a FETCH ALL to get more data
   //     process 75 rows
-  public void testResultSetFetchSizeTwo() throws Exception {
+  public void testResultSetFetchSizeTwo() throws Exception
+  {
     createRows(100);
 
     PreparedStatement stmt = con.prepareStatement("select * from test_fetch order by value");
@@ -191,7 +216,8 @@ public class CursorFetchTest extends BaseTest {
     rs.setFetchSize(0);
 
     int count = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals(count, rs.getInt(1));
       ++count;
     }
@@ -209,7 +235,8 @@ public class CursorFetchTest extends BaseTest {
   //     process 50 rows
   //     do a FETCH FORWARD 50
   //     process 25 rows. end of results.
-  public void testResultSetFetchSizeThree() throws Exception {
+  public void testResultSetFetchSizeThree() throws Exception
+  {
     createRows(100);
 
     PreparedStatement stmt = con.prepareStatement("select * from test_fetch order by value");
@@ -218,7 +245,8 @@ public class CursorFetchTest extends BaseTest {
     rs.setFetchSize(50);
 
     int count = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals(count, rs.getInt(1));
       ++count;
     }
@@ -236,7 +264,8 @@ public class CursorFetchTest extends BaseTest {
   //     process 25 rows
   //     do a FETCH FORWARD 25
   //     process 25 rows. end of results.
-  public void testResultSetFetchSizeFour() throws Exception {
+  public void testResultSetFetchSizeFour() throws Exception
+  {
     createRows(100);
 
     PreparedStatement stmt = con.prepareStatement("select * from test_fetch order by value");
@@ -245,7 +274,8 @@ public class CursorFetchTest extends BaseTest {
     rs.setFetchSize(25);
 
     int count = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals(count, rs.getInt(1));
       ++count;
     }
@@ -253,12 +283,14 @@ public class CursorFetchTest extends BaseTest {
     assertEquals(100, count);
   }
 
-  public void testSingleRowResultPositioning() throws Exception {
+  public void testSingleRowResultPositioning() throws Exception
+  {
     String msg;
     createRows(1);
 
     int[] sizes = {0, 1, 10};
-    for (int i = 0; i < sizes.length; ++i) {
+    for (int i = 0; i < sizes.length; ++i)
+    {
       Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
       stmt.setFetchSize(sizes[i]);
 
@@ -293,13 +325,15 @@ public class CursorFetchTest extends BaseTest {
     }
   }
 
-  public void testMultiRowResultPositioning() throws Exception {
+  public void testMultiRowResultPositioning() throws Exception
+  {
     String msg;
 
     createRows(100);
 
     int[] sizes = {0, 1, 10, 100};
-    for (int i = 0; i < sizes.length; ++i) {
+    for (int i = 0; i < sizes.length; ++i)
+    {
       Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
       stmt.setFetchSize(sizes[i]);
 
@@ -310,22 +344,27 @@ public class CursorFetchTest extends BaseTest {
       assertTrue(msg, !rs.isFirst());
       assertTrue(msg, !rs.isLast());
 
-      for (int j = 0; j < 100; ++j) {
+      for (int j = 0; j < 100; ++j)
+      {
         msg = "row " + j + " positioning error with fetchsize=" + sizes[i];
         assertTrue(msg, rs.next());
         assertEquals(msg, j, rs.getInt(1));
 
         assertTrue(msg, !rs.isBeforeFirst());
         assertTrue(msg, !rs.isAfterLast());
-        if (j == 0) {
+        if (j == 0)
+        {
           assertTrue(msg, rs.isFirst());
-        } else {
+        } else
+        {
           assertTrue(msg, !rs.isFirst());
         }
 
-        if (j == 99) {
+        if (j == 99)
+        {
           assertTrue(msg, rs.isLast());
-        } else {
+        } else
+        {
           assertTrue(msg, !rs.isLast());
         }
       }
@@ -344,14 +383,16 @@ public class CursorFetchTest extends BaseTest {
   }
 
   // Test odd queries that should not be transformed into cursor-based fetches.
-  public void testInsert() throws Exception {
+  public void testInsert() throws Exception
+  {
     // INSERT should not be transformed.
     PreparedStatement stmt = con.prepareStatement("insert into test_fetch(value) values(1)");
     stmt.setFetchSize(100); // Should be meaningless.
     stmt.executeUpdate();
   }
 
-  public void testMultistatement() throws Exception {
+  public void testMultistatement() throws Exception
+  {
     // Queries with multiple statements should not be transformed.
 
     createRows(100); // 0 .. 99
@@ -363,7 +404,8 @@ public class CursorFetchTest extends BaseTest {
     assertTrue(stmt.getMoreResults()); // SELECT
     ResultSet rs = stmt.getResultSet();
     int count = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals(count, rs.getInt(1));
       ++count;
     }
@@ -374,26 +416,30 @@ public class CursorFetchTest extends BaseTest {
   // if the driver tries to use a cursor with autocommit on
   // it will fail because the cursor will disappear partway
   // through execution
-  public void testNoCursorWithAutoCommit() throws Exception {
+  public void testNoCursorWithAutoCommit() throws Exception
+  {
     createRows(10); // 0 .. 9
     con.setAutoCommit(true);
     Statement stmt = con.createStatement();
     stmt.setFetchSize(3);
     ResultSet rs = stmt.executeQuery("SELECT * FROM test_fetch ORDER BY value");
     int count = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals(count++, rs.getInt(1));
     }
 
     assertEquals(10, count);
   }
 
-  public void testGetRow() throws SQLException {
+  public void testGetRow() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.setFetchSize(1);
     ResultSet rs = stmt.executeQuery("SELECT 1 UNION SELECT 2 UNION SELECT 3");
     int count = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       count++;
       assertEquals(count, rs.getInt(1));
       assertEquals(count, rs.getRow());
@@ -404,14 +450,16 @@ public class CursorFetchTest extends BaseTest {
   // isLast() may change the results of other positioning methods as it has to
   // buffer some more results. This tests avoid using it so as to test robustness
   // other positioning methods
-  public void testRowResultPositioningWithoutIsLast() throws Exception {
+  public void testRowResultPositioningWithoutIsLast() throws Exception
+  {
     String msg;
 
     int rowCount = 4;
     createRows(rowCount);
 
     int[] sizes = {1, 2, 3, 4, 5};
-    for (int i = 0; i < sizes.length; ++i) {
+    for (int i = 0; i < sizes.length; ++i)
+    {
       Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
       stmt.setFetchSize(sizes[i]);
 
@@ -421,16 +469,19 @@ public class CursorFetchTest extends BaseTest {
       assertTrue(msg, !rs.isAfterLast());
       assertTrue(msg, !rs.isFirst());
 
-      for (int j = 0; j < rowCount; ++j) {
+      for (int j = 0; j < rowCount; ++j)
+      {
         msg = "row " + j + " positioning error with fetchsize=" + sizes[i];
         assertTrue(msg, rs.next());
         assertEquals(msg, j, rs.getInt(1));
 
         assertTrue(msg, !rs.isBeforeFirst());
         assertTrue(msg, !rs.isAfterLast());
-        if (j == 0) {
+        if (j == 0)
+        {
           assertTrue(msg, rs.isFirst());
-        } else {
+        } else
+        {
           assertTrue(msg, !rs.isFirst());
         }
       }
@@ -450,11 +501,13 @@ public class CursorFetchTest extends BaseTest {
 
 
   // Empty resultsets require all row positioning methods to return false
-  public void testNoRowResultPositioning() throws Exception {
+  public void testNoRowResultPositioning() throws Exception
+  {
     String msg;
 
     int[] sizes = {0, 1, 50, 100};
-    for (int i = 0; i < sizes.length; ++i) {
+    for (int i = 0; i < sizes.length; ++i)
+    {
       Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
       stmt.setFetchSize(sizes[i]);
 
@@ -477,11 +530,13 @@ public class CursorFetchTest extends BaseTest {
   }
 
   // Empty resultsets require all row positioning methods to return false
-  public void testScrollableNoRowResultPositioning() throws Exception {
+  public void testScrollableNoRowResultPositioning() throws Exception
+  {
     String msg;
 
     int[] sizes = {0, 1, 50, 100};
-    for (int i = 0; i < sizes.length; ++i) {
+    for (int i = 0; i < sizes.length; ++i)
+    {
       Statement stmt =
           con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
       stmt.setFetchSize(sizes[i]);

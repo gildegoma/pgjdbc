@@ -26,17 +26,22 @@ import java.util.concurrent.TimeUnit;
  * test systems. It is assumed you would not use pgjdbc benchmarks for running a production system,
  * thus it is believed to be safe.
  */
-public class FlightRecorderProfiler implements ExternalProfiler {
+public class FlightRecorderProfiler implements ExternalProfiler
+{
   @Override
-  public Collection<String> addJVMInvokeOptions(BenchmarkParams params) {
+  public Collection<String> addJVMInvokeOptions(BenchmarkParams params)
+  {
     return Collections.emptyList();
   }
 
   @Override
-  public Collection<String> addJVMOptions(BenchmarkParams params) {
+  public Collection<String> addJVMOptions(BenchmarkParams params)
+  {
     StringBuilder sb = new StringBuilder();
-    for (String param : params.getParamsKeys()) {
-      if (sb.length() != 0) {
+    for (String param : params.getParamsKeys())
+    {
+      if (sb.length() != 0)
+      {
         sb.append('-');
       }
       sb.append(param).append('-').append(params.getParam(param));
@@ -50,33 +55,39 @@ public class FlightRecorderProfiler implements ExternalProfiler {
             + params.getBenchmark() + "_" + sb + ".jfr");
   }
 
-  private long getDurationSeconds(IterationParams warmup) {
+  private long getDurationSeconds(IterationParams warmup)
+  {
     return warmup.getTime().convertTo(TimeUnit.SECONDS) * warmup.getCount();
   }
 
   @Override
-  public void beforeTrial(BenchmarkParams benchmarkParams) {
+  public void beforeTrial(BenchmarkParams benchmarkParams)
+  {
 
   }
 
   @Override
   public Collection<? extends Result> afterTrial(BenchmarkResult br, long pid, File stdOut,
-      File stdErr) {
+      File stdErr)
+  {
     return Collections.emptyList();
   }
 
   @Override
-  public boolean allowPrintOut() {
+  public boolean allowPrintOut()
+  {
     return true;
   }
 
   @Override
-  public boolean allowPrintErr() {
+  public boolean allowPrintErr()
+  {
     return true;
   }
 
   @Override
-  public String getDescription() {
+  public String getDescription()
+  {
     return "Collects Java Flight Recorder profile";
   }
 }

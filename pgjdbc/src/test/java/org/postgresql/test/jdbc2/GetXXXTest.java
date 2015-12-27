@@ -24,14 +24,17 @@ import java.util.HashMap;
  * Test for getObject
  */
 
-public class GetXXXTest extends TestCase {
+public class GetXXXTest extends TestCase
+{
   Connection con = null;
 
-  public GetXXXTest(String name) {
+  public GetXXXTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     super.setUp();
 
     con = TestUtil.openDB();
@@ -48,17 +51,20 @@ public class GetXXXTest extends TestCase {
     pstmt.close();
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     super.tearDown();
     TestUtil.dropTable(con, "test_interval");
     con.close();
   }
 
-  public void testGetObject() throws SQLException {
+  public void testGetObject() throws SQLException
+  {
     Statement stmt = con.createStatement();
     ResultSet rs = stmt.executeQuery(
         "select (final-initial) as diff from test_interval");
-    while (rs.next()) {
+    while (rs.next())
+    {
       String str = (String) rs.getString(1);
 
       assertNotNull(str);
@@ -67,11 +73,13 @@ public class GetXXXTest extends TestCase {
     }
   }
 
-  public void testGetUDT() throws SQLException {
+  public void testGetUDT() throws SQLException
+  {
     Statement stmt = con.createStatement();
     ResultSet rs = stmt.executeQuery("select (final-initial) as diff from test_interval");
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       // make this return a PGobject
       Object obj = rs.getObject(1, new HashMap<String, Class<?>>());
 

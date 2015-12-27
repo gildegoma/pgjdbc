@@ -36,7 +36,8 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class TimestampToTime {
+public class TimestampToTime
+{
   private static final long ONEDAY = TimeUnit.DAYS.toMillis(1);
 
   @Param({"GMT+02:00", "Europe/Moscow"})
@@ -47,12 +48,14 @@ public class TimestampToTime {
   Calendar cachedCalendar = new GregorianCalendar();
 
   @Setup
-  public void init() {
+  public void init()
+  {
     timeZone = TimeZone.getTimeZone(tz);
   }
 
   @Benchmark
-  public long simple() {
+  public long simple()
+  {
     long millis = ts.getTime() + 10;
     ts.setTime(millis);
     Calendar cal = cachedCalendar;
@@ -65,15 +68,18 @@ public class TimestampToTime {
     return cal.getTimeInMillis();
   }
 
-  private static boolean isSimpleTimeZone(String id) {
+  private static boolean isSimpleTimeZone(String id)
+  {
     return id.startsWith("GMT") || id.startsWith("UTC");
   }
 
   @Benchmark
-  public long advanced() {
+  public long advanced()
+  {
     long millis = ts.getTime() + 10;
     TimeZone tz = this.timeZone;
-    if (isSimpleTimeZone(tz.getID())) {
+    if (isSimpleTimeZone(tz.getID()))
+    {
       // Leave just time part of the day.
       // Suppose the input date is 2015 7 Jan 15:40 GMT+02:00 (that is 13:40 UTC)
       // We want it to become 1970 1 Jan 15:40 GMT+02:00
@@ -98,7 +104,8 @@ public class TimestampToTime {
     return cal.getTimeInMillis();
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(TimestampToTime.class.getSimpleName())
         //.addProfiler(GCProfiler.class)

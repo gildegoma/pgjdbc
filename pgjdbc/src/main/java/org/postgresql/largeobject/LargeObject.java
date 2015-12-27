@@ -41,7 +41,8 @@ import java.sql.SQLException;
  * @see java.sql.PreparedStatement#setBinaryStream
  * @see java.sql.PreparedStatement#setUnicodeStream
  */
-public class LargeObject {
+public class LargeObject
+{
   /**
    * Indicates a seek from the begining of a file
    */
@@ -84,14 +85,17 @@ public class LargeObject {
    * @see org.postgresql.largeobject.LargeObjectManager
    */
   protected LargeObject(Fastpath fp, long oid, int mode, BaseConnection conn, boolean commitOnClose)
-      throws SQLException {
+      throws SQLException
+  {
     this.fp = fp;
     this.oid = oid;
     this.mode = mode;
-    if (commitOnClose == true) {
+    if (commitOnClose == true)
+    {
       this.commitOnClose = true;
       this.conn = conn;
-    } else {
+    } else
+    {
       this.commitOnClose = false;
     }
 
@@ -112,11 +116,13 @@ public class LargeObject {
    * @throws SQLException if a database-access error occurs.
    * @see org.postgresql.largeobject.LargeObjectManager
    */
-  protected LargeObject(Fastpath fp, long oid, int mode) throws SQLException {
+  protected LargeObject(Fastpath fp, long oid, int mode) throws SQLException
+  {
     this(fp, oid, mode, null, false);
   }
 
-  public LargeObject copy() throws SQLException {
+  public LargeObject copy() throws SQLException
+  {
     return new LargeObject(fp, oid, mode);
   }
 
@@ -138,14 +144,16 @@ public class LargeObject {
    * @return the OID of this LargeObject
    * @deprecated As of 8.3, replaced by {@link #getLongOID()}
    */
-  public int getOID() {
+  public int getOID()
+  {
     return (int) oid;
   }
 
   /**
    * @return the OID of this LargeObject
    */
-  public long getLongOID() {
+  public long getLongOID()
+  {
     return oid;
   }
 
@@ -154,17 +162,23 @@ public class LargeObject {
    *
    * @throws SQLException if a database-access error occurs.
    */
-  public void close() throws SQLException {
-    if (!closed) {
+  public void close() throws SQLException
+  {
+    if (!closed)
+    {
       // flush any open output streams
-      if (os != null) {
-        try {
+      if (os != null)
+      {
+        try
+        {
           // we can't call os.close() otherwise we go into an infinite loop!
           os.flush();
-        } catch (IOException ioe) {
+        } catch (IOException ioe)
+        {
           throw new PSQLException("Exception flushing output stream",
               PSQLState.DATA_ERROR, ioe);
-        } finally {
+        } finally
+        {
           os = null;
         }
       }
@@ -174,7 +188,8 @@ public class LargeObject {
       args[0] = new FastpathArg(fd);
       fp.fastpath("lo_close", args); // true here as we dont care!!
       closed = true;
-      if (this.commitOnClose == true) {
+      if (this.commitOnClose == true)
+      {
         this.conn.commit();
       }
     }
@@ -187,7 +202,8 @@ public class LargeObject {
    * @return byte[] array containing data read
    * @throws SQLException if a database-access error occurs.
    */
-  public byte[] read(int len) throws SQLException {
+  public byte[] read(int len) throws SQLException
+  {
     // This is the original method, where the entire block (len bytes)
     // is retrieved in one go.
     FastpathArg args[] = new FastpathArg[2];
@@ -205,9 +221,11 @@ public class LargeObject {
    * @return the number of bytes actually read
    * @throws SQLException if a database-access error occurs.
    */
-  public int read(byte buf[], int off, int len) throws SQLException {
+  public int read(byte buf[], int off, int len) throws SQLException
+  {
     byte b[] = read(len);
-    if (b.length < len) {
+    if (b.length < len)
+    {
       len = b.length;
     }
     System.arraycopy(b, 0, buf, off, len);
@@ -220,7 +238,8 @@ public class LargeObject {
    * @param buf array to write
    * @throws SQLException if a database-access error occurs.
    */
-  public void write(byte buf[]) throws SQLException {
+  public void write(byte buf[]) throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[2];
     args[0] = new FastpathArg(fd);
     args[1] = new FastpathArg(buf);
@@ -235,7 +254,8 @@ public class LargeObject {
    * @param len number of bytes to write
    * @throws SQLException if a database-access error occurs.
    */
-  public void write(byte buf[], int off, int len) throws SQLException {
+  public void write(byte buf[], int off, int len) throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[2];
     args[0] = new FastpathArg(fd);
     args[1] = new FastpathArg(buf, off, len);
@@ -252,7 +272,8 @@ public class LargeObject {
    * @param ref Either SEEK_SET, SEEK_CUR or SEEK_END
    * @throws SQLException if a database-access error occurs.
    */
-  public void seek(int pos, int ref) throws SQLException {
+  public void seek(int pos, int ref) throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[3];
     args[0] = new FastpathArg(fd);
     args[1] = new FastpathArg(pos);
@@ -267,7 +288,8 @@ public class LargeObject {
    * @param ref Either SEEK_SET, SEEK_CUR or SEEK_END
    * @throws SQLException if a database-access error occurs.
    */
-  public void seek64(long pos, int ref) throws SQLException {
+  public void seek64(long pos, int ref) throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[3];
     args[0] = new FastpathArg(fd);
     args[1] = new FastpathArg(pos);
@@ -284,7 +306,8 @@ public class LargeObject {
    * @param pos position within object from begining
    * @throws SQLException if a database-access error occurs.
    */
-  public void seek(int pos) throws SQLException {
+  public void seek(int pos) throws SQLException
+  {
     seek(pos, SEEK_SET);
   }
 
@@ -292,7 +315,8 @@ public class LargeObject {
    * @return the current position within the object
    * @throws SQLException if a database-access error occurs.
    */
-  public int tell() throws SQLException {
+  public int tell() throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[1];
     args[0] = new FastpathArg(fd);
     return fp.getInteger("lo_tell", args);
@@ -302,7 +326,8 @@ public class LargeObject {
    * @return the current position within the object
    * @throws SQLException if a database-access error occurs.
    */
-  public long tell64() throws SQLException {
+  public long tell64() throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[1];
     args[0] = new FastpathArg(fd);
     return fp.getLong("lo_tell64", args);
@@ -317,7 +342,8 @@ public class LargeObject {
    * @return the size of the large object
    * @throws SQLException if a database-access error occurs.
    */
-  public int size() throws SQLException {
+  public int size() throws SQLException
+  {
     int cp = tell();
     seek(0, SEEK_END);
     int sz = tell();
@@ -331,7 +357,8 @@ public class LargeObject {
    * @return the size of the large object
    * @throws SQLException if a database-access error occurs.
    */
-  public long size64() throws SQLException {
+  public long size64() throws SQLException
+  {
     long cp = tell64();
     seek64(0, SEEK_END);
     long sz = tell64();
@@ -347,7 +374,8 @@ public class LargeObject {
    * @param len given length in bytes
    * @throws SQLException if something goes wrong
    */
-  public void truncate(int len) throws SQLException {
+  public void truncate(int len) throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[2];
     args[0] = new FastpathArg(fd);
     args[1] = new FastpathArg(len);
@@ -362,7 +390,8 @@ public class LargeObject {
    * @param len given length in bytes
    * @throws SQLException if something goes wrong
    */
-  public void truncate64(long len) throws SQLException {
+  public void truncate64(long len) throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[2];
     args[0] = new FastpathArg(fd);
     args[1] = new FastpathArg(len);
@@ -377,7 +406,8 @@ public class LargeObject {
    * @return {@link InputStream} from this object
    * @throws SQLException if a database-access error occurs.
    */
-  public InputStream getInputStream() throws SQLException {
+  public InputStream getInputStream() throws SQLException
+  {
     return new BlobInputStream(this, 4096);
   }
 
@@ -389,7 +419,8 @@ public class LargeObject {
    * @return {@link InputStream} from this object
    * @throws SQLException if a database-access error occurs.
    */
-  public InputStream getInputStream(long limit) throws SQLException {
+  public InputStream getInputStream(long limit) throws SQLException
+  {
     return new BlobInputStream(this, 4096, limit);
   }
 
@@ -401,8 +432,10 @@ public class LargeObject {
    * @return {@link OutputStream} from this object
    * @throws SQLException if a database-access error occurs.
    */
-  public OutputStream getOutputStream() throws SQLException {
-    if (os == null) {
+  public OutputStream getOutputStream() throws SQLException
+  {
+    if (os == null)
+    {
       os = new BlobOutputStream(this, 4096);
     }
     return os;

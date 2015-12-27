@@ -20,7 +20,8 @@ import java.sql.Statement;
  * This interface defines the public PostgreSQL extensions to java.sql.Connection. All Connections
  * returned by the PostgreSQL driver implement PGConnection.
  */
-public interface PGConnection {
+public interface PGConnection
+{
   /**
    * This method returns any notifications that have been received since the last call to this
    * method. Returns null if there have been no notifications.

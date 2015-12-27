@@ -23,13 +23,16 @@ import java.util.Locale;
  */
 
 
-public class EncodingTest extends TestCase {
+public class EncodingTest extends TestCase
+{
 
-  public EncodingTest(String name) {
+  public EncodingTest(String name)
+  {
     super(name);
   }
 
-  public void testCreation() throws Exception {
+  public void testCreation() throws Exception
+  {
     Encoding encoding;
     encoding = Encoding.getDatabaseEncoding("UTF8");
     assertEquals("UTF", encoding.name().substring(0, 3).toUpperCase(Locale.US));
@@ -40,7 +43,8 @@ public class EncodingTest extends TestCase {
         Encoding.getDatabaseEncoding("UNKNOWN"));
   }
 
-  public void testTransformations() throws Exception {
+  public void testTransformations() throws Exception
+  {
     Encoding encoding = Encoding.getDatabaseEncoding("UTF8");
     assertEquals("ab", encoding.decode(new byte[]{97, 98}));
 
@@ -54,7 +58,8 @@ public class EncodingTest extends TestCase {
         encoding.decode(new byte[]{97}));
   }
 
-  public void testReader() throws Exception {
+  public void testReader() throws Exception
+  {
     Encoding encoding = Encoding.getDatabaseEncoding("SQL_ASCII");
     InputStream stream = new ByteArrayInputStream(new byte[]{97, 98});
     Reader reader = encoding.getDecodingReader(stream);

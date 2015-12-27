@@ -21,7 +21,8 @@ import java.util.Set;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-public interface ProtocolConnection {
+public interface ProtocolConnection
+{
   /**
    * Constant returned by {@link #getTransactionState} indicating that no transaction is currently
    * open.

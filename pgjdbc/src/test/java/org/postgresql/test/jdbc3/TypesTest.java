@@ -20,20 +20,25 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-public class TypesTest extends TestCase {
+public class TypesTest extends TestCase
+{
 
   private Connection _conn;
 
-  public TypesTest(String name) {
+  public TypesTest(String name)
+  {
     super(name);
-    try {
+    try
+    {
       Class.forName("org.postgresql.Driver");
-    } catch (Exception ex) {
+    } catch (Exception ex)
+    {
 
     }
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     Statement stmt = _conn.createStatement();
     stmt.execute(
@@ -41,14 +46,16 @@ public class TypesTest extends TestCase {
     stmt.close();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("DROP FUNCTION return_bool(boolean)");
     stmt.close();
     TestUtil.closeDB(_conn);
   }
 
-  public void testPreparedBoolean() throws SQLException {
+  public void testPreparedBoolean() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?,?,?,?");
     pstmt.setNull(1, Types.BOOLEAN);
     pstmt.setObject(2, null, Types.BOOLEAN);
@@ -63,12 +70,14 @@ public class TypesTest extends TestCase {
     // Only the V3 protocol return will be strongly typed.
     // The V2 path will return a String because it doesn't know
     // any better.
-    if (TestUtil.isProtocolVersion(_conn, 3)) {
+    if (TestUtil.isProtocolVersion(_conn, 3))
+    {
       assertTrue(!((Boolean) rs.getObject(4)).booleanValue());
     }
   }
 
-  public void testPreparedByte() throws SQLException {
+  public void testPreparedByte() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?,?");
     pstmt.setByte(1, (byte) 1);
     pstmt.setObject(2, new Byte((byte) 2));
@@ -82,7 +91,8 @@ public class TypesTest extends TestCase {
     pstmt.close();
   }
 
-  public void testCallableBoolean() throws SQLException {
+  public void testCallableBoolean() throws SQLException
+  {
     CallableStatement cs = _conn.prepareCall("{? = call return_bool(?)}");
     cs.registerOutParameter(1, Types.BOOLEAN);
     cs.setBoolean(2, true);
@@ -91,7 +101,8 @@ public class TypesTest extends TestCase {
     cs.close();
   }
 
-  public void testUnknownType() throws SQLException {
+  public void testUnknownType() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
 
     ResultSet rs = stmt.executeQuery("select 'foo1' as icon1, 'foo2' as icon2 ");

@@ -19,7 +19,8 @@ import java.sql.SQLException;
 /**
  * Created by amozhenin on 30.09.2015.
  */
-public class CopyLargeFileTest extends TestCase {
+public class CopyLargeFileTest extends TestCase
+{
 
   private static final int FEED_COUNT = 10;
 
@@ -27,7 +28,8 @@ public class CopyLargeFileTest extends TestCase {
   private CopyManager copyAPI;
 
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
 
     super.setUp();
 
@@ -45,63 +47,79 @@ public class CopyLargeFileTest extends TestCase {
     copyAPI = ((PGConnection) con).getCopyAPI();
   }
 
-  private void feedTable() throws Exception {
+  private void feedTable() throws Exception
+  {
     PreparedStatement stmt = con.prepareStatement(
         TestUtil.insertSQL("pgjdbc_issue366_test_glossary", "text_id, name", "?, ?"));
     char ch = ' ';
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 26; i++)
+    {
       ch = (char) ((int) 'A' + i); //black magic
       insertData(stmt, "VERY_LONG_STRING_TO_REPRODUCE_ISSUE_366_" + ch + ch + ch,
           "" + ch + ch + ch);
     }
   }
 
-  private void insertData(PreparedStatement stmt, String textId, String name) throws SQLException {
+  private void insertData(PreparedStatement stmt, String textId, String name) throws SQLException
+  {
     stmt.setString(1, textId);
     stmt.setString(2, name);
     stmt.executeUpdate();
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     super.tearDown();
-    try {
+    try
+    {
       TestUtil.dropTable(con, "pgjdbc_issue366_test_data");
       TestUtil.dropTable(con, "pgjdbc_issue366_test_glossary");
       new File("target/buffer.txt").delete();
-    } finally {
+    } finally
+    {
       con.close();
     }
   }
 
-  public void testFeedTableSeveralTimesTest() throws Exception {
-    for (int i = 1; i <= FEED_COUNT; i++) {
+  public void testFeedTableSeveralTimesTest() throws Exception
+  {
+    for (int i = 1; i <= FEED_COUNT; i++)
+    {
       feedTableAndCheckTableFeedIsOk(con);
       cleanupTable(con);
     }
   }
 
-  private void feedTableAndCheckTableFeedIsOk(Connection conn) throws Exception {
+  private void feedTableAndCheckTableFeedIsOk(Connection conn) throws Exception
+  {
     InputStream in = null;
-    try {
+    try
+    {
       in = new StrangeInputStream(new FileInputStream("target/buffer.txt"));
       long size = copyAPI.copyIn(
           "COPY pgjdbc_issue366_test_data(data_text_id, glossary_text_id, value) FROM STDIN", in);
       assertEquals(BufferGenerator.ROW_COUNT, size);
-    } finally {
-      if (in != null) {
+    } finally
+    {
+      if (in != null)
+      {
         in.close();
       }
     }
 
   }
 
-  private void cleanupTable(Connection conn) throws Exception {
+  private void cleanupTable(Connection conn) throws Exception
+  {
     CallableStatement stmt = null;
-    try {
+    try
+    {
       stmt = conn.prepareCall("TRUNCATE pgjdbc_issue366_test_data;");
       stmt.execute();
-    } finally {
-      if (stmt != null) {
+    } finally
+    {
+      if (stmt != null)
+      {
         stmt.close();
       }
     }

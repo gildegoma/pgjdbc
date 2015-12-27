@@ -30,163 +30,208 @@ import javax.naming.spi.ObjectFactory;
  *
  * @author Aaron Mulder (ammulder@chariotsolutions.com)
  */
-public class MiniJndiContext implements Context {
+public class MiniJndiContext implements Context
+{
   private Map<String, Object> map = new HashMap<String, Object>();
 
-  public MiniJndiContext() {
+  public MiniJndiContext()
+  {
   }
 
-  public Object lookup(Name name) throws NamingException {
+  public Object lookup(Name name) throws NamingException
+  {
     return lookup(name.get(0));
   }
 
-  public Object lookup(String name) throws NamingException {
+  public Object lookup(String name) throws NamingException
+  {
     Object o = map.get(name);
-    if (o == null) {
+    if (o == null)
+    {
       return null;
     }
-    if (o instanceof Reference) {
+    if (o instanceof Reference)
+    {
       Reference ref = (Reference) o;
-      try {
+      try
+      {
         Class<?> factoryClass = Class.forName(ref.getFactoryClassName());
         ObjectFactory fac = (ObjectFactory) factoryClass.newInstance();
         Object result = fac.getObjectInstance(ref, null, this, null);
         return result;
-      } catch (Exception e) {
+      } catch (Exception e)
+      {
         throw new NamingException("Unable to dereference to object: " + e);
       }
-    } else if (o instanceof MarshalledObject) {
-      try {
+    } else if (o instanceof MarshalledObject)
+    {
+      try
+      {
         Object result = ((MarshalledObject<?>) o).get();
         return result;
-      } catch (java.io.IOException e) {
+      } catch (java.io.IOException e)
+      {
         throw new NamingException("Unable to deserialize object: " + e);
-      } catch (ClassNotFoundException e) {
+      } catch (ClassNotFoundException e)
+      {
         throw new NamingException("Unable to deserialize object: " + e);
       }
-    } else {
+    } else
+    {
       throw new NamingException("JNDI Object is neither Referenceable nor Serializable");
     }
   }
 
-  public void bind(Name name, Object obj) throws NamingException {
+  public void bind(Name name, Object obj) throws NamingException
+  {
     rebind(name.get(0), obj);
   }
 
-  public void bind(String name, Object obj) throws NamingException {
+  public void bind(String name, Object obj) throws NamingException
+  {
     rebind(name, obj);
   }
 
-  public void rebind(Name name, Object obj) throws NamingException {
+  public void rebind(Name name, Object obj) throws NamingException
+  {
     rebind(name.get(0), obj);
   }
 
-  public void rebind(String name, Object obj) throws NamingException {
-    if (obj instanceof Referenceable) {
+  public void rebind(String name, Object obj) throws NamingException
+  {
+    if (obj instanceof Referenceable)
+    {
       Reference ref = ((Referenceable) obj).getReference();
       map.put(name, ref);
-    } else if (obj instanceof Serializable) {
-      try {
+    } else if (obj instanceof Serializable)
+    {
+      try
+      {
         MarshalledObject<Object> mo = new MarshalledObject<Object>(obj);
         map.put(name, mo);
-      } catch (java.io.IOException e) {
+      } catch (java.io.IOException e)
+      {
         throw new NamingException("Unable to serialize object to JNDI: " + e);
       }
-    } else {
+    } else
+    {
       throw new NamingException(
           "Object to store in JNDI is neither Referenceable nor Serializable");
     }
   }
 
-  public void unbind(Name name) throws NamingException {
+  public void unbind(Name name) throws NamingException
+  {
     unbind(name.get(0));
   }
 
-  public void unbind(String name) throws NamingException {
+  public void unbind(String name) throws NamingException
+  {
     map.remove(name);
   }
 
-  public void rename(Name oldName, Name newName) throws NamingException {
+  public void rename(Name oldName, Name newName) throws NamingException
+  {
     rename(oldName.get(0), newName.get(0));
   }
 
-  public void rename(String oldName, String newName) throws NamingException {
+  public void rename(String oldName, String newName) throws NamingException
+  {
     map.put(newName, map.remove(oldName));
   }
 
-  public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
+  public NamingEnumeration<NameClassPair> list(Name name) throws NamingException
+  {
     return null;
   }
 
-  public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
+  public NamingEnumeration<NameClassPair> list(String name) throws NamingException
+  {
     return null;
   }
 
-  public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
+  public NamingEnumeration<Binding> listBindings(Name name) throws NamingException
+  {
     return null;
   }
 
-  public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
+  public NamingEnumeration<Binding> listBindings(String name) throws NamingException
+  {
     return null;
   }
 
-  public void destroySubcontext(Name name) throws NamingException {
+  public void destroySubcontext(Name name) throws NamingException
+  {
   }
 
-  public void destroySubcontext(String name) throws NamingException {
+  public void destroySubcontext(String name) throws NamingException
+  {
   }
 
-  public Context createSubcontext(Name name) throws NamingException {
+  public Context createSubcontext(Name name) throws NamingException
+  {
     return null;
   }
 
-  public Context createSubcontext(String name) throws NamingException {
+  public Context createSubcontext(String name) throws NamingException
+  {
     return null;
   }
 
-  public Object lookupLink(Name name) throws NamingException {
+  public Object lookupLink(Name name) throws NamingException
+  {
     return null;
   }
 
-  public Object lookupLink(String name) throws NamingException {
+  public Object lookupLink(String name) throws NamingException
+  {
     return null;
   }
 
-  public NameParser getNameParser(Name name) throws NamingException {
+  public NameParser getNameParser(Name name) throws NamingException
+  {
     return null;
   }
 
-  public NameParser getNameParser(String name) throws NamingException {
+  public NameParser getNameParser(String name) throws NamingException
+  {
     return null;
   }
 
-  public Name composeName(Name name, Name prefix) throws NamingException {
+  public Name composeName(Name name, Name prefix) throws NamingException
+  {
     return null;
   }
 
   public String composeName(String name, String prefix)
-      throws NamingException {
+      throws NamingException
+  {
     return null;
   }
 
   public Object addToEnvironment(String propName, Object propVal)
-      throws NamingException {
+      throws NamingException
+  {
     return null;
   }
 
   public Object removeFromEnvironment(String propName)
-      throws NamingException {
+      throws NamingException
+  {
     return null;
   }
 
-  public Hashtable<?, ?> getEnvironment() throws NamingException {
+  public Hashtable<?, ?> getEnvironment() throws NamingException
+  {
     return null;
   }
 
-  public void close() throws NamingException {
+  public void close() throws NamingException
+  {
   }
 
-  public String getNameInNamespace() throws NamingException {
+  public String getNameInNamespace() throws NamingException
+  {
     return null;
   }
 }

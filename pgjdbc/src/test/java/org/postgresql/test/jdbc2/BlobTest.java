@@ -29,42 +29,53 @@ import java.sql.Types;
  * Some simple tests based on problems reported by users. Hopefully these will help prevent previous
  * problems from re-occuring ;-)
  */
-public class BlobTest extends TestCase {
+public class BlobTest extends TestCase
+{
 
   private Connection con;
 
   private static final int LOOP = 0; // LargeObject API using loop
   private static final int NATIVE_STREAM = 1; // LargeObject API using OutputStream
 
-  public BlobTest(String name) {
+  public BlobTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, "testblob", "id name,lo oid");
     con.setAutoCommit(false);
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     con.setAutoCommit(true);
-    try {
+    try
+    {
       Statement stmt = con.createStatement();
-      try {
+      try
+      {
         stmt.execute("SELECT lo_unlink(lo) FROM testblob");
-      } finally {
-        try {
+      } finally
+      {
+        try
+        {
           stmt.close();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
         }
       }
-    } finally {
+    } finally
+    {
       TestUtil.dropTable(con, "testblob");
       TestUtil.closeDB(con);
     }
   }
 
-  public void testSetNull() throws Exception {
+  public void testSetNull() throws Exception
+  {
     PreparedStatement pstmt = con.prepareStatement("INSERT INTO testblob(lo) VALUES (?)");
 
     pstmt.setBlob(1, (Blob) null);
@@ -86,7 +97,8 @@ public class BlobTest extends TestCase {
     pstmt.executeUpdate();
   }
 
-  public void testSet() throws SQLException {
+  public void testSet() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.execute("INSERT INTO testblob(id,lo) VALUES ('1', lo_creat(-1))");
     ResultSet rs = stmt.executeQuery("SELECT lo FROM testblob");
@@ -128,7 +140,8 @@ public class BlobTest extends TestCase {
   /*
    * Tests one method of uploading a blob to the database
    */
-  public void testUploadBlob_LOOP() throws Exception {
+  public void testUploadBlob_LOOP() throws Exception
+  {
     assertTrue(uploadFile("/test-file.xml", LOOP) > 0);
 
     // Now compare the blob & the file. Note this actually tests the
@@ -141,7 +154,8 @@ public class BlobTest extends TestCase {
   /*
    * Tests one method of uploading a blob to the database
    */
-  public void testUploadBlob_NATIVE() throws Exception {
+  public void testUploadBlob_NATIVE() throws Exception
+  {
     assertTrue(uploadFile("/test-file.xml", NATIVE_STREAM) > 0);
 
     // Now compare the blob & the file. Note this actually tests the
@@ -149,7 +163,8 @@ public class BlobTest extends TestCase {
     assertTrue(compareBlobs());
   }
 
-  public void testGetBytesOffset() throws Exception {
+  public void testGetBytesOffset() throws Exception
+  {
     assertTrue(uploadFile("/test-file.xml", NATIVE_STREAM) > 0);
 
     Statement stmt = con.createStatement();
@@ -165,7 +180,8 @@ public class BlobTest extends TestCase {
     assertEquals(data[3], 'l');
   }
 
-  public void testMultipleStreams() throws Exception {
+  public void testMultipleStreams() throws Exception
+  {
     assertTrue(uploadFile("/test-file.xml", NATIVE_STREAM) > 0);
 
     Statement stmt = con.createStatement();
@@ -188,7 +204,8 @@ public class BlobTest extends TestCase {
     is.close();
   }
 
-  public void testParallelStreams() throws Exception {
+  public void testParallelStreams() throws Exception
+  {
     assertTrue(uploadFile("/test-file.xml", NATIVE_STREAM) > 0);
 
     Statement stmt = con.createStatement();
@@ -199,11 +216,13 @@ public class BlobTest extends TestCase {
     InputStream is1 = lob.getBinaryStream();
     InputStream is2 = lob.getBinaryStream();
 
-    while (true) {
+    while (true)
+    {
       int i1 = is1.read();
       int i2 = is2.read();
       assertEquals(i1, i2);
-      if (i1 == -1) {
+      if (i1 == -1)
+      {
         break;
       }
     }
@@ -212,8 +231,10 @@ public class BlobTest extends TestCase {
     is2.close();
   }
 
-  public void testLargeLargeObject() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(con, "9.3")) {
+  public void testLargeLargeObject() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "9.3"))
+    {
       return;
     }
 
@@ -233,7 +254,8 @@ public class BlobTest extends TestCase {
    * because it always works, and we can use it as a base to test the new
    * methods.
    */
-  private long uploadFile(String file, int method) throws Exception {
+  private long uploadFile(String file, int method) throws Exception
+  {
     LargeObjectManager lom = ((org.postgresql.PGConnection) con).getLargeObjectAPI();
 
     InputStream fis = getClass().getResourceAsStream(file);
@@ -245,11 +267,13 @@ public class BlobTest extends TestCase {
     byte buf[];
     OutputStream os;
 
-    switch (method) {
+    switch (method)
+    {
       case LOOP:
         buf = new byte[2048];
         t = 0;
-        while ((s = fis.read(buf, 0, buf.length)) > 0) {
+        while ((s = fis.read(buf, 0, buf.length)) > 0)
+        {
           t += s;
           blob.write(buf, 0, s);
         }
@@ -258,7 +282,8 @@ public class BlobTest extends TestCase {
       case NATIVE_STREAM:
         os = blob.getOutputStream();
         s = fis.read();
-        while (s > -1) {
+        while (s > -1)
+        {
           os.write(s);
           s = fis.read();
         }
@@ -285,7 +310,8 @@ public class BlobTest extends TestCase {
    * Helper - compares the blobs in a table with a local file. Note this uses
    * the postgresql specific Large Object API
    */
-  private boolean compareBlobsLOAPI() throws Exception {
+  private boolean compareBlobsLOAPI() throws Exception
+  {
     boolean result = true;
 
     LargeObjectManager lom = ((org.postgresql.PGConnection) con).getLargeObjectAPI();
@@ -294,7 +320,8 @@ public class BlobTest extends TestCase {
     ResultSet rs = st.executeQuery(TestUtil.selectSQL("testblob", "id,lo"));
     assertNotNull(rs);
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       String file = rs.getString(1);
       long oid = rs.getLong(2);
 
@@ -305,7 +332,8 @@ public class BlobTest extends TestCase {
       int f = fis.read();
       int b = bis.read();
       int c = 0;
-      while (f >= 0 && b >= 0 & result) {
+      while (f >= 0 && b >= 0 & result)
+      {
         result = (f == b);
         f = fis.read();
         b = bis.read();
@@ -313,7 +341,8 @@ public class BlobTest extends TestCase {
       }
       result = result && f == -1 && b == -1;
 
-      if (!result) {
+      if (!result)
+      {
         assertTrue("Large Object API Blob compare failed at " + c + " of " + blob.size(), false);
       }
 
@@ -330,14 +359,16 @@ public class BlobTest extends TestCase {
    * Helper - compares the blobs in a table with a local file. This uses the
    * jdbc java.sql.Blob api
    */
-  private boolean compareBlobs() throws Exception {
+  private boolean compareBlobs() throws Exception
+  {
     boolean result = true;
 
     Statement st = con.createStatement();
     ResultSet rs = st.executeQuery(TestUtil.selectSQL("testblob", "id,lo"));
     assertNotNull(rs);
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       String file = rs.getString(1);
       Blob blob = rs.getBlob(2);
 
@@ -347,7 +378,8 @@ public class BlobTest extends TestCase {
       int f = fis.read();
       int b = bis.read();
       int c = 0;
-      while (f >= 0 && b >= 0 & result) {
+      while (f >= 0 && b >= 0 & result)
+      {
         result = (f == b);
         f = fis.read();
         b = bis.read();
@@ -355,7 +387,8 @@ public class BlobTest extends TestCase {
       }
       result = result && f == -1 && b == -1;
 
-      if (!result) {
+      if (!result)
+      {
         assertTrue("JDBC API Blob compare failed at " + c + " of " + blob.length(), false);
       }
 
@@ -371,14 +404,16 @@ public class BlobTest extends TestCase {
   /*
    * Helper - compares the clobs in a table with a local file.
    */
-  private boolean compareClobs() throws Exception {
+  private boolean compareClobs() throws Exception
+  {
     boolean result = true;
 
     Statement st = con.createStatement();
     ResultSet rs = st.executeQuery(TestUtil.selectSQL("testblob", "id,lo"));
     assertNotNull(rs);
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       String file = rs.getString(1);
       Clob clob = rs.getClob(2);
 
@@ -388,7 +423,8 @@ public class BlobTest extends TestCase {
       int f = fis.read();
       int b = bis.read();
       int c = 0;
-      while (f >= 0 && b >= 0 & result) {
+      while (f >= 0 && b >= 0 & result)
+      {
         result = (f == b);
         f = fis.read();
         b = bis.read();
@@ -396,7 +432,8 @@ public class BlobTest extends TestCase {
       }
       result = result && f == -1 && b == -1;
 
-      if (!result) {
+      if (!result)
+      {
         assertTrue("Clob compare failed at " + c + " of " + clob.length(), false);
       }
 

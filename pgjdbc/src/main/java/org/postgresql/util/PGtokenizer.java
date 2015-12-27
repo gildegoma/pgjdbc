@@ -23,7 +23,8 @@ import java.util.List;
  * @see org.postgresql.geometric.PGpoint
  * @see org.postgresql.geometric.PGpolygon
  */
-public class PGtokenizer {
+public class PGtokenizer
+{
   // Our tokens
   protected List<String> tokens;
 
@@ -36,7 +37,8 @@ public class PGtokenizer {
    * @param string containing tokens
    * @param delim  single character to split the tokens
    */
-  public PGtokenizer(String string, char delim) {
+  public PGtokenizer(String string, char delim)
+  {
     tokenize(string, delim);
   }
 
@@ -47,7 +49,8 @@ public class PGtokenizer {
    * @param delim  single character to split the tokens
    * @return number of tokens
    */
-  public int tokenize(String string, char delim) {
+  public int tokenize(String string, char delim)
+  {
     tokens = new ArrayList<String>();
 
     // nest holds how many levels we are in the current token.
@@ -63,33 +66,41 @@ public class PGtokenizer {
     boolean skipChar = false;
     boolean nestedDoubleQuote = false;
 
-    for (p = 0, s = 0; p < string.length(); p++) {
+    for (p = 0, s = 0; p < string.length(); p++)
+    {
       char c = string.charAt(p);
 
       // increase nesting if an open character is found
-      if (c == '(' || c == '[' || c == '<' || (!nestedDoubleQuote && !skipChar && c == '"')) {
+      if (c == '(' || c == '[' || c == '<' || (!nestedDoubleQuote && !skipChar && c == '"'))
+      {
         nest++;
-        if (c == '"') {
+        if (c == '"')
+        {
           nestedDoubleQuote = true;
           skipChar = true;
         }
       }
 
       // decrease nesting if a close character is found
-      if (c == ')' || c == ']' || c == '>' || (nestedDoubleQuote && !skipChar && c == '"')) {
+      if (c == ')' || c == ']' || c == '>' || (nestedDoubleQuote && !skipChar && c == '"'))
+      {
         nest--;
-        if (c == '"') {
+        if (c == '"')
+        {
           nestedDoubleQuote = false;
         }
       }
 
-      if (c == '\\') {
+      if (c == '\\')
+      {
         skipChar = true;
-      } else {
+      } else
+      {
         skipChar = false;
       }
 
-      if (nest == 0 && c == delim) {
+      if (nest == 0 && c == delim)
+      {
         tokens.add(string.substring(s, p));
         s = p + 1; // +1 to skip the delimiter
       }
@@ -99,7 +110,8 @@ public class PGtokenizer {
     // Don't forget the last token ;-)
 
 
-    if (s < string.length()) {
+    if (s < string.length())
+    {
       tokens.add(string.substring(s));
     }
 
@@ -109,7 +121,8 @@ public class PGtokenizer {
   /**
    * @return the number of tokens available
    */
-  public int getSize() {
+  public int getSize()
+  {
     return tokens.size();
   }
 
@@ -117,7 +130,8 @@ public class PGtokenizer {
    * @param n Token number ( 0 ... getSize()-1 )
    * @return The token value
    */
-  public String getToken(int n) {
+  public String getToken(int n)
+  {
     return tokens.get(n);
   }
 
@@ -130,7 +144,8 @@ public class PGtokenizer {
    * @param delim The delimiter to use
    * @return A new instance of PGtokenizer based on the token
    */
-  public PGtokenizer tokenizeToken(int n, char delim) {
+  public PGtokenizer tokenizeToken(int n, char delim)
+  {
     return new PGtokenizer(getToken(n), delim);
   }
 
@@ -142,11 +157,14 @@ public class PGtokenizer {
    * @param t Trailing string to remove
    * @return String without the lead/trailing strings
    */
-  public static String remove(String s, String l, String t) {
-    if (s.startsWith(l)) {
+  public static String remove(String s, String l, String t)
+  {
+    if (s.startsWith(l))
+    {
       s = s.substring(l.length());
     }
-    if (s.endsWith(t)) {
+    if (s.endsWith(t))
+    {
       s = s.substring(0, s.length() - t.length());
     }
     return s;
@@ -158,8 +176,10 @@ public class PGtokenizer {
    * @param l Leading string to remove
    * @param t Trailing string to remove
    */
-  public void remove(String l, String t) {
-    for (int i = 0; i < tokens.size(); i++) {
+  public void remove(String l, String t)
+  {
+    for (int i = 0; i < tokens.size(); i++)
+    {
       tokens.set(i, remove(tokens.get(i), l, t));
     }
   }
@@ -170,14 +190,16 @@ public class PGtokenizer {
    * @param s String to remove from
    * @return String without the ( or )
    */
-  public static String removePara(String s) {
+  public static String removePara(String s)
+  {
     return remove(s, "(", ")");
   }
 
   /**
    * Removes ( and ) from the beginning and end of all tokens
    */
-  public void removePara() {
+  public void removePara()
+  {
     remove("(", ")");
   }
 
@@ -187,14 +209,16 @@ public class PGtokenizer {
    * @param s String to remove from
    * @return String without the [ or ]
    */
-  public static String removeBox(String s) {
+  public static String removeBox(String s)
+  {
     return remove(s, "[", "]");
   }
 
   /**
    * Removes [ and ] from the beginning and end of all tokens
    */
-  public void removeBox() {
+  public void removeBox()
+  {
     remove("[", "]");
   }
 
@@ -204,14 +228,16 @@ public class PGtokenizer {
    * @param s String to remove from
    * @return String without the &lt; or &gt;
    */
-  public static String removeAngle(String s) {
+  public static String removeAngle(String s)
+  {
     return remove(s, "<", ">");
   }
 
   /**
    * Removes &lt; and &gt; from the beginning and end of all tokens
    */
-  public void removeAngle() {
+  public void removeAngle()
+  {
     remove("<", ">");
   }
 
@@ -221,14 +247,16 @@ public class PGtokenizer {
    * @param s String to remove from
    * @return String without the { or }
    */
-  public static String removeCurlyBrace(String s) {
+  public static String removeCurlyBrace(String s)
+  {
     return remove(s, "{", "}");
   }
 
   /**
    * Removes &lt; and &gt; from the beginning and end of all tokens
    */
-  public void removeCurlyBrace() {
+  public void removeCurlyBrace()
+  {
     remove("{", "}");
   }
 

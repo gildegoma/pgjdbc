@@ -6,7 +6,8 @@ package org.postgresql.jdbc2;
  *
  * @author Minglei Tu
  */
-public interface ArrayAssistant {
+public interface ArrayAssistant
+{
   /**
    * get array base type
    *

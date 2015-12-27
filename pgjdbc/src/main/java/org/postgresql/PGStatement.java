@@ -14,7 +14,8 @@ import java.sql.SQLException;
  * This interface defines the public PostgreSQL extensions to java.sql.Statement. All Statements
  * constructed by the PostgreSQL driver implement PGStatement.
  */
-public interface PGStatement {
+public interface PGStatement
+{
   // We can't use Long.MAX_VALUE or Long.MIN_VALUE for java.sql.date
   // because this would break the 'normalization contract' of the
   // java.sql.Date API.

@@ -21,9 +21,11 @@ import java.util.Properties;
 /*
  * Executes multi host tests (aka master/slave connectivity selection).
  */
-public class MultiHostTestSuite extends TestSuite {
+public class MultiHostTestSuite extends TestSuite
+{
 
-  public static java.sql.Connection openSlaveDB() throws Exception {
+  public static java.sql.Connection openSlaveDB() throws Exception
+  {
     TestUtil.initDriver();
 
     Properties props = new Properties();
@@ -37,14 +39,16 @@ public class MultiHostTestSuite extends TestSuite {
   /*
    * Returns the Test server
    */
-  public static String getSlaveServer() {
+  public static String getSlaveServer()
+  {
     return System.getProperty("slaveServer", TestUtil.getServer());
   }
 
   /*
    * Returns the Test port
    */
-  public static int getSlavePort() {
+  public static int getSlavePort()
+  {
     return Integer.parseInt(
         System.getProperty("slavePort", String.valueOf(TestUtil.getPort() + 1)));
   }
@@ -52,14 +56,17 @@ public class MultiHostTestSuite extends TestSuite {
   /*
    * The main entry point for JUnit
    */
-  public static TestSuite suite() throws Exception {
+  public static TestSuite suite() throws Exception
+  {
     Class.forName("org.postgresql.Driver");
     TestSuite suite = new TestSuite();
 
-    try {
+    try
+    {
       Connection connection = openSlaveDB();
       TestUtil.closeDB(connection);
-    } catch (PSQLException ex) {
+    } catch (PSQLException ex)
+    {
       // replication instance is not available, but suite must have at lest one test case
       suite.addTestSuite(DummyTest.class);
       return suite;
@@ -69,12 +76,15 @@ public class MultiHostTestSuite extends TestSuite {
     return suite;
   }
 
-  public static class DummyTest extends TestCase {
-    public DummyTest(String name) {
+  public static class DummyTest extends TestCase
+  {
+    public DummyTest(String name)
+    {
       super(name);
     }
 
-    public void testDummy() {
+    public void testDummy()
+    {
     }
   }
 }

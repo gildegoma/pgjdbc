@@ -9,20 +9,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class CloseOnCompletionTest extends TestCase {
+public class CloseOnCompletionTest extends TestCase
+{
 
   private Connection _conn;
 
-  public CloseOnCompletionTest(String name) {
+  public CloseOnCompletionTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     TestUtil.createTable(_conn, "table1", "id integer");
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.dropTable(_conn, "table1");
     TestUtil.closeDB(_conn);
   }
@@ -30,7 +34,8 @@ public class CloseOnCompletionTest extends TestCase {
   /**
    * Test that the statement is not automatically closed if we do not ask for it
    */
-  public void testWithoutCloseOnCompletion() throws SQLException {
+  public void testWithoutCloseOnCompletion() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
 
     ResultSet rs = stmt.executeQuery(TestUtil.selectSQL("table1", "*"));
@@ -41,7 +46,8 @@ public class CloseOnCompletionTest extends TestCase {
   /**
    * Test the behavior of closeOnCompletion with a single result set
    */
-  public void testSingleResultSet() throws SQLException {
+  public void testSingleResultSet() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.closeOnCompletion();
 
@@ -53,7 +59,8 @@ public class CloseOnCompletionTest extends TestCase {
   /**
    * Test the behavior of closeOnCompletion with a multiple result sets
    */
-  public void testMultipleResultSet() throws SQLException {
+  public void testMultipleResultSet() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.closeOnCompletion();
 
@@ -72,7 +79,8 @@ public class CloseOnCompletionTest extends TestCase {
    * Test that when execution does not produce any result sets, closeOnCompletion has no effect
    * (spec)
    */
-  public void testNoResultSet() throws SQLException {
+  public void testNoResultSet() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.closeOnCompletion();
 

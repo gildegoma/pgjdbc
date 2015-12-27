@@ -21,7 +21,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaData {
+public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaData
+{
   protected final BaseConnection connection;
   protected final Field[] fields;
 
@@ -34,7 +35,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    *
    * @param fields the array of field descriptors
    */
-  public PgResultSetMetaData(BaseConnection connection, Field[] fields) {
+  public PgResultSetMetaData(BaseConnection connection, Field[] fields)
+  {
     this.connection = connection;
     this.fields = fields;
     fieldInfoFetched = false;
@@ -47,7 +49,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the number
    * @exception SQLException if a database access error occurs
    */
-  public int getColumnCount() throws SQLException {
+  public int getColumnCount() throws SQLException
+  {
     return fields.length;
   }
 
@@ -59,7 +62,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if so
    * @exception SQLException if a database access error occurs
    */
-  public boolean isAutoIncrement(int column) throws SQLException {
+  public boolean isAutoIncrement(int column) throws SQLException
+  {
     fetchFieldMetaData();
     Field field = getField(column);
     return field.getAutoIncrement();
@@ -73,7 +77,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if so
    * @exception SQLException if a database access error occurs
    */
-  public boolean isCaseSensitive(int column) throws SQLException {
+  public boolean isCaseSensitive(int column) throws SQLException
+  {
     Field field = getField(column);
     return connection.getTypeInfo().isCaseSensitive(field.getOID());
   }
@@ -90,7 +95,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if they can be used in a WHERE clause
    * @exception SQLException if a database access error occurs
    */
-  public boolean isSearchable(int column) throws SQLException {
+  public boolean isSearchable(int column) throws SQLException
+  {
     return true;
   }
 
@@ -103,7 +109,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if its a cash column
    * @exception SQLException if a database access error occurs
    */
-  public boolean isCurrency(int column) throws SQLException {
+  public boolean isCurrency(int column) throws SQLException
+  {
     String type_name = getPGType(column);
 
     return type_name.equals("cash") || type_name.equals("money");
@@ -116,7 +123,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return one of the columnNullable values
    * @exception SQLException if a database access error occurs
    */
-  public int isNullable(int column) throws SQLException {
+  public int isNullable(int column) throws SQLException
+  {
     fetchFieldMetaData();
     Field field = getField(column);
     return field.getNullable();
@@ -131,7 +139,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if so
    * @exception SQLException if a database access error occurs
    */
-  public boolean isSigned(int column) throws SQLException {
+  public boolean isSigned(int column) throws SQLException
+  {
     Field field = getField(column);
     return connection.getTypeInfo().isSigned(field.getOID());
   }
@@ -143,7 +152,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the maximum width
    * @exception SQLException if a database access error occurs
    */
-  public int getColumnDisplaySize(int column) throws SQLException {
+  public int getColumnDisplaySize(int column) throws SQLException
+  {
     Field field = getField(column);
     return connection.getTypeInfo().getDisplaySize(field.getOID(), field.getMod());
   }
@@ -153,7 +163,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the column label
    * @exception SQLException if a database access error occurs
    */
-  public String getColumnLabel(int column) throws SQLException {
+  public String getColumnLabel(int column) throws SQLException
+  {
     Field field = getField(column);
     return field.getColumnLabel();
   }
@@ -165,11 +176,13 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the column name
    * @exception SQLException if a database access error occurs
    */
-  public String getColumnName(int column) throws SQLException {
+  public String getColumnName(int column) throws SQLException
+  {
     return getColumnLabel(column);
   }
 
-  public String getBaseColumnName(int column) throws SQLException {
+  public String getBaseColumnName(int column) throws SQLException
+  {
     fetchFieldMetaData();
     Field field = getField(column);
     return field.getColumnName();
@@ -180,18 +193,22 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the Schema Name
    * @exception SQLException if a database access error occurs
    */
-  public String getSchemaName(int column) throws SQLException {
+  public String getSchemaName(int column) throws SQLException
+  {
     return "";
   }
 
-  private void fetchFieldMetaData() throws SQLException {
-    if (fieldInfoFetched) {
+  private void fetchFieldMetaData() throws SQLException
+  {
+    if (fieldInfoFetched)
+    {
       return;
     }
 
     // see if cached
     String idFields = _cache.getIdFields(fields);
-    if (_cache.isCached(idFields)) {
+    if (_cache.isCached(idFields))
+    {
       // get metadata from cache
       _cache.getCache(idFields, fields);
       fieldInfoFetched = true;
@@ -216,39 +233,47 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
     // so we've got to fake that with a JOIN here.
     //
     boolean hasSourceInfo = false;
-    for (Field field : fields) {
-      if (field.getTableOid() == 0) {
+    for (Field field : fields)
+    {
+      if (field.getTableOid() == 0)
+      {
         continue;
       }
 
-      if (hasSourceInfo) {
+      if (hasSourceInfo)
+      {
         sql.append(" UNION ALL ");
       }
 
       sql.append("SELECT ");
       sql.append(field.getTableOid());
-      if (!hasSourceInfo) {
+      if (!hasSourceInfo)
+      {
         sql.append(" AS oid ");
       }
       sql.append(", ");
       sql.append(field.getPositionInTable());
-      if (!hasSourceInfo) {
+      if (!hasSourceInfo)
+      {
         sql.append(" AS attnum");
       }
 
-      if (!hasSourceInfo) {
+      if (!hasSourceInfo)
+      {
         hasSourceInfo = true;
       }
     }
     sql.append(") vals ON (c.oid = vals.oid AND a.attnum = vals.attnum) ");
 
-    if (!hasSourceInfo) {
+    if (!hasSourceInfo)
+    {
       return;
     }
 
     Statement stmt = connection.createStatement();
     ResultSet rs = stmt.executeQuery(sql.toString());
-    while (rs.next()) {
+    while (rs.next())
+    {
       int table = (int) rs.getLong(1);
       int column = (int) rs.getLong(2);
       String columnName = rs.getString(3);
@@ -257,8 +282,10 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
       int nullable =
           rs.getBoolean(6) ? ResultSetMetaData.columnNoNulls : ResultSetMetaData.columnNullable;
       boolean autoIncrement = rs.getBoolean(7);
-      for (Field field : fields) {
-        if (field.getTableOid() == table && field.getPositionInTable() == column) {
+      for (Field field : fields)
+      {
+        if (field.getTableOid() == table && field.getPositionInTable() == column)
+        {
           field.setColumnName(columnName);
           field.setTableName(tableName);
           field.setSchemaName(schemaName);
@@ -272,7 +299,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
     _cache.setCache(idFields, fields);
   }
 
-  public String getBaseSchemaName(int column) throws SQLException {
+  public String getBaseSchemaName(int column) throws SQLException
+  {
     fetchFieldMetaData();
     Field field = getField(column);
     return field.getSchemaName();
@@ -285,7 +313,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the precision
    * @exception SQLException if a database access error occurs
    */
-  public int getPrecision(int column) throws SQLException {
+  public int getPrecision(int column) throws SQLException
+  {
     Field field = getField(column);
     return connection.getTypeInfo().getPrecision(field.getOID(), field.getMod());
   }
@@ -298,7 +327,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the scale
    * @exception SQLException if a database access error occurs
    */
-  public int getScale(int column) throws SQLException {
+  public int getScale(int column) throws SQLException
+  {
     Field field = getField(column);
     return connection.getTypeInfo().getScale(field.getOID(), field.getMod());
   }
@@ -309,11 +339,13 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @exception SQLException if a database access error occurs
    * @see #getBaseTableName
    */
-  public String getTableName(int column) throws SQLException {
+  public String getTableName(int column) throws SQLException
+  {
     return getBaseTableName(column);
   }
 
-  public String getBaseTableName(int column) throws SQLException {
+  public String getBaseTableName(int column) throws SQLException
+  {
     fetchFieldMetaData();
     Field field = getField(column);
     return field.getTableName();
@@ -328,7 +360,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return catalog name, or "" if not applicable
    * @exception SQLException if a database access error occurs
    */
-  public String getCatalogName(int column) throws SQLException {
+  public String getCatalogName(int column) throws SQLException
+  {
     return "";
   }
 
@@ -341,7 +374,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @see org.postgresql.Field#getSQLType
    * @see java.sql.Types
    */
-  public int getColumnType(int column) throws SQLException {
+  public int getColumnType(int column) throws SQLException
+  {
     return getSQLType(column);
   }
 
@@ -352,7 +386,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return column name, or "" if not applicable
    * @exception SQLException if a database access error occurs
    */
-  public int getFormat(int column) throws SQLException {
+  public int getFormat(int column) throws SQLException
+  {
     return getField(column).getFormat();
   }
 
@@ -363,12 +398,16 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the type name
    * @exception SQLException if a database access error occurs
    */
-  public String getColumnTypeName(int column) throws SQLException {
+  public String getColumnTypeName(int column) throws SQLException
+  {
     String type = getPGType(column);
-    if (isAutoIncrement(column)) {
-      if ("int4".equals(type)) {
+    if (isAutoIncrement(column))
+    {
+      if ("int4".equals(type))
+      {
         return "serial";
-      } else if ("int8".equals(type)) {
+      } else if ("int8".equals(type))
+      {
         return "bigserial";
       }
     }
@@ -386,7 +425,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if so
    * @exception SQLException if a database access error occurs
    */
-  public boolean isReadOnly(int column) throws SQLException {
+  public boolean isReadOnly(int column) throws SQLException
+  {
     return false;
   }
 
@@ -400,7 +440,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if so
    * @exception SQLException if a database access error occurs
    */
-  public boolean isWritable(int column) throws SQLException {
+  public boolean isWritable(int column) throws SQLException
+  {
     return !isReadOnly(column);
   }
 
@@ -414,7 +455,8 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return true if so
    * @exception SQLException if a database access error occurs
    */
-  public boolean isDefinitelyWritable(int column) throws SQLException {
+  public boolean isDefinitelyWritable(int column) throws SQLException
+  {
     return false;
   }
 
@@ -431,8 +473,10 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * @return the Field description
    * @exception SQLException if a database access error occurs
    */
-  protected Field getField(int columnIndex) throws SQLException {
-    if (columnIndex < 1 || columnIndex > fields.length) {
+  protected Field getField(int columnIndex) throws SQLException
+  {
+    if (columnIndex < 1 || columnIndex > fields.length)
+    {
       throw new PSQLException(
           GT.tr("The column index is out of range: {0}, number of columns: {1}.",
               new Object[]{columnIndex, fields.length}), PSQLState.INVALID_PARAMETER_VALUE);
@@ -440,11 +484,13 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
     return fields[columnIndex - 1];
   }
 
-  protected String getPGType(int columnIndex) throws SQLException {
+  protected String getPGType(int columnIndex) throws SQLException
+  {
     return connection.getTypeInfo().getPGType(getField(columnIndex).getOID());
   }
 
-  protected int getSQLType(int columnIndex) throws SQLException {
+  protected int getSQLType(int columnIndex) throws SQLException
+  {
     return connection.getTypeInfo().getSQLType(getField(columnIndex).getOID());
   }
 
@@ -465,33 +511,40 @@ public class PgResultSetMetaData implements ResultSetMetaData, PGResultSetMetaDa
    * column. This is the class name used for custom mapping.
    * @throws SQLException if a database access error occurs
    */
-  public String getColumnClassName(int column) throws SQLException {
+  public String getColumnClassName(int column) throws SQLException
+  {
     Field field = getField(column);
     String result = connection.getTypeInfo().getJavaClass(field.getOID());
 
-    if (result != null) {
+    if (result != null)
+    {
       return result;
     }
 
     int sqlType = getSQLType(column);
-    switch (sqlType) {
+    switch (sqlType)
+    {
       case Types.ARRAY:
         return ("java.sql.Array");
       default:
         String type = getPGType(column);
-        if ("unknown".equals(type)) {
+        if ("unknown".equals(type))
+        {
           return ("java.lang.String");
         }
         return ("java.lang.Object");
     }
   }
 
-  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+  public boolean isWrapperFor(Class<?> iface) throws SQLException
+  {
     return iface.isAssignableFrom(getClass());
   }
 
-  public <T> T unwrap(Class<T> iface) throws SQLException {
-    if (iface.isAssignableFrom(getClass())) {
+  public <T> T unwrap(Class<T> iface) throws SQLException
+  {
+    if (iface.isAssignableFrom(getClass()))
+    {
       return iface.cast(this);
     }
     throw new SQLException("Cannot unwrap to " + iface.getName());

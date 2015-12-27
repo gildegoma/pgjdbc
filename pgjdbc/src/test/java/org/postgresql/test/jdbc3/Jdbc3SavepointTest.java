@@ -19,38 +19,45 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 import java.sql.Statement;
 
-public class Jdbc3SavepointTest extends TestCase {
+public class Jdbc3SavepointTest extends TestCase
+{
 
   private Connection _conn;
 
-  public Jdbc3SavepointTest(String name) {
+  public Jdbc3SavepointTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     TestUtil.createTable(_conn, "savepointtable", "id int primary key");
     _conn.setAutoCommit(false);
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     _conn.setAutoCommit(true);
     TestUtil.dropTable(_conn, "savepointtable");
     TestUtil.closeDB(_conn);
   }
 
-  private boolean hasSavepoints() throws SQLException {
+  private boolean hasSavepoints() throws SQLException
+  {
     return TestUtil.haveMinimumServerVersion(_conn, "8.0");
   }
 
-  private void addRow(int id) throws SQLException {
+  private void addRow(int id) throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("INSERT INTO savepointtable VALUES (?)");
     pstmt.setInt(1, id);
     pstmt.executeUpdate();
     pstmt.close();
   }
 
-  private int countRows() throws SQLException {
+  private int countRows() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM savepointtable");
     rs.next();
@@ -59,50 +66,64 @@ public class Jdbc3SavepointTest extends TestCase {
     return count;
   }
 
-  public void testAutoCommitFails() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testAutoCommitFails() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
     _conn.setAutoCommit(true);
 
-    try {
+    try
+    {
       _conn.setSavepoint();
       fail("Can't create a savepoint with autocommit.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
-    try {
+    try
+    {
       _conn.setSavepoint("spname");
       fail("Can't create a savepoint with autocommit.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  public void testCantMixSavepointTypes() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testCantMixSavepointTypes() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
     Savepoint namedSavepoint = _conn.setSavepoint("named");
     Savepoint unNamedSavepoint = _conn.setSavepoint();
 
-    try {
+    try
+    {
       namedSavepoint.getSavepointId();
       fail("Can't get id from named savepoint.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
-    try {
+    try
+    {
       unNamedSavepoint.getSavepointName();
       fail("Can't get name from unnamed savepoint.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
   }
 
-  public void testRollingBackToSavepoints() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testRollingBackToSavepoints() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
@@ -118,8 +139,10 @@ public class Jdbc3SavepointTest extends TestCase {
     assertEquals(0, countRows());
   }
 
-  public void testGlobalRollbackWorks() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testGlobalRollbackWorks() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
@@ -133,17 +156,21 @@ public class Jdbc3SavepointTest extends TestCase {
     assertEquals(0, countRows());
   }
 
-  public void testContinueAfterError() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testContinueAfterError() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
     addRow(1);
     Savepoint savepoint = _conn.setSavepoint();
-    try {
+    try
+    {
       addRow(1);
       fail("Should have thrown duplicate key exception");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
       _conn.rollback(savepoint);
     }
 
@@ -152,30 +179,38 @@ public class Jdbc3SavepointTest extends TestCase {
     assertEquals(2, countRows());
   }
 
-  public void testReleaseSavepoint() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testReleaseSavepoint() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
     Savepoint savepoint = _conn.setSavepoint("mysavepoint");
     _conn.releaseSavepoint(savepoint);
-    try {
+    try
+    {
       savepoint.getSavepointName();
       fail("Can't use savepoint after release.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
     savepoint = _conn.setSavepoint();
     _conn.releaseSavepoint(savepoint);
-    try {
+    try
+    {
       savepoint.getSavepointId();
       fail("Can't use savepoint after release.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  public void testComplicatedSavepointName() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testComplicatedSavepointName() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
@@ -184,8 +219,10 @@ public class Jdbc3SavepointTest extends TestCase {
     _conn.releaseSavepoint(savepoint);
   }
 
-  public void testRollingBackToInvalidSavepointFails() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testRollingBackToInvalidSavepointFails() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 
@@ -193,15 +230,19 @@ public class Jdbc3SavepointTest extends TestCase {
     Savepoint sp2 = _conn.setSavepoint();
 
     _conn.rollback(sp1);
-    try {
+    try
+    {
       _conn.rollback(sp2);
       fail("Can't rollback to a savepoint that's invalid.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  public void testRollbackMultipleTimes() throws SQLException {
-    if (!hasSavepoints()) {
+  public void testRollbackMultipleTimes() throws SQLException
+  {
+    if (!hasSavepoints())
+    {
       return;
     }
 

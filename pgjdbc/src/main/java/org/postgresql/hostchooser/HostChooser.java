@@ -15,7 +15,8 @@ import java.util.Iterator;
 /**
  * Lists connections in preferred order.
  */
-public interface HostChooser {
+public interface HostChooser
+{
   /**
    * Lists connection hosts in preferred order.
    *

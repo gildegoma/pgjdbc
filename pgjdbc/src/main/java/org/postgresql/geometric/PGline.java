@@ -20,7 +20,8 @@ import java.sql.SQLException;
 /**
  * This implements a line represented by the linear equation Ax + By + C = 0
  **/
-public class PGline extends PGobject implements Serializable, Cloneable {
+public class PGline extends PGobject implements Serializable, Cloneable
+{
 
   /**
    * Coefficient of x
@@ -42,7 +43,8 @@ public class PGline extends PGobject implements Serializable, Cloneable {
    * @param b coefficient of y
    * @param c constant
    */
-  public PGline(double a, double b, double c) {
+  public PGline(double a, double b, double c)
+  {
     this();
     this.a = a;
     this.b = b;
@@ -55,12 +57,15 @@ public class PGline extends PGobject implements Serializable, Cloneable {
    * @param x2 coordinate for second point on the line
    * @param y2 coordinate for second point on the line
    */
-  public PGline(double x1, double y1, double x2, double y2) {
+  public PGline(double x1, double y1, double x2, double y2)
+  {
     this();
-    if (x1 == x2) {
+    if (x1 == x2)
+    {
       a = -1;
       b = 0;
-    } else {
+    } else
+    {
       a = (y2 - y1) / (x2 - x1);
       b = -1;
     }
@@ -71,14 +76,16 @@ public class PGline extends PGobject implements Serializable, Cloneable {
    * @param p1 first point on the line
    * @param p2 second point on the line
    */
-  public PGline(PGpoint p1, PGpoint p2) {
+  public PGline(PGpoint p1, PGpoint p2)
+  {
     this(p1.x, p1.y, p2.x, p2.y);
   }
 
   /**
    * @param lseg Line segment which calls on this line.
    */
-  public PGline(PGlseg lseg) {
+  public PGline(PGlseg lseg)
+  {
     this(lseg.point[0], lseg.point[1]);
   }
 
@@ -86,7 +93,8 @@ public class PGline extends PGobject implements Serializable, Cloneable {
    * @param s definition of the line in PostgreSQL's syntax.
    * @throws SQLException on conversion failure
    */
-  public PGline(String s) throws SQLException {
+  public PGline(String s) throws SQLException
+  {
     this();
     setValue(s);
   }
@@ -94,7 +102,8 @@ public class PGline extends PGobject implements Serializable, Cloneable {
   /**
    * required by the driver
    */
-  public PGline() {
+  public PGline()
+  {
     setType("line");
   }
 
@@ -102,19 +111,24 @@ public class PGline extends PGobject implements Serializable, Cloneable {
    * @param s Definition of the line in PostgreSQL's syntax
    * @throws SQLException on conversion failure
    */
-  public void setValue(String s) throws SQLException {
-    if (s.trim().startsWith("{")) {
+  public void setValue(String s) throws SQLException
+  {
+    if (s.trim().startsWith("{"))
+    {
       PGtokenizer t = new PGtokenizer(PGtokenizer.removeCurlyBrace(s), ',');
-      if (t.getSize() != 3) {
+      if (t.getSize() != 3)
+      {
         throw new PSQLException(GT.tr("Conversion to type {0} failed: {1}.", new Object[]{type, s}),
             PSQLState.DATA_TYPE_MISMATCH);
       }
       a = Double.parseDouble(t.getToken(0));
       b = Double.parseDouble(t.getToken(1));
       c = Double.parseDouble(t.getToken(2));
-    } else if (s.trim().startsWith("[")) {
+    } else if (s.trim().startsWith("["))
+    {
       PGtokenizer t = new PGtokenizer(PGtokenizer.removeBox(s), ',');
-      if (t.getSize() != 2) {
+      if (t.getSize() != 2)
+      {
         throw new PSQLException(GT.tr("Conversion to type {0} failed: {1}.", new Object[]{type, s}),
             PSQLState.DATA_TYPE_MISMATCH);
       }
@@ -130,14 +144,18 @@ public class PGline extends PGobject implements Serializable, Cloneable {
    * @param obj Object to compare with
    * @return true if the two lines are identical
    */
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object obj)
+  {
+    if (this == obj)
+    {
       return true;
     }
-    if (obj == null || getClass() != obj.getClass()) {
+    if (obj == null || getClass() != obj.getClass())
+    {
       return false;
     }
-    if (!super.equals(obj)) {
+    if (!super.equals(obj))
+    {
       return false;
     }
 
@@ -148,7 +166,8 @@ public class PGline extends PGobject implements Serializable, Cloneable {
         && Double.compare(pGline.c, c) == 0;
   }
 
-  public int hashCode() {
+  public int hashCode()
+  {
     int result = super.hashCode();
     long temp;
     temp = Double.doubleToLongBits(a);
@@ -163,7 +182,8 @@ public class PGline extends PGobject implements Serializable, Cloneable {
   /**
    * @return the PGline in the syntax expected by org.postgresql
    */
-  public String getValue() {
+  public String getValue()
+  {
     return "{" + a + "," + b + "," + c + "}";
   }
 

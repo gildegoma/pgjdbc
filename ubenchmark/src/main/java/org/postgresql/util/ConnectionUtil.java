@@ -4,18 +4,21 @@ import org.postgresql.PGProperty;
 
 import java.util.Properties;
 
-public class ConnectionUtil {
+public class ConnectionUtil
+{
   /**
    * @return the Postgresql username
    */
-  public static String getUser() {
+  public static String getUser()
+  {
     return System.getProperty("user", "test");
   }
 
   /**
    * @return the user's password
    */
-  public static String getPassword() {
+  public static String getPassword()
+  {
     return System.getProperty("password", "password");
   }
 
@@ -23,28 +26,32 @@ public class ConnectionUtil {
   /**
    * @return the test server
    */
-  public static String getServer() {
+  public static String getServer()
+  {
     return System.getProperty("server", "localhost");
   }
 
   /**
    * @return the test port
    */
-  public static int getPort() {
+  public static int getPort()
+  {
     return Integer.parseInt(System.getProperty("port", System.getProperty("def_pgport", "5432")));
   }
 
   /**
    * @return the Test database
    */
-  public static String getDatabase() {
+  public static String getDatabase()
+  {
     return System.getProperty("database", "test");
   }
 
   /**
    * @return connection url to server
    */
-  public static String getURL() {
+  public static String getURL()
+  {
     return "jdbc:postgresql://" + ConnectionUtil.getServer() + ":" + ConnectionUtil.getPort() + "/"
         + ConnectionUtil
         .getDatabase();
@@ -54,7 +61,8 @@ public class ConnectionUtil {
   /**
    * @return merged with default property list
    */
-  public static Properties getProperties() {
+  public static Properties getProperties()
+  {
     Properties properties = new Properties(System.getProperties());
 
     PGProperty.USER.set(properties, getUser());

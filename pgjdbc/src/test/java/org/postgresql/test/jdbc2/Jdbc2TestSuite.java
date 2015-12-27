@@ -18,12 +18,14 @@ import java.sql.Connection;
 /*
  * Executes all known tests for JDBC2 and includes some utility methods.
  */
-public class Jdbc2TestSuite extends TestSuite {
+public class Jdbc2TestSuite extends TestSuite
+{
 
   /*
    * The main entry point for JUnit
    */
-  public static TestSuite suite() throws Exception {
+  public static TestSuite suite() throws Exception
+  {
     TestSuite suite = new TestSuite();
 
     //
@@ -105,11 +107,13 @@ public class Jdbc2TestSuite extends TestSuite {
     suite.addTestSuite(PGPropertyTest.class);
 
     Connection conn = TestUtil.openDB();
-    if (TestUtil.isProtocolVersion(conn, 3)) {
+    if (TestUtil.isProtocolVersion(conn, 3))
+    {
       suite.addTestSuite(CopyTest.class);
       suite.addTestSuite(CopyLargeFileTest.class);
     }
-    if (TestUtil.haveMinimumServerVersion(conn, "9.3")) {
+    if (TestUtil.haveMinimumServerVersion(conn, "9.3"))
+    {
       suite.addTestSuite(ServerErrorTest.class);
     }
     conn.close();

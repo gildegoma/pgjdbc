@@ -15,7 +15,8 @@ package org.postgresql;
  * code should call getString() on the ResultSet that contains the refcursor to obtain the
  * underlying cursor name.
  */
-public interface PGRefCursorResultSet {
+public interface PGRefCursorResultSet
+{
 
   /**
    * @return the name of the cursor.

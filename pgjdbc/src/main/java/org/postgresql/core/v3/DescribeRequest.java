@@ -13,13 +13,15 @@ package org.postgresql.core.v3;
  *
  * @see QueryExecutorImpl#pendingDescribeStatementQueue
  */
-class DescribeRequest {
+class DescribeRequest
+{
   public final SimpleQuery query;
   public final SimpleParameterList parameterList;
   public final boolean describeOnly;
 
   public DescribeRequest(SimpleQuery query, SimpleParameterList parameterList,
-      boolean describeOnly) {
+      boolean describeOnly)
+  {
     this.query = query;
     this.parameterList = parameterList;
     this.describeOnly = describeOnly;

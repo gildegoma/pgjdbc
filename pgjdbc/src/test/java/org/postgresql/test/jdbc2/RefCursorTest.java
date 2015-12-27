@@ -26,14 +26,17 @@ import java.sql.Types;
  *
  * @author Nic Ferrier <nferrier@tapsellferrier.co.uk>
  */
-public class RefCursorTest extends TestCase {
+public class RefCursorTest extends TestCase
+{
   private Connection con;
 
-  public RefCursorTest(String name) {
+  public RefCursorTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     // this is the same as the ResultSet setup.
     con = TestUtil.openDB();
     Statement stmt = con.createStatement();
@@ -59,7 +62,8 @@ public class RefCursorTest extends TestCase {
     con.setAutoCommit(false);
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     con.setAutoCommit(true);
     Statement stmt = con.createStatement();
     stmt.execute("drop FUNCTION testspg__getRefcursor ();");
@@ -68,7 +72,8 @@ public class RefCursorTest extends TestCase {
     TestUtil.closeDB(con);
   }
 
-  public void testResult() throws SQLException {
+  public void testResult() throws SQLException
+  {
     CallableStatement call = con.prepareCall("{ ? = call testspg__getRefcursor () }");
     call.registerOutParameter(1, Types.OTHER);
     call.execute();
@@ -98,7 +103,8 @@ public class RefCursorTest extends TestCase {
   }
 
 
-  public void testEmptyResult() throws SQLException {
+  public void testEmptyResult() throws SQLException
+  {
     CallableStatement call = con.prepareCall("{ ? = call testspg__getEmptyRefcursor () }");
     call.registerOutParameter(1, Types.OTHER);
     call.execute();
@@ -109,8 +115,10 @@ public class RefCursorTest extends TestCase {
     call.close();
   }
 
-  public void testMetaData() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.4")) {
+  public void testMetaData() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.4"))
+    {
       return;
     }
 
@@ -129,7 +137,8 @@ public class RefCursorTest extends TestCase {
     call.close();
   }
 
-  public void testResultType() throws SQLException {
+  public void testResultType() throws SQLException
+  {
     CallableStatement call =
         con.prepareCall("{ ? = call testspg__getRefcursor () }", ResultSet.TYPE_SCROLL_INSENSITIVE,
             ResultSet.CONCUR_READ_ONLY);

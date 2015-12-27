@@ -24,15 +24,18 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.UUID;
 
-public class ArrayTest extends TestCase {
+public class ArrayTest extends TestCase
+{
 
   private Connection _conn;
 
-  public ArrayTest(String name) {
+  public ArrayTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     TestUtil.createTable(_conn, "arrtest",
         "intarr int[], decarr decimal(2,1)[], strarr text[], uuidarr uuid[]");
@@ -43,7 +46,8 @@ public class ArrayTest extends TestCase {
     TestUtil.createTable(_conn, "\"Evil.Table\"", "id serial");
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.dropTable(_conn, "arrtest");
     TestUtil.dropTable(_conn, "arrcompprnttest");
     TestUtil.dropTable(_conn, "arrcompchldttest");
@@ -51,7 +55,8 @@ public class ArrayTest extends TestCase {
     TestUtil.closeDB(_conn);
   }
 
-  public void testCreateArrayOfInt() throws SQLException {
+  public void testCreateArrayOfInt() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?::int[]");
     Integer in[] = new Integer[3];
     in[0] = 0;
@@ -70,7 +75,8 @@ public class ArrayTest extends TestCase {
     assertEquals(2, out[2].intValue());
   }
 
-  public void testCreateArrayOfMultiString() throws SQLException {
+  public void testCreateArrayOfMultiString() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?::text[]");
     String in[][] = new String[2][2];
     in[0][0] = "a";
@@ -92,7 +98,8 @@ public class ArrayTest extends TestCase {
     assertEquals("\"\\'z", out[1][1]);
   }
 
-  public void testCreateArrayWithNonStandardDelimiter() throws SQLException {
+  public void testCreateArrayWithNonStandardDelimiter() throws SQLException
+  {
     PGbox in[] = new PGbox[2];
     in[0] = new PGbox(1, 2, 3, 4);
     in[1] = new PGbox(5, 6, 7, 8);
@@ -111,14 +118,17 @@ public class ArrayTest extends TestCase {
   }
 
 
-  public void testCreateArrayOfNull() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(_conn, "8.2")) {
+  public void testCreateArrayOfNull() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(_conn, "8.2"))
+    {
       return;
     }
 
     String sql = "SELECT ?";
     // We must provide the type information for V2 protocol
-    if (TestUtil.isProtocolVersion(_conn, 2)) {
+    if (TestUtil.isProtocolVersion(_conn, 2))
+    {
       sql = "SELECT ?::int8[]";
     }
 
@@ -138,7 +148,8 @@ public class ArrayTest extends TestCase {
     assertNull(out[1]);
   }
 
-  public void testCreateEmptyArrayOfIntViaAlias() throws SQLException {
+  public void testCreateEmptyArrayOfIntViaAlias() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?::int[]");
     Integer in[] = new Integer[0];
     pstmt.setArray(1, _conn.createArrayOf("integer", in));
@@ -154,7 +165,8 @@ public class ArrayTest extends TestCase {
     assertFalse(arrRs.next());
   }
 
-  public void testCreateArrayWithoutServer() throws SQLException {
+  public void testCreateArrayWithoutServer() throws SQLException
+  {
     String in[][] = new String[2][2];
     in[0][0] = "a";
     in[0][1] = "";
@@ -172,7 +184,8 @@ public class ArrayTest extends TestCase {
     assertEquals("\"\\'z", out[1][1]);
   }
 
-  public void testCreatePrimitiveArray() throws SQLException {
+  public void testCreatePrimitiveArray() throws SQLException
+  {
     double in[][] = new double[2][2];
     in[0][0] = 3.5;
     in[0][1] = -4.5;
@@ -190,7 +203,8 @@ public class ArrayTest extends TestCase {
     assertEquals(77, out[1][1], 0.00001);
   }
 
-  public void testUUIDArray() throws SQLException {
+  public void testUUIDArray() throws SQLException
+  {
     UUID uuid1 = UUID.randomUUID();
     UUID uuid2 = UUID.randomUUID();
     UUID uuid3 = UUID.randomUUID();
@@ -235,26 +249,31 @@ public class ArrayTest extends TestCase {
     assertEquals(uuid4, out[3]);
   }
 
-  public void testSetObjectFromJavaArray() throws SQLException {
+  public void testSetObjectFromJavaArray() throws SQLException
+  {
     String[] strArray = new String[]{"a", "b", "c"};
 
     PreparedStatement pstmt = _conn.prepareStatement("INSERT INTO arrtest(strarr) VALUES (?)");
 
     // Incorrect, but commonly attempted by many ORMs:
-    try {
+    try
+    {
       pstmt.setObject(1, strArray, Types.ARRAY);
       pstmt.executeUpdate();
       fail("setObject() with a Java array parameter and Types.ARRAY shouldn't succeed");
-    } catch (org.postgresql.util.PSQLException ex) {
+    } catch (org.postgresql.util.PSQLException ex)
+    {
       // Expected failure.
     }
 
     // Also incorrect, but commonly attempted by many ORMs:
-    try {
+    try
+    {
       pstmt.setObject(1, strArray);
       pstmt.executeUpdate();
       fail("setObject() with a Java array parameter and no Types argument shouldn't succeed");
-    } catch (org.postgresql.util.PSQLException ex) {
+    } catch (org.postgresql.util.PSQLException ex)
+    {
       // Expected failure.
     }
 
@@ -267,7 +286,8 @@ public class ArrayTest extends TestCase {
     pstmt.close();
   }
 
-  public void testGetArrayOfComposites() throws SQLException {
+  public void testGetArrayOfComposites() throws SQLException
+  {
     PreparedStatement insert_parent_pstmt = _conn.prepareStatement(
         "INSERT INTO arrcompprnttest (name) "
             + "VALUES ('aParent');");
@@ -316,22 +336,26 @@ public class ArrayTest extends TestCase {
 
     ResultSet rsChildren = childrenArray.getResultSet();
     assertNotNull(rsChildren);
-    while (rsChildren.next()) {
+    while (rsChildren.next())
+    {
       String comp = rsChildren.getString(2);
       PGtokenizer token = new PGtokenizer(PGtokenizer.removePara(comp), ',');
       token.remove("\"", "\""); //remove surrounding double quotes
-      if (2 < token.getSize()) {
+      if (2 < token.getSize())
+      {
         int childID = Integer.parseInt(token.getToken(0));
         String value = token.getToken(2)
             .replace("\"\"", "\""); //remove double quotes escaping with double quotes
         assertEquals(children[childID - 1], value);
-      } else {
+      } else
+      {
         fail("Needs to have 3 tokens");
       }
     }
   }
 
-  public void testCasingComposite() throws SQLException {
+  public void testCasingComposite() throws SQLException
+  {
     PGobject cc = new PGobject();
     cc.setType("\"CorrectCasing\"");
     cc.setValue("(1)");
@@ -351,7 +375,8 @@ public class ArrayTest extends TestCase {
     assertEquals("(1)", resObj.getValue());
   }
 
-  public void testCasingBuiltinAlias() throws SQLException {
+  public void testCasingBuiltinAlias() throws SQLException
+  {
     Array arr = _conn.createArrayOf("INT", new Integer[]{1, 2, 3});
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?::INT[]");
     pstmt.setArray(1, arr);
@@ -363,7 +388,8 @@ public class ArrayTest extends TestCase {
     Assert.assertArrayEquals(new Integer[]{1, 2, 3}, resArr);
   }
 
-  public void testCasingBuiltinNonAlias() throws SQLException {
+  public void testCasingBuiltinNonAlias() throws SQLException
+  {
     Array arr = _conn.createArrayOf("INT4", new Integer[]{1, 2, 3});
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?::INT4[]");
     pstmt.setArray(1, arr);
@@ -375,7 +401,8 @@ public class ArrayTest extends TestCase {
     Assert.assertArrayEquals(new Integer[]{1, 2, 3}, resArr);
   }
 
-  public void testEvilCasing() throws SQLException {
+  public void testEvilCasing() throws SQLException
+  {
     PGobject cc = new PGobject();
     cc.setType("\"Evil.Table\"");
     cc.setValue("(1)");

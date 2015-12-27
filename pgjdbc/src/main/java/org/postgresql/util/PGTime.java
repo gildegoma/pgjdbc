@@ -15,7 +15,8 @@ import java.util.Calendar;
 /**
  * This class augments the Java built-in Time to allow for explicit setting of the time zone.
  */
-public class PGTime extends Time {
+public class PGTime extends Time
+{
   /**
    * The serial version UID.
    */
@@ -33,7 +34,8 @@ public class PGTime extends Time {
    *             before January 1, 1970, 00:00:00 GMT.
    * @see Time#Time(long)
    */
-  public PGTime(long time) {
+  public PGTime(long time)
+  {
     this(time, null);
   }
 
@@ -49,7 +51,8 @@ public class PGTime extends Time {
    * @param calendar the calendar object containing the time zone or <code>null</code>.
    * @see Time#Time(long)
    */
-  public PGTime(long time, Calendar calendar) {
+  public PGTime(long time, Calendar calendar)
+  {
     super(time);
     this.setCalendar(calendar);
   }
@@ -59,7 +62,8 @@ public class PGTime extends Time {
    *
    * @param calendar the calendar object or <code>null</code>.
    */
-  public void setCalendar(Calendar calendar) {
+  public void setCalendar(Calendar calendar)
+  {
     this.calendar = calendar;
   }
 
@@ -68,12 +72,14 @@ public class PGTime extends Time {
    *
    * @return the calendar or <code>null</code>.
    */
-  public Calendar getCalendar() {
+  public Calendar getCalendar()
+  {
     return calendar;
   }
 
   @Override
-  public int hashCode() {
+  public int hashCode()
+  {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result
@@ -82,31 +88,40 @@ public class PGTime extends Time {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object obj)
+  {
+    if (this == obj)
+    {
       return true;
     }
-    if (!super.equals(obj)) {
+    if (!super.equals(obj))
+    {
       return false;
     }
-    if (!(obj instanceof PGTime)) {
+    if (!(obj instanceof PGTime))
+    {
       return false;
     }
     PGTime other = (PGTime) obj;
-    if (calendar == null) {
-      if (other.calendar != null) {
+    if (calendar == null)
+    {
+      if (other.calendar != null)
+      {
         return false;
       }
-    } else if (!calendar.equals(other.calendar)) {
+    } else if (!calendar.equals(other.calendar))
+    {
       return false;
     }
     return true;
   }
 
   @Override
-  public Object clone() {
+  public Object clone()
+  {
     PGTime clone = (PGTime) super.clone();
-    if (getCalendar() != null) {
+    if (getCalendar() != null)
+    {
       clone.setCalendar((Calendar) getCalendar().clone());
     }
     return clone;

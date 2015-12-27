@@ -48,7 +48,8 @@ import java.util.Properties;
  * @see org.postgresql.PGConnection
  * @see java.sql.Driver
  */
-public class Driver implements java.sql.Driver {
+public class Driver implements java.sql.Driver
+{
 
   // make these public so they can be used in setLogLevel below
 
@@ -61,14 +62,17 @@ public class Driver implements java.sql.Driver {
   private static boolean logLevelSet = false;
   private static SharedTimer sharedTimer = new SharedTimer(logger);
 
-  static {
-    try {
+  static
+  {
+    try
+    {
       // moved the registerDriver from the constructor to here
       // because some clients call the driver themselves (I know, as
       // my early jdbc work did - and that was based on other examples).
       // Placing it here, means that the driver is registered once only.
       register();
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       throw new ExceptionInInitializerError(e);
     }
   }
@@ -77,34 +81,45 @@ public class Driver implements java.sql.Driver {
   // properties files.
   private Properties defaultProperties;
 
-  private synchronized Properties getDefaultProperties() throws IOException {
-    if (defaultProperties != null) {
+  private synchronized Properties getDefaultProperties() throws IOException
+  {
+    if (defaultProperties != null)
+    {
       return defaultProperties;
     }
 
     // Make sure we load properties with the maximum possible
     // privileges.
-    try {
+    try
+    {
       defaultProperties =
-          AccessController.doPrivileged(new PrivilegedExceptionAction<Properties>() {
-            public Properties run() throws IOException {
+          AccessController.doPrivileged(new PrivilegedExceptionAction<Properties>()
+          {
+            public Properties run() throws IOException
+            {
               return loadDefaultProperties();
             }
           });
-    } catch (PrivilegedActionException e) {
+    } catch (PrivilegedActionException e)
+    {
       throw (IOException) e.getException();
     }
 
     // Use the loglevel from the default properties (if any)
     // as the driver-wide default unless someone explicitly called
     // setLogLevel() already.
-    synchronized (Driver.class) {
-      if (!logLevelSet) {
+    synchronized (Driver.class)
+    {
+      if (!logLevelSet)
+      {
         String driverLogLevel = PGProperty.LOG_LEVEL.get(defaultProperties);
-        if (driverLogLevel != null) {
-          try {
+        if (driverLogLevel != null)
+        {
+          try
+          {
             setLogLevel(Integer.parseInt(driverLogLevel));
-          } catch (Exception l_e) {
+          } catch (Exception l_e)
+          {
             // XXX revisit
             // invalid value for loglevel; ignore it
           }
@@ -115,12 +130,15 @@ public class Driver implements java.sql.Driver {
     return defaultProperties;
   }
 
-  private Properties loadDefaultProperties() throws IOException {
+  private Properties loadDefaultProperties() throws IOException
+  {
     Properties merged = new Properties();
 
-    try {
+    try
+    {
       PGProperty.USER.set(merged, System.getProperty("user.name"));
-    } catch (java.lang.SecurityException se) {
+    } catch (java.lang.SecurityException se)
+    {
       // We're just trying to set a default, so if we can't
       // it's not a big deal.
     }
@@ -134,16 +152,19 @@ public class Driver implements java.sql.Driver {
     // when our classloader is null. The ClassLoader javadoc claims
     // neither case can throw SecurityException.
     ClassLoader cl = getClass().getClassLoader();
-    if (cl == null) {
+    if (cl == null)
+    {
       cl = ClassLoader.getSystemClassLoader();
     }
 
-    if (cl == null) {
+    if (cl == null)
+    {
       logger.debug("Can't find a classloader for the Driver; not loading driver configuration");
       return merged; // Give up on finding defaults.
     }
 
-    if (logger.logDebug()) {
+    if (logger.logDebug())
+    {
       logger.debug("Loading driver configuration via classloader " + cl);
     }
 
@@ -153,13 +174,16 @@ public class Driver implements java.sql.Driver {
     // Enumeration into temporary storage.
     ArrayList<URL> urls = new ArrayList<URL>();
     Enumeration<URL> urlEnum = cl.getResources("org/postgresql/driverconfig.properties");
-    while (urlEnum.hasMoreElements()) {
+    while (urlEnum.hasMoreElements())
+    {
       urls.add(urlEnum.nextElement());
     }
 
-    for (int i = urls.size() - 1; i >= 0; i--) {
+    for (int i = urls.size() - 1; i >= 0; i--)
+    {
       URL url = urls.get(i);
-      if (logger.logDebug()) {
+      if (logger.logDebug())
+      {
         logger.debug("Loading driver configuration from: " + url);
       }
       InputStream is = url.openStream();
@@ -211,27 +235,34 @@ public class Driver implements java.sql.Driver {
    * @throws SQLException if a database access error occurs
    * @see java.sql.Driver#connect
    */
-  public java.sql.Connection connect(String url, Properties info) throws SQLException {
+  public java.sql.Connection connect(String url, Properties info) throws SQLException
+  {
     // get defaults
     Properties defaults;
 
-    if (!url.startsWith("jdbc:postgresql:")) {
+    if (!url.startsWith("jdbc:postgresql:"))
+    {
       return null;
     }
-    try {
+    try
+    {
       defaults = getDefaultProperties();
-    } catch (IOException ioe) {
+    } catch (IOException ioe)
+    {
       throw new PSQLException(GT.tr("Error loading default settings from driverconfig.properties"),
           PSQLState.UNEXPECTED_ERROR, ioe);
     }
 
     // override defaults with provided properties
     Properties props = new Properties(defaults);
-    if (info != null) {
-      for (Enumeration<?> e = info.propertyNames(); e.hasMoreElements(); ) {
+    if (info != null)
+    {
+      for (Enumeration<?> e = info.propertyNames(); e.hasMoreElements(); )
+      {
         String propName = (String) e.nextElement();
         String propValue = info.getProperty(propName);
-        if (propValue == null) {
+        if (propValue == null)
+        {
           throw new PSQLException(
               GT.tr("Properties for the driver contains a non-string value for the key ")
                   + propName,
@@ -241,12 +272,15 @@ public class Driver implements java.sql.Driver {
       }
     }
     // parse URL and add more properties
-    if ((props = parseURL(url, props)) == null) {
+    if ((props = parseURL(url, props)) == null)
+    {
       logger.debug("Error in url: " + url);
       return null;
     }
-    try {
-      if (logger.logDebug()) {
+    try
+    {
+      if (logger.logDebug())
+      {
         logger.debug("Connecting with URL: " + url);
       }
 
@@ -259,7 +293,8 @@ public class Driver implements java.sql.Driver {
       // we managed to establish one after all. See ConnectThread for
       // more details.
       long timeout = timeout(props);
-      if (timeout <= 0) {
+      if (timeout <= 0)
+      {
         return makeConnection(url, props);
       }
 
@@ -268,16 +303,19 @@ public class Driver implements java.sql.Driver {
       thread.setDaemon(true); // Don't prevent the VM from shutting down
       thread.start();
       return ct.getResult(timeout);
-    } catch (PSQLException ex1) {
+    } catch (PSQLException ex1)
+    {
       logger.debug("Connection error:", ex1);
       // re-throw the exception, otherwise it will be caught next, and a
       // org.postgresql.unusual error will be returned instead.
       throw ex1;
-    } catch (java.security.AccessControlException ace) {
+    } catch (java.security.AccessControlException ace)
+    {
       throw new PSQLException(GT.tr(
           "Your security policy has prevented the connection from being attempted.  You probably need to grant the connect java.net.SocketPermission to the database server host and port that you wish to connect to."),
           PSQLState.UNEXPECTED_ERROR, ace);
-    } catch (Exception ex2) {
+    } catch (Exception ex2)
+    {
       logger.debug("Unexpected connection error:", ex2);
       throw new PSQLException(GT.tr(
           "Something unusual has occurred to cause the driver to fail. Please report this exception."),
@@ -289,33 +327,44 @@ public class Driver implements java.sql.Driver {
    * Perform a connect in a separate thread; supports getting the results from the original thread
    * while enforcing a login timeout.
    */
-  private static class ConnectThread implements Runnable {
-    ConnectThread(String url, Properties props) {
+  private static class ConnectThread implements Runnable
+  {
+    ConnectThread(String url, Properties props)
+    {
       this.url = url;
       this.props = props;
     }
 
-    public void run() {
+    public void run()
+    {
       Connection conn;
       Throwable error;
 
-      try {
+      try
+      {
         conn = makeConnection(url, props);
         error = null;
-      } catch (Throwable t) {
+      } catch (Throwable t)
+      {
         conn = null;
         error = t;
       }
 
-      synchronized (this) {
-        if (abandoned) {
-          if (conn != null) {
-            try {
+      synchronized (this)
+      {
+        if (abandoned)
+        {
+          if (conn != null)
+          {
+            try
+            {
               conn.close();
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
             }
           }
-        } else {
+        } else
+        {
           result = conn;
           resultException = error;
           notify();
@@ -331,19 +380,26 @@ public class Driver implements java.sql.Driver {
      * @return the new connection, if successful
      * @throws SQLException if a connection error occurs or the timeout is reached
      */
-    public Connection getResult(long timeout) throws SQLException {
+    public Connection getResult(long timeout) throws SQLException
+    {
       long expiry = System.currentTimeMillis() + timeout;
-      synchronized (this) {
-        while (true) {
-          if (result != null) {
+      synchronized (this)
+      {
+        while (true)
+        {
+          if (result != null)
+          {
             return result;
           }
 
-          if (resultException != null) {
-            if (resultException instanceof SQLException) {
+          if (resultException != null)
+          {
+            if (resultException instanceof SQLException)
+            {
               resultException.fillInStackTrace();
               throw (SQLException) resultException;
-            } else {
+            } else
+            {
               throw new PSQLException(GT.tr(
                   "Something unusual has occurred to cause the driver to fail. Please report this exception."),
                   PSQLState.UNEXPECTED_ERROR, resultException);
@@ -351,15 +407,18 @@ public class Driver implements java.sql.Driver {
           }
 
           long delay = expiry - System.currentTimeMillis();
-          if (delay <= 0) {
+          if (delay <= 0)
+          {
             abandoned = true;
             throw new PSQLException(GT.tr("Connection attempt timed out."),
                 PSQLState.CONNECTION_UNABLE_TO_CONNECT);
           }
 
-          try {
+          try
+          {
             wait(delay);
-          } catch (InterruptedException ie) {
+          } catch (InterruptedException ie)
+          {
 
             // reset the interrupt flag
             Thread.currentThread().interrupt();
@@ -388,7 +447,8 @@ public class Driver implements java.sql.Driver {
    * @return a new connection
    * @throws SQLException if the connection could not be made
    */
-  private static Connection makeConnection(String url, Properties props) throws SQLException {
+  private static Connection makeConnection(String url, Properties props) throws SQLException
+  {
     return new PgConnection(hostSpecs(props),
         user(props), database(props),
         props, url);
@@ -403,8 +463,10 @@ public class Driver implements java.sql.Driver {
    * @return true if this driver accepts the given URL
    * @see java.sql.Driver#acceptsURL
    */
-  public boolean acceptsURL(String url) {
-    if (parseURL(url, null) == null) {
+  public boolean acceptsURL(String url)
+  {
+    if (parseURL(url, null) == null)
+    {
       return false;
     }
     return true;
@@ -423,16 +485,19 @@ public class Driver implements java.sql.Driver {
    * be an empty array if no properties are required
    * @see java.sql.Driver#getPropertyInfo
    */
-  public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) {
+  public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
+  {
     Properties copy = new Properties(info);
     Properties parse = parseURL(url, copy);
-    if (parse != null) {
+    if (parse != null)
+    {
       copy = parse;
     }
 
     PGProperty[] knownProperties = PGProperty.values();
     DriverPropertyInfo[] props = new DriverPropertyInfo[knownProperties.length];
-    for (int i = 0; i < props.length; ++i) {
+    for (int i = 0; i < props.length; ++i)
+    {
       props[i] = knownProperties[i].toDriverPropertyInfo(copy);
     }
 
@@ -450,7 +515,8 @@ public class Driver implements java.sql.Driver {
    *
    * @return the drivers major version number
    */
-  public int getMajorVersion() {
+  public int getMajorVersion()
+  {
     return MAJORVERSION;
   }
 
@@ -465,7 +531,8 @@ public class Driver implements java.sql.Driver {
    *
    * @return the drivers minor version number
    */
-  public int getMinorVersion() {
+  public int getMinorVersion()
+  {
     return MINORVERSION;
   }
 
@@ -474,7 +541,8 @@ public class Driver implements java.sql.Driver {
    *
    * @return JDBC driver version
    */
-  public static String getVersion() {
+  public static String getVersion()
+  {
     return "PostgreSQL /*$mvn.project.property.parsedversion.osgiversion$*/";
   }
 
@@ -485,7 +553,8 @@ public class Driver implements java.sql.Driver {
    *
    * <p>For PostgreSQL, this is not yet possible, as we are not SQL92 compliant (yet).
    */
-  public boolean jdbcCompliant() {
+  public boolean jdbcCompliant()
+  {
     return false;
   }
 
@@ -498,27 +567,32 @@ public class Driver implements java.sql.Driver {
    * @param defaults Default properties
    * @return Properties with elements added from the url
    */
-  public static Properties parseURL(String url, Properties defaults) {
+  public static Properties parseURL(String url, Properties defaults)
+  {
     Properties urlProps = new Properties(defaults);
 
     String l_urlServer = url;
     String l_urlArgs = "";
 
     int l_qPos = url.indexOf('?');
-    if (l_qPos != -1) {
+    if (l_qPos != -1)
+    {
       l_urlServer = url.substring(0, l_qPos);
       l_urlArgs = url.substring(l_qPos + 1);
     }
 
-    if (!l_urlServer.startsWith("jdbc:postgresql:")) {
+    if (!l_urlServer.startsWith("jdbc:postgresql:"))
+    {
       return null;
     }
     l_urlServer = l_urlServer.substring("jdbc:postgresql:".length());
 
-    if (l_urlServer.startsWith("//")) {
+    if (l_urlServer.startsWith("//"))
+    {
       l_urlServer = l_urlServer.substring(2);
       int slash = l_urlServer.indexOf('/');
-      if (slash == -1) {
+      if (slash == -1)
+      {
         return null;
       }
       urlProps.setProperty("PGDBNAME", l_urlServer.substring(slash + 1));
@@ -526,20 +600,25 @@ public class Driver implements java.sql.Driver {
       String[] addresses = l_urlServer.substring(0, slash).split(",");
       StringBuilder hosts = new StringBuilder();
       StringBuilder ports = new StringBuilder();
-      for (int addr = 0; addr < addresses.length; ++addr) {
+      for (int addr = 0; addr < addresses.length; ++addr)
+      {
         String address = addresses[addr];
 
         int portIdx = address.lastIndexOf(':');
-        if (portIdx != -1 && address.lastIndexOf(']') < portIdx) {
+        if (portIdx != -1 && address.lastIndexOf(']') < portIdx)
+        {
           String portStr = address.substring(portIdx + 1);
-          try {
+          try
+          {
             Integer.parseInt(portStr);
-          } catch (NumberFormatException ex) {
+          } catch (NumberFormatException ex)
+          {
             return null;
           }
           ports.append(portStr);
           hosts.append(address.subSequence(0, portIdx));
-        } else {
+        } else
+        {
           ports.append("/*$mvn.project.property.template.default.pg.port$*/");
           hosts.append(address);
         }
@@ -550,7 +629,8 @@ public class Driver implements java.sql.Driver {
       hosts.setLength(hosts.length() - 1);
       urlProps.setProperty("PGPORT", ports.toString());
       urlProps.setProperty("PGHOST", hosts.toString());
-    } else {
+    } else
+    {
       urlProps.setProperty("PGPORT", "/*$mvn.project.property.template.default.pg.port$*/");
       urlProps.setProperty("PGHOST", "localhost");
       urlProps.setProperty("PGDBNAME", l_urlServer);
@@ -558,15 +638,19 @@ public class Driver implements java.sql.Driver {
 
     //parse the args part of the url
     String[] args = l_urlArgs.split("&");
-    for (int i = 0; i < args.length; ++i) {
+    for (int i = 0; i < args.length; ++i)
+    {
       String token = args[i];
-      if (token.length() == 0) {
+      if (token.length() == 0)
+      {
         continue;
       }
       int l_pos = token.indexOf('=');
-      if (l_pos == -1) {
+      if (l_pos == -1)
+      {
         urlProps.setProperty(token, "");
-      } else {
+      } else
+      {
         urlProps.setProperty(token.substring(0, l_pos), token.substring(l_pos + 1));
       }
     }
@@ -577,11 +661,13 @@ public class Driver implements java.sql.Driver {
   /**
    * @return the address portion of the URL
    */
-  private static HostSpec[] hostSpecs(Properties props) {
+  private static HostSpec[] hostSpecs(Properties props)
+  {
     String[] hosts = props.getProperty("PGHOST").split(",");
     String[] ports = props.getProperty("PGPORT").split(",");
     HostSpec[] hostSpecs = new HostSpec[hosts.length];
-    for (int i = 0; i < hostSpecs.length; ++i) {
+    for (int i = 0; i < hostSpecs.length; ++i)
+    {
       hostSpecs[i] = new HostSpec(hosts[i], Integer.parseInt(ports[i]));
     }
     return hostSpecs;
@@ -590,29 +676,36 @@ public class Driver implements java.sql.Driver {
   /**
    * @return the username of the URL
    */
-  private static String user(Properties props) {
+  private static String user(Properties props)
+  {
     return props.getProperty("user", "");
   }
 
   /**
    * @return the database name of the URL
    */
-  private static String database(Properties props) {
+  private static String database(Properties props)
+  {
     return props.getProperty("PGDBNAME", "");
   }
 
   /**
    * @return the timeout from the URL, in milliseconds
    */
-  private static long timeout(Properties props) {
+  private static long timeout(Properties props)
+  {
     String timeout = PGProperty.LOGIN_TIMEOUT.get(props);
-    if (timeout != null) {
-      try {
+    if (timeout != null)
+    {
+      try
+      {
         return (long) (Float.parseFloat(timeout) * 1000);
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException e)
+      {
         // Log level isn't set yet, so this doesn't actually
         // get printed.
-        if (logger.logDebug()) {
+        if (logger.logDebug())
+        {
           logger.debug("Couldn't parse loginTimeout value: " + timeout);
         }
       }
@@ -632,7 +725,8 @@ public class Driver implements java.sql.Driver {
    * unimplemeted function
    */
   public static SQLFeatureNotSupportedException notImplemented(Class<?> callClass,
-      String functionName) {
+      String functionName)
+  {
     return new SQLFeatureNotSupportedException(
         GT.tr("Method {0} is not yet implemented.", callClass.getName() + "." + functionName),
         PSQLState.NOT_IMPLEMENTED.getState());
@@ -645,24 +739,30 @@ public class Driver implements java.sql.Driver {
    * @param logLevel sets the level which logging will respond to OFF turn off logging INFO being
    *                 almost no messages DEBUG most verbose
    */
-  public static void setLogLevel(int logLevel) {
-    synchronized (Driver.class) {
+  public static void setLogLevel(int logLevel)
+  {
+    synchronized (Driver.class)
+    {
       logger.setLogLevel(logLevel);
       logLevelSet = true;
     }
   }
 
-  public static int getLogLevel() {
-    synchronized (Driver.class) {
+  public static int getLogLevel()
+  {
+    synchronized (Driver.class)
+    {
       return logger.getLogLevel();
     }
   }
 
-  public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+  public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException
+  {
     throw notImplemented(this.getClass(), "getParentLogger()");
   }
 
-  public static SharedTimer getSharedTimer() {
+  public static SharedTimer getSharedTimer()
+  {
     return sharedTimer;
   }
 
@@ -674,8 +774,10 @@ public class Driver implements java.sql.Driver {
    * @throws IllegalStateException if the driver is already registered
    * @throws SQLException          if registering the driver fails
    */
-  public static void register() throws SQLException {
-    if (isRegistered()) {
+  public static void register() throws SQLException
+  {
+    if (isRegistered())
+    {
       throw new IllegalStateException(
           "Driver is already registered. It can only be registered once.");
     }
@@ -692,8 +794,10 @@ public class Driver implements java.sql.Driver {
    * @throws IllegalStateException if the driver is not registered
    * @throws SQLException          if deregistering the driver fails
    */
-  public static void deregister() throws SQLException {
-    if (!isRegistered()) {
+  public static void deregister() throws SQLException
+  {
+    if (!isRegistered())
+    {
       throw new IllegalStateException(
           "Driver is not registered (or it has not been registered using Driver.register() method)");
     }
@@ -704,7 +808,8 @@ public class Driver implements java.sql.Driver {
   /**
    * @return {@code true} if the driver is registered against {@link DriverManager}
    */
-  public static boolean isRegistered() {
+  public static boolean isRegistered()
+  {
     return registeredDriver != null;
   }
 }

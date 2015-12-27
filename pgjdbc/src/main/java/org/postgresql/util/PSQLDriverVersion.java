@@ -17,9 +17,11 @@ import org.postgresql.Driver;
  * determine what version they really have and resolve problems with old and unknown versions
  * located somewhere in the classpath.
  */
-public class PSQLDriverVersion {
+public class PSQLDriverVersion
+{
 
-  public static void main(String args[]) {
+  public static void main(String args[])
+  {
     java.net.URL url = Driver.class.getResource("/org/postgresql/Driver.class");
     System.out.println(Driver.getVersion());
     System.out.println("Found in: " + url);

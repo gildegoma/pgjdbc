@@ -15,7 +15,8 @@ import java.sql.SQLException;
 /**
  * This is an implementation of an InputStream from a large object.
  */
-public class BlobInputStream extends InputStream {
+public class BlobInputStream extends InputStream
+{
   /**
    * The parent LargeObject
    */
@@ -54,7 +55,8 @@ public class BlobInputStream extends InputStream {
   /**
    * @param lo LargeObject to read from
    */
-  public BlobInputStream(LargeObject lo) {
+  public BlobInputStream(LargeObject lo)
+  {
     this(lo, 1024);
   }
 
@@ -63,7 +65,8 @@ public class BlobInputStream extends InputStream {
    * @param bsize buffer size
    */
 
-  public BlobInputStream(LargeObject lo, int bsize) {
+  public BlobInputStream(LargeObject lo, int bsize)
+  {
     this(lo, bsize, -1);
   }
 
@@ -72,7 +75,8 @@ public class BlobInputStream extends InputStream {
    * @param bsize buffer size
    * @param limit max number of bytes to read
    */
-  public BlobInputStream(LargeObject lo, int bsize, long limit) {
+  public BlobInputStream(LargeObject lo, int bsize, long limit)
+  {
     this.lo = lo;
     buffer = null;
     bpos = 0;
@@ -84,24 +88,30 @@ public class BlobInputStream extends InputStream {
   /**
    * The minimum required to implement input stream
    */
-  public int read() throws java.io.IOException {
+  public int read() throws java.io.IOException
+  {
     checkClosed();
-    try {
-      if (limit > 0 && apos >= limit) {
+    try
+    {
+      if (limit > 0 && apos >= limit)
+      {
         return -1;
       }
-      if (buffer == null || bpos >= buffer.length) {
+      if (buffer == null || bpos >= buffer.length)
+      {
         buffer = lo.read(bsize);
         bpos = 0;
       }
 
       // Handle EOF
-      if (bpos >= buffer.length) {
+      if (bpos >= buffer.length)
+      {
         return -1;
       }
 
       int ret = (buffer[bpos] & 0x7F);
-      if ((buffer[bpos] & 0x80) == 0x80) {
+      if ((buffer[bpos] & 0x80) == 0x80)
+      {
         ret |= 0x80;
       }
 
@@ -109,7 +119,8 @@ public class BlobInputStream extends InputStream {
       apos++;
 
       return ret;
-    } catch (SQLException se) {
+    } catch (SQLException se)
+    {
       throw new IOException(se.toString());
     }
   }
@@ -122,12 +133,16 @@ public class BlobInputStream extends InputStream {
    *
    * @throws IOException if an I/O error occurs.
    */
-  public void close() throws IOException {
-    if (lo != null) {
-      try {
+  public void close() throws IOException
+  {
+    if (lo != null)
+    {
+      try
+      {
         lo.close();
         lo = null;
-      } catch (SQLException se) {
+      } catch (SQLException se)
+      {
         throw new IOException(se.toString());
       }
     }
@@ -154,10 +169,13 @@ public class BlobInputStream extends InputStream {
    *                  invalid.
    * @see java.io.InputStream#reset()
    */
-  public synchronized void mark(int readlimit) {
-    try {
+  public synchronized void mark(int readlimit)
+  {
+    try
+    {
       mpos = lo.tell();
-    } catch (SQLException se) {
+    } catch (SQLException se)
+    {
       // Can't throw this because mark API doesn't allow it.
       // throw new IOException(se.toString());
     }
@@ -171,11 +189,14 @@ public class BlobInputStream extends InputStream {
    * @see java.io.IOException
    */
   public synchronized void reset()
-      throws IOException {
+      throws IOException
+  {
     checkClosed();
-    try {
+    try
+    {
       lo.seek(mpos);
-    } catch (SQLException se) {
+    } catch (SQLException se)
+    {
       throw new IOException(se.toString());
     }
   }
@@ -189,12 +210,15 @@ public class BlobInputStream extends InputStream {
    * @see java.io.InputStream#mark(int)
    * @see java.io.InputStream#reset()
    */
-  public boolean markSupported() {
+  public boolean markSupported()
+  {
     return true;
   }
 
-  private void checkClosed() throws IOException {
-    if (lo == null) {
+  private void checkClosed() throws IOException
+  {
+    if (lo == null)
+    {
       throw new IOException("BlobOutputStream is closed");
     }
   }

@@ -24,24 +24,29 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-public class ArrayTest extends TestCase {
+public class ArrayTest extends TestCase
+{
   private Connection conn;
 
-  public ArrayTest(String name) {
+  public ArrayTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     conn = TestUtil.openDB();
     TestUtil.createTable(conn, "arrtest", "intarr int[], decarr decimal(2,1)[], strarr text[]");
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.dropTable(conn, "arrtest");
     TestUtil.closeDB(conn);
   }
 
-  public void testSetNull() throws SQLException {
+  public void testSetNull() throws SQLException
+  {
     PreparedStatement pstmt = conn.prepareStatement("INSERT INTO arrtest VALUES (?,?,?)");
     pstmt.setNull(1, Types.ARRAY);
     pstmt.setNull(2, Types.ARRAY);
@@ -62,7 +67,8 @@ public class ArrayTest extends TestCase {
   }
 
 
-  public void testRetrieveArrays() throws SQLException {
+  public void testRetrieveArrays() throws SQLException
+  {
     Statement stmt = conn.createStatement();
 
     // you need a lot of backslashes to get a double quote in.
@@ -98,7 +104,8 @@ public class ArrayTest extends TestCase {
     stmt.close();
   }
 
-  public void testRetrieveResultSets() throws SQLException {
+  public void testRetrieveResultSets() throws SQLException
+  {
     Statement stmt = conn.createStatement();
 
     // you need a lot of backslashes to get a double quote in.
@@ -152,7 +159,8 @@ public class ArrayTest extends TestCase {
     stmt.close();
   }
 
-  public void testSetArray() throws SQLException {
+  public void testSetArray() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet arrRS = stmt.executeQuery("SELECT '{1,2,3}'::int4[]");
     assertTrue(arrRS.next());
@@ -175,7 +183,8 @@ public class ArrayTest extends TestCase {
     Statement select = conn.createStatement();
     ResultSet rs = select.executeQuery("SELECT intarr FROM arrtest");
     int resultCount = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       resultCount++;
       Array result = rs.getArray(1);
       assertEquals(Types.INTEGER, result.getBaseType());
@@ -196,7 +205,8 @@ public class ArrayTest extends TestCase {
    * the data.  The following should return "[0:3]={0,1,2,3,4}" when queried.  Older versions simply
    * do not return the bounds.
    */
-  public void testNonStandardBounds() throws SQLException {
+  public void testNonStandardBounds() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     stmt.executeUpdate("INSERT INTO arrtest (intarr) VALUES ('{1,2,3}')");
     stmt.executeUpdate("UPDATE arrtest SET intarr[0] = 0");
@@ -205,12 +215,14 @@ public class ArrayTest extends TestCase {
     Array result = rs.getArray(1);
     Integer intarr[] = (Integer[]) result.getArray();
     assertEquals(4, intarr.length);
-    for (int i = 0; i < intarr.length; i++) {
+    for (int i = 0; i < intarr.length; i++)
+    {
       assertEquals(i, intarr[i].intValue());
     }
   }
 
-  public void testMultiDimensionalArray() throws SQLException {
+  public void testMultiDimensionalArray() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT '{{1,2},{3,4}}'::int[]");
     assertTrue(rs.next());
@@ -229,8 +241,10 @@ public class ArrayTest extends TestCase {
     stmt.close();
   }
 
-  public void testNullValues() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(conn, "8.2")) {
+  public void testNullValues() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(conn, "8.2"))
+    {
       return;
     }
 
@@ -245,7 +259,8 @@ public class ArrayTest extends TestCase {
     assertEquals(3, i[2].intValue());
   }
 
-  public void testUnknownArrayType() throws SQLException {
+  public void testUnknownArrayType() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs =
         stmt.executeQuery("SELECT relacl FROM pg_class WHERE relacl IS NOT NULL LIMIT 1");
@@ -261,7 +276,8 @@ public class ArrayTest extends TestCase {
     assertEquals("aclitem", arrRSMD.getColumnTypeName(2));
   }
 
-  public void testRecursiveResultSets() throws SQLException {
+  public void testRecursiveResultSets() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT '{{1,2},{3,4}}'::int[]");
     assertTrue(rs.next());
@@ -304,7 +320,8 @@ public class ArrayTest extends TestCase {
     stmt.close();
   }
 
-  public void testNullString() throws SQLException {
+  public void testNullString() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT '{a,NULL}'::text[]");
     assertTrue(rs.next());
@@ -313,17 +330,21 @@ public class ArrayTest extends TestCase {
     String s[] = (String[]) arr.getArray();
     assertEquals(2, s.length);
     assertEquals("a", s[0]);
-    if (TestUtil.haveMinimumServerVersion(conn, "8.2")) {
+    if (TestUtil.haveMinimumServerVersion(conn, "8.2"))
+    {
       assertNull(s[1]);
-    } else {
+    } else
+    {
       assertEquals("NULL", s[1]);
     }
   }
 
-  public void testEscaping() throws SQLException {
+  public void testEscaping() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     String sql = "SELECT ";
-    if (TestUtil.haveMinimumServerVersion(conn, "8.1")) {
+    if (TestUtil.haveMinimumServerVersion(conn, "8.1"))
+    {
       sql += 'E';
     }
     // Uggg.  Three levels of escaping: Java, string literal, array.
@@ -360,7 +381,8 @@ public class ArrayTest extends TestCase {
     assertTrue(!rs2.next());
   }
 
-  public void testWriteMultiDimensional() throws SQLException {
+  public void testWriteMultiDimensional() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT '{{1,2},{3,4}}'::int[]");
     assertTrue(rs.next());
@@ -369,7 +391,8 @@ public class ArrayTest extends TestCase {
     stmt.close();
 
     String sql = "SELECT ?";
-    if (TestUtil.isProtocolVersion(conn, 2)) {
+    if (TestUtil.isProtocolVersion(conn, 2))
+    {
       sql = "SELECT ?::int[]";
     }
     PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -390,7 +413,8 @@ public class ArrayTest extends TestCase {
    * delimiter instead of a comma which pretty much everything
    * else uses.
    */
-  public void testNonStandardDelimiter() throws SQLException {
+  public void testNonStandardDelimiter() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT '{(3,4),(1,2);(7,8),(5,6)}'::box[]");
     assertTrue(rs.next());
@@ -413,7 +437,8 @@ public class ArrayTest extends TestCase {
     assertTrue(!arrRS.next());
   }
 
-  public void testEmptyBinaryArray() throws SQLException {
+  public void testEmptyBinaryArray() throws SQLException
+  {
 
     PreparedStatement pstmt = conn.prepareStatement("SELECT '{}'::int[]");
     // force binary
@@ -421,9 +446,11 @@ public class ArrayTest extends TestCase {
 
     ResultSet rs = pstmt.executeQuery();
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       Array array = rs.getArray(1);
-      if (!rs.wasNull()) {
+      if (!rs.wasNull())
+      {
         ResultSet ars = array.getResultSet();
         assertEquals("get columntype should return Types.INTEGER", java.sql.Types.INTEGER,
             ars.getMetaData().getColumnType(1));

@@ -6,7 +6,8 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-abstract public class DbKeyStoreSocketFactory extends org.postgresql.ssl.WrappedFactory {
+abstract public class DbKeyStoreSocketFactory extends org.postgresql.ssl.WrappedFactory
+{
   /*
    * Populate the WrappedFactory member _factory with an SSL Socket Factory
    * that uses the JKS keystore provided by getKeyStorePassword() and
@@ -15,21 +16,27 @@ abstract public class DbKeyStoreSocketFactory extends org.postgresql.ssl.Wrapped
    * certificate to send to the server, as well as checking the server's
    * certificate against a set of trusted CAs.
    */
-  public DbKeyStoreSocketFactory() throws DbKeyStoreSocketException {
+  public DbKeyStoreSocketFactory() throws DbKeyStoreSocketException
+  {
     KeyStore keys;
     char[] password;
-    try {
+    try
+    {
       keys = KeyStore.getInstance("JKS");
       password = getKeyStorePassword();
       keys.load(getKeyStoreStream(), password);
-    } catch (java.security.GeneralSecurityException gse) {
+    } catch (java.security.GeneralSecurityException gse)
+    {
       throw new DbKeyStoreSocketException("Failed to load keystore: " + gse.getMessage());
-    } catch (java.io.FileNotFoundException fnfe) {
+    } catch (java.io.FileNotFoundException fnfe)
+    {
       throw new DbKeyStoreSocketException("Failed to find keystore file." + fnfe.getMessage());
-    } catch (java.io.IOException ioe) {
+    } catch (java.io.IOException ioe)
+    {
       throw new DbKeyStoreSocketException("Failed to read keystore file: " + ioe.getMessage());
     }
-    try {
+    try
+    {
       KeyManagerFactory keyfact = KeyManagerFactory.getInstance(
           KeyManagerFactory.getDefaultAlgorithm());
       keyfact.init(keys, password);
@@ -44,7 +51,8 @@ abstract public class DbKeyStoreSocketFactory extends org.postgresql.ssl.Wrapped
           trustfact.getTrustManagers(),
           null);
       _factory = ctx.getSocketFactory();
-    } catch (java.security.GeneralSecurityException gse) {
+    } catch (java.security.GeneralSecurityException gse)
+    {
       throw new DbKeyStoreSocketException(
           "Failed to set up database socket factory: " + gse.getMessage());
     }
@@ -54,8 +62,10 @@ abstract public class DbKeyStoreSocketFactory extends org.postgresql.ssl.Wrapped
 
   abstract public InputStream getKeyStoreStream();
 
-  public static class DbKeyStoreSocketException extends Exception {
-    public DbKeyStoreSocketException(String message) {
+  public static class DbKeyStoreSocketException extends Exception
+  {
+    public DbKeyStoreSocketException(String message)
+    {
       super(message);
     }
   }

@@ -39,7 +39,8 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
-public class PgStatement implements Statement, BaseStatement {
+public class PgStatement implements Statement, BaseStatement
+{
   /**
    * Default state for use or not binary transfers. Can use only for testing purposes
    */
@@ -162,7 +163,8 @@ public class PgStatement implements Statement, BaseStatement {
   protected int maxfieldSize = 0;
 
   PgStatement(PgConnection c, int rsType, int rsConcurrency, int rsHoldability)
-      throws SQLException {
+      throws SQLException
+  {
     this.connection = c;
     this.lastSimpleQuery = null;
     forceBinaryTransfers |= c.getForceBinary();
@@ -175,7 +177,8 @@ public class PgStatement implements Statement, BaseStatement {
 
   public ResultSet createResultSet(Query originalQuery, Field[] fields, List<byte[][]> tuples,
       ResultCursor cursor)
-      throws SQLException {
+      throws SQLException
+  {
     PgResultSet newResult = new PgResultSet(originalQuery,
         this,
         fields,
@@ -191,23 +194,28 @@ public class PgStatement implements Statement, BaseStatement {
     return newResult;
   }
 
-  public BaseConnection getPGConnection() {
+  public BaseConnection getPGConnection()
+  {
     return connection;
   }
 
-  public String getFetchingCursorName() {
+  public String getFetchingCursorName()
+  {
     return null;
   }
 
-  public int getFetchSize() {
+  public int getFetchSize()
+  {
     return fetchSize;
   }
 
-  protected boolean wantsScrollableResultSet() {
+  protected boolean wantsScrollableResultSet()
+  {
     return resultsettype != ResultSet.TYPE_FORWARD_ONLY;
   }
 
-  protected boolean wantsHoldableResultSet() {
+  protected boolean wantsHoldableResultSet()
+  {
     // FIXME: false if not supported
     return rsHoldability == ResultSet.HOLD_CURSORS_OVER_COMMIT;
   }
@@ -215,61 +223,80 @@ public class PgStatement implements Statement, BaseStatement {
   /**
    * ResultHandler implementations for updates, queries, and either-or.
    */
-  public class StatementResultHandler implements ResultHandler {
+  public class StatementResultHandler implements ResultHandler
+  {
     private SQLException error;
     private ResultWrapper results;
 
-    ResultWrapper getResults() {
+    ResultWrapper getResults()
+    {
       return results;
     }
 
-    private void append(ResultWrapper newResult) {
-      if (results == null) {
+    private void append(ResultWrapper newResult)
+    {
+      if (results == null)
+      {
         results = newResult;
-      } else {
+      } else
+      {
         results.append(newResult);
       }
     }
 
     public void handleResultRows(Query fromQuery, Field[] fields, List<byte[][]> tuples,
-        ResultCursor cursor) {
-      try {
+        ResultCursor cursor)
+    {
+      try
+      {
         ResultSet rs = PgStatement.this.createResultSet(fromQuery, fields, tuples, cursor);
         append(new ResultWrapper(rs));
-      } catch (SQLException e) {
+      } catch (SQLException e)
+      {
         handleError(e);
       }
     }
 
-    public void handleCommandStatus(String status, int updateCount, long insertOID) {
+    public void handleCommandStatus(String status, int updateCount, long insertOID)
+    {
       append(new ResultWrapper(updateCount, insertOID));
     }
 
-    public void handleWarning(SQLWarning warning) {
+    public void handleWarning(SQLWarning warning)
+    {
       PgStatement.this.addWarning(warning);
     }
 
-    public void handleError(SQLException newError) {
-      if (error == null) {
+    public void handleError(SQLException newError)
+    {
+      if (error == null)
+      {
         error = newError;
-      } else {
+      } else
+      {
         error.setNextException(newError);
       }
     }
 
-    public void handleCompletion() throws SQLException {
-      if (error != null) {
+    public void handleCompletion() throws SQLException
+    {
+      if (error != null)
+      {
         throw error;
       }
     }
   }
 
-  public java.sql.ResultSet executeQuery(String p_sql) throws SQLException {
-    if (forceBinaryTransfers) {
+  public java.sql.ResultSet executeQuery(String p_sql) throws SQLException
+  {
+    if (forceBinaryTransfers)
+    {
       clearWarnings();
       // Close any existing resultsets associated with this statement.
-      while (firstUnclosedResult != null) {
-        if (firstUnclosedResult.getResultSet() != null) {
+      while (firstUnclosedResult != null)
+      {
+        if (firstUnclosedResult.getResultSet() != null)
+        {
           firstUnclosedResult.getResultSet().close();
         }
         firstUnclosedResult = firstUnclosedResult.getNext();
@@ -287,11 +314,13 @@ public class PgStatement implements Statement, BaseStatement {
       return rs;
     }
 
-    if (!executeWithFlags(p_sql, 0)) {
+    if (!executeWithFlags(p_sql, 0))
+    {
       throw new PSQLException(GT.tr("No results were returned by the query."), PSQLState.NO_DATA);
     }
 
-    if (result.getNext() != null) {
+    if (result.getNext() != null)
+    {
       throw new PSQLException(GT.tr("Multiple ResultSets were returned by the query."),
           PSQLState.TOO_MANY_RESULTS);
     }
@@ -299,12 +328,15 @@ public class PgStatement implements Statement, BaseStatement {
     return (ResultSet) result.getResultSet();
   }
 
-  public int executeUpdate(String p_sql) throws SQLException {
+  public int executeUpdate(String p_sql) throws SQLException
+  {
     executeWithFlags(p_sql, QueryExecutor.QUERY_NO_RESULTS);
 
     ResultWrapper iter = result;
-    while (iter != null) {
-      if (iter.getResultSet() != null) {
+    while (iter != null)
+    {
+      if (iter.getResultSet() != null)
+      {
         throw new PSQLException(GT.tr("A result was returned when none was expected."),
             PSQLState.TOO_MANY_RESULTS);
 
@@ -315,11 +347,13 @@ public class PgStatement implements Statement, BaseStatement {
     return getUpdateCount();
   }
 
-  public boolean execute(String p_sql) throws SQLException {
+  public boolean execute(String p_sql) throws SQLException
+  {
     return executeWithFlags(p_sql, 0);
   }
 
-  public boolean executeWithFlags(String p_sql, int flags) throws SQLException {
+  public boolean executeWithFlags(String p_sql, int flags) throws SQLException
+  {
     checkClosed();
     p_sql = replaceProcessing(p_sql, replaceProcessingEnabled,
         connection.getStandardConformingStrings());
@@ -329,33 +363,40 @@ public class PgStatement implements Statement, BaseStatement {
     return (result != null && result.getResultSet() != null);
   }
 
-  public boolean executeWithFlags(int flags) throws SQLException {
+  public boolean executeWithFlags(int flags) throws SQLException
+  {
     checkClosed();
     throw new PSQLException(GT.tr("Can''t use executeWithFlags(int) on a Statement."),
         PSQLState.WRONG_OBJECT_TYPE);
   }
 
-  protected void closeForNextExecution() throws SQLException {
+  protected void closeForNextExecution() throws SQLException
+  {
     // Every statement execution clears any previous warnings.
     clearWarnings();
 
     // Close any existing resultsets associated with this statement.
-    while (firstUnclosedResult != null) {
+    while (firstUnclosedResult != null)
+    {
       ResultSet rs = firstUnclosedResult.getResultSet();
-      if (rs != null) {
+      if (rs != null)
+      {
         rs.close();
       }
       firstUnclosedResult = firstUnclosedResult.getNext();
     }
     result = null;
 
-    if (lastSimpleQuery != null) {
+    if (lastSimpleQuery != null)
+    {
       lastSimpleQuery.close();
       lastSimpleQuery = null;
     }
 
-    if (generatedKeys != null) {
-      if (generatedKeys.getResultSet() != null) {
+    if (generatedKeys != null)
+    {
+      if (generatedKeys.getResultSet() != null)
+      {
         generatedKeys.getResultSet().close();
       }
       generatedKeys = null;
@@ -368,64 +409,76 @@ public class PgStatement implements Statement, BaseStatement {
    * @param query to check (null if current query)
    * @return true if query is unlikely to be reused
    */
-  protected boolean isOneShotQuery(Query query) {
+  protected boolean isOneShotQuery(Query query)
+  {
     return true;
   }
 
   protected void execute(Query queryToExecute, ParameterList queryParameters, int flags)
-      throws SQLException {
+      throws SQLException
+  {
     closeForNextExecution();
 
     // Enable cursor-based resultset if possible.
     if (fetchSize > 0 && !wantsScrollableResultSet() && !connection.getAutoCommit()
-        && !wantsHoldableResultSet()) {
+        && !wantsHoldableResultSet())
+    {
       flags |= QueryExecutor.QUERY_FORWARD_CURSOR;
     }
 
-    if (wantsGeneratedKeysOnce || wantsGeneratedKeysAlways) {
+    if (wantsGeneratedKeysOnce || wantsGeneratedKeysAlways)
+    {
       flags |= QueryExecutor.QUERY_BOTH_ROWS_AND_STATUS;
 
       // If the no results flag is set (from executeUpdate)
       // clear it so we get the generated keys results.
       //
-      if ((flags & QueryExecutor.QUERY_NO_RESULTS) != 0) {
+      if ((flags & QueryExecutor.QUERY_NO_RESULTS) != 0)
+      {
         flags &= ~(QueryExecutor.QUERY_NO_RESULTS);
       }
     }
 
-    if (isOneShotQuery(queryToExecute)) {
+    if (isOneShotQuery(queryToExecute))
+    {
       flags |= QueryExecutor.QUERY_ONESHOT;
     }
     // Only use named statements after we hit the threshold. Note that only
     // named statements can be transferred in binary format.
 
-    if (connection.getAutoCommit()) {
+    if (connection.getAutoCommit())
+    {
       flags |= QueryExecutor.QUERY_SUPPRESS_BEGIN;
     }
 
     // updateable result sets do not yet support binary updates
-    if (concurrency != ResultSet.CONCUR_READ_ONLY) {
+    if (concurrency != ResultSet.CONCUR_READ_ONLY)
+    {
       flags |= QueryExecutor.QUERY_NO_BINARY_TRANSFER;
     }
 
-    if (queryToExecute.isEmpty()) {
+    if (queryToExecute.isEmpty())
+    {
       flags |= QueryExecutor.QUERY_SUPPRESS_BEGIN;
     }
 
-    if (!queryToExecute.isStatementDescribed() && forceBinaryTransfers) {
+    if (!queryToExecute.isStatementDescribed() && forceBinaryTransfers)
+    {
       int flags2 = flags | QueryExecutor.QUERY_DESCRIBE_ONLY;
       StatementResultHandler handler2 = new StatementResultHandler();
       connection.getQueryExecutor()
           .execute(queryToExecute, queryParameters, handler2, 0, 0, flags2);
       ResultWrapper result2 = handler2.getResults();
-      if (result2 != null) {
+      if (result2 != null)
+      {
         result2.getResultSet().close();
       }
     }
 
     StatementResultHandler handler = new StatementResultHandler();
     result = null;
-    try {
+    try
+    {
       startTimer();
       connection.getQueryExecutor().execute(queryToExecute,
           queryParameters,
@@ -433,23 +486,27 @@ public class PgStatement implements Statement, BaseStatement {
           maxrows,
           fetchSize,
           flags);
-    } finally {
+    } finally
+    {
       killTimerTask();
     }
     result = firstUnclosedResult = handler.getResults();
 
-    if (wantsGeneratedKeysOnce || wantsGeneratedKeysAlways) {
+    if (wantsGeneratedKeysOnce || wantsGeneratedKeysAlways)
+    {
       generatedKeys = result;
       result = result.getNext();
 
-      if (wantsGeneratedKeysOnce) {
+      if (wantsGeneratedKeysOnce)
+      {
         wantsGeneratedKeysOnce = false;
       }
     }
 
   }
 
-  public void setCursorName(String name) throws SQLException {
+  public void setCursorName(String name) throws SQLException
+  {
     checkClosed();
     // No-op.
   }
@@ -458,25 +515,31 @@ public class PgStatement implements Statement, BaseStatement {
   // see #close()
   protected boolean isClosed = false;
 
-  public int getUpdateCount() throws SQLException {
+  public int getUpdateCount() throws SQLException
+  {
     checkClosed();
-    if (result == null || result.getResultSet() != null) {
+    if (result == null || result.getResultSet() != null)
+    {
       return -1;
     }
 
     return result.getUpdateCount();
   }
 
-  public boolean getMoreResults() throws SQLException {
-    if (result == null) {
+  public boolean getMoreResults() throws SQLException
+  {
+    if (result == null)
+    {
       return false;
     }
 
     result = result.getNext();
 
     // Close preceding resultsets.
-    while (firstUnclosedResult != result) {
-      if (firstUnclosedResult.getResultSet() != null) {
+    while (firstUnclosedResult != result)
+    {
+      if (firstUnclosedResult.getResultSet() != null)
+      {
         firstUnclosedResult.getResultSet().close();
       }
       firstUnclosedResult = firstUnclosedResult.getNext();
@@ -485,14 +548,17 @@ public class PgStatement implements Statement, BaseStatement {
     return (result != null && result.getResultSet() != null);
   }
 
-  public int getMaxRows() throws SQLException {
+  public int getMaxRows() throws SQLException
+  {
     checkClosed();
     return maxrows;
   }
 
-  public void setMaxRows(int max) throws SQLException {
+  public void setMaxRows(int max) throws SQLException
+  {
     checkClosed();
-    if (max < 0) {
+    if (max < 0)
+    {
       throw new PSQLException(
           GT.tr("Maximum number of rows must be a value grater than or equal to 0."),
           PSQLState.INVALID_PARAMETER_VALUE);
@@ -500,16 +566,19 @@ public class PgStatement implements Statement, BaseStatement {
     maxrows = max;
   }
 
-  public void setEscapeProcessing(boolean enable) throws SQLException {
+  public void setEscapeProcessing(boolean enable) throws SQLException
+  {
     checkClosed();
     replaceProcessingEnabled = enable;
   }
 
-  public int getQueryTimeout() throws SQLException {
+  public int getQueryTimeout() throws SQLException
+  {
     return getQueryTimeoutMs() / 1000;
   }
 
-  public void setQueryTimeout(int seconds) throws SQLException {
+  public void setQueryTimeout(int seconds) throws SQLException
+  {
     setQueryTimeoutMs(seconds * 1000);
   }
 
@@ -520,7 +589,8 @@ public class PgStatement implements Statement, BaseStatement {
    * @return the current query timeout limit in milliseconds; 0 = unlimited
    * @throws SQLException if a database access error occurs
    */
-  public int getQueryTimeoutMs() throws SQLException {
+  public int getQueryTimeoutMs() throws SQLException
+  {
     checkClosed();
     return timeout;
   }
@@ -531,10 +601,12 @@ public class PgStatement implements Statement, BaseStatement {
    * @param millis - the new query timeout limit in milliseconds
    * @throws SQLException if a database access error occurs
    */
-  public void setQueryTimeoutMs(int millis) throws SQLException {
+  public void setQueryTimeoutMs(int millis) throws SQLException
+  {
     checkClosed();
 
-    if (millis < 0) {
+    if (millis < 0)
+    {
       throw new PSQLException(GT.tr("Query timeout must be a value greater than or equals to 0."),
           PSQLState.INVALID_PARAMETER_VALUE);
     }
@@ -548,28 +620,35 @@ public class PgStatement implements Statement, BaseStatement {
    *
    * @param warn warning to add
    */
-  public void addWarning(SQLWarning warn) {
-    if (warnings == null) {
+  public void addWarning(SQLWarning warn)
+  {
+    if (warnings == null)
+    {
       warnings = warn;
       lastWarning = warn;
-    } else {
+    } else
+    {
       lastWarning.setNextWarning(warn);
       lastWarning = warn;
     }
   }
 
-  public SQLWarning getWarnings() throws SQLException {
+  public SQLWarning getWarnings() throws SQLException
+  {
     checkClosed();
     return warnings;
   }
 
-  public int getMaxFieldSize() throws SQLException {
+  public int getMaxFieldSize() throws SQLException
+  {
     return maxfieldSize;
   }
 
-  public void setMaxFieldSize(int max) throws SQLException {
+  public void setMaxFieldSize(int max) throws SQLException
+  {
     checkClosed();
-    if (max < 0) {
+    if (max < 0)
+    {
       throw new PSQLException(
           GT.tr("The maximum field size must be a value greater than or equal to 0."),
           PSQLState.INVALID_PARAMETER_VALUE);
@@ -577,15 +656,18 @@ public class PgStatement implements Statement, BaseStatement {
     maxfieldSize = max;
   }
 
-  public void clearWarnings() throws SQLException {
+  public void clearWarnings() throws SQLException
+  {
     warnings = null;
     lastWarning = null;
   }
 
-  public java.sql.ResultSet getResultSet() throws SQLException {
+  public java.sql.ResultSet getResultSet() throws SQLException
+  {
     checkClosed();
 
-    if (result == null) {
+    if (result == null)
+    {
       return null;
     }
 
@@ -598,9 +680,11 @@ public class PgStatement implements Statement, BaseStatement {
    *
    * {@inheritDoc}
    */
-  public void close() throws SQLException {
+  public void close() throws SQLException
+  {
     // closing an already closed Statement is a no-op.
-    if (isClosed) {
+    if (isClosed)
+    {
       return;
     }
 
@@ -626,27 +710,32 @@ public class PgStatement implements Statement, BaseStatement {
    * @return PostgreSQL-compatible SQL
    */
   static String replaceProcessing(String p_sql, boolean replaceProcessingEnabled,
-      boolean standardConformingStrings) throws SQLException {
-    if (replaceProcessingEnabled) {
+      boolean standardConformingStrings) throws SQLException
+  {
+    if (replaceProcessingEnabled)
+    {
       // Since escape codes can only appear in SQL CODE, we keep track
       // of if we enter a string or not.
       int len = p_sql.length();
       StringBuilder newsql = new StringBuilder(len);
       int i = 0;
-      while (i < len) {
+      while (i < len)
+      {
         i = parseSql(p_sql, i, newsql, false, standardConformingStrings);
         // We need to loop here in case we encounter invalid
         // SQL, consider: SELECT a FROM t WHERE (1 > 0)) ORDER BY a
         // We can't ending replacing after the extra closing paren
         // because that changes a syntax error to a valid query
         // that isn't what the user specified.
-        if (i < len) {
+        if (i < len)
+        {
           newsql.append(p_sql.charAt(i));
           i++;
         }
       }
       return newsql.toString();
-    } else {
+    } else
+    {
       return p_sql;
     }
   }
@@ -665,7 +754,8 @@ public class PgStatement implements Statement, BaseStatement {
    * @throws SQLException if given SQL is wrong
    */
   protected static int parseSql(String p_sql, int i, StringBuilder newsql, boolean stopOnComma,
-      boolean stdStrings) throws SQLException {
+      boolean stdStrings) throws SQLException
+  {
     short state = IN_SQLCODE;
     int len = p_sql.length();
     int nestedParenthesis = 0;
@@ -673,58 +763,75 @@ public class PgStatement implements Statement, BaseStatement {
 
     // because of the ++i loop
     i--;
-    while (!endOfNested && ++i < len) {
+    while (!endOfNested && ++i < len)
+    {
       char c = p_sql.charAt(i);
-      switch (state) {
+      switch (state)
+      {
         case IN_SQLCODE:
-          if (c == '\'') {
+          if (c == '\'')
+          {
             // start of a string?
             state = IN_STRING;
-          } else if (c == '"') {
+          } else if (c == '"')
+          {
             // start of a identifer?
             state = IN_IDENTIFIER;
-          } else if (c == '(') { // begin nested sql
+          } else if (c == '(')
+          { // begin nested sql
             nestedParenthesis++;
-          } else if (c == ')') { // end of nested sql
+          } else if (c == ')')
+          { // end of nested sql
             nestedParenthesis--;
-            if (nestedParenthesis < 0) {
+            if (nestedParenthesis < 0)
+            {
               endOfNested = true;
               break;
             }
-          } else if (stopOnComma && c == ',' && nestedParenthesis == 0) {
+          } else if (stopOnComma && c == ',' && nestedParenthesis == 0)
+          {
             endOfNested = true;
             break;
-          } else if (c == '{') {     // start of an escape code?
-            if (i + 1 < len) {
+          } else if (c == '{')
+          {     // start of an escape code?
+            if (i + 1 < len)
+            {
               char next = p_sql.charAt(i + 1);
               char nextnext = (i + 2 < len) ? p_sql.charAt(i + 2) : '\0';
-              if (next == 'd' || next == 'D') {
+              if (next == 'd' || next == 'D')
+              {
                 state = ESC_TIMEDATE;
                 i++;
                 newsql.append("DATE ");
                 break;
-              } else if (next == 't' || next == 'T') {
+              } else if (next == 't' || next == 'T')
+              {
                 state = ESC_TIMEDATE;
-                if (nextnext == 's' || nextnext == 'S') {
+                if (nextnext == 's' || nextnext == 'S')
+                {
                   // timestamp constant
                   i += 2;
                   newsql.append("TIMESTAMP ");
-                } else {
+                } else
+                {
                   // time constant
                   i++;
                   newsql.append("TIME ");
                 }
                 break;
-              } else if (next == 'f' || next == 'F') {
+              } else if (next == 'f' || next == 'F')
+              {
                 state = ESC_FUNCTION;
                 i += (nextnext == 'n' || nextnext == 'N') ? 2 : 1;
                 break;
-              } else if (next == 'o' || next == 'O') {
+              } else if (next == 'o' || next == 'O')
+              {
                 state = ESC_OUTERJOIN;
                 i += (nextnext == 'j' || nextnext == 'J') ? 2 : 1;
                 break;
               } else if (next == 'e' || next
-                  == 'E') { // we assume that escape is the only escape sequence beginning with e
+                  == 'E')
+              { // we assume that escape is the only escape sequence beginning with e
                 state = ESC_ESCAPECHAR;
                 break;
               }
@@ -734,10 +841,12 @@ public class PgStatement implements Statement, BaseStatement {
           break;
 
         case IN_STRING:
-          if (c == '\'') {
+          if (c == '\'')
+          {
             // end of string?
             state = IN_SQLCODE;
-          } else if (c == '\\' && !stdStrings) {
+          } else if (c == '\\' && !stdStrings)
+          {
             // a backslash?
             state = BACKSLASH;
           }
@@ -746,7 +855,8 @@ public class PgStatement implements Statement, BaseStatement {
           break;
 
         case IN_IDENTIFIER:
-          if (c == '"') {
+          if (c == '"')
+          {
             // end of identifier
             state = IN_SQLCODE;
           }
@@ -763,7 +873,8 @@ public class PgStatement implements Statement, BaseStatement {
           // extract function name
           String functionName;
           int posArgs = p_sql.indexOf('(', i);
-          if (posArgs != -1) {
+          if (posArgs != -1)
+          {
             functionName = p_sql.substring(i, posArgs).trim();
             // extract arguments
             i = posArgs + 1;// we start the scan after the first (
@@ -774,7 +885,8 @@ public class PgStatement implements Statement, BaseStatement {
           }
           // go to the end of the function copying anything found
           i++;
-          while (i < len && p_sql.charAt(i) != '}') {
+          while (i < len && p_sql.charAt(i) != '}')
+          {
             newsql.append(p_sql.charAt(i++));
           }
           state = IN_SQLCODE; // end of escaped function (or query)
@@ -782,9 +894,11 @@ public class PgStatement implements Statement, BaseStatement {
         case ESC_TIMEDATE:
         case ESC_OUTERJOIN:
         case ESC_ESCAPECHAR:
-          if (c == '}') {
+          if (c == '}')
+          {
             state = IN_SQLCODE;    // end of escape code.
-          } else {
+          } else
+          {
             newsql.append(c);
           }
           break;
@@ -803,38 +917,48 @@ public class PgStatement implements Statement, BaseStatement {
    * @throws SQLException if something goes wrong
    */
   protected static String escapeFunction(String functionName, String args, boolean stdStrings)
-      throws SQLException {
+      throws SQLException
+  {
     // parse function arguments
     int len = args.length();
     int i = 0;
     ArrayList<StringBuilder> parsedArgs = new ArrayList<StringBuilder>();
-    while (i < len) {
+    while (i < len)
+    {
       StringBuilder arg = new StringBuilder();
       int lastPos = i;
       i = parseSql(args, i, arg, true, stdStrings);
-      if (lastPos != i) {
+      if (lastPos != i)
+      {
         parsedArgs.add(arg);
       }
       i++;
     }
     // we can now tranlate escape functions
-    try {
+    try
+    {
       Method escapeMethod = EscapedFunctions.getFunction(functionName);
       return (String) escapeMethod.invoke(null, new Object[]{parsedArgs});
-    } catch (InvocationTargetException e) {
-      if (e.getTargetException() instanceof SQLException) {
+    } catch (InvocationTargetException e)
+    {
+      if (e.getTargetException() instanceof SQLException)
+      {
         throw (SQLException) e.getTargetException();
-      } else {
+      } else
+      {
         throw new PSQLException(e.getTargetException().getMessage(),
             PSQLState.SYSTEM_ERROR);
       }
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       // by default the function name is kept unchanged
       StringBuilder buf = new StringBuilder();
       buf.append(functionName).append('(');
-      for (int iArg = 0; iArg < parsedArgs.size(); iArg++) {
+      for (int iArg = 0; iArg < parsedArgs.size(); iArg++)
+      {
         buf.append(parsedArgs.get(iArg));
-        if (iArg != (parsedArgs.size() - 1)) {
+        if (iArg != (parsedArgs.size() - 1))
+        {
           buf.append(',');
         }
       }
@@ -850,18 +974,22 @@ public class PgStatement implements Statement, BaseStatement {
    *
    */
 
-  public long getLastOID() throws SQLException {
+  public long getLastOID() throws SQLException
+  {
     checkClosed();
-    if (result == null) {
+    if (result == null)
+    {
       return 0;
     }
     return result.getInsertOID();
   }
 
-  public void setPrepareThreshold(int newThreshold) throws SQLException {
+  public void setPrepareThreshold(int newThreshold) throws SQLException
+  {
     checkClosed();
 
-    if (newThreshold < 0) {
+    if (newThreshold < 0)
+    {
       forceBinaryTransfers = true;
       newThreshold = 1;
     }
@@ -869,20 +997,25 @@ public class PgStatement implements Statement, BaseStatement {
     this.m_prepareThreshold = newThreshold;
   }
 
-  public int getPrepareThreshold() {
+  public int getPrepareThreshold()
+  {
     return m_prepareThreshold;
   }
 
-  public void setUseServerPrepare(boolean flag) throws SQLException {
+  public void setUseServerPrepare(boolean flag) throws SQLException
+  {
     setPrepareThreshold(flag ? 1 : 0);
   }
 
-  public boolean isUseServerPrepare() {
+  public boolean isUseServerPrepare()
+  {
     return false;
   }
 
-  protected void checkClosed() throws SQLException {
-    if (isClosed) {
+  protected void checkClosed() throws SQLException
+  {
+    if (isClosed)
+    {
       throw new PSQLException(GT.tr("This statement has been closed."),
           PSQLState.OBJECT_NOT_IN_STATE);
     }
@@ -890,10 +1023,12 @@ public class PgStatement implements Statement, BaseStatement {
 
   // ** JDBC 2 Extensions **
 
-  public void addBatch(String p_sql) throws SQLException {
+  public void addBatch(String p_sql) throws SQLException
+  {
     checkClosed();
 
-    if (batchStatements == null) {
+    if (batchStatements == null)
+    {
       batchStatements = new ArrayList<Query>();
       batchParameters = new ArrayList<ParameterList>();
     }
@@ -905,25 +1040,30 @@ public class PgStatement implements Statement, BaseStatement {
     batchParameters.add(null);
   }
 
-  public void clearBatch() throws SQLException {
-    if (batchStatements != null) {
+  public void clearBatch() throws SQLException
+  {
+    if (batchStatements != null)
+    {
       batchStatements.clear();
       batchParameters.clear();
     }
   }
 
   protected ResultHandler createBatchHandler(int[] updateCounts, Query[] queries,
-      ParameterList[] parameterLists) {
+      ParameterList[] parameterLists)
+  {
     return new BatchResultHandler(this, queries, parameterLists, updateCounts,
         wantsGeneratedKeysAlways);
   }
 
-  public int[] executeBatch() throws SQLException {
+  public int[] executeBatch() throws SQLException
+  {
     checkClosed();
 
     closeForNextExecution();
 
-    if (batchStatements == null || batchStatements.isEmpty()) {
+    if (batchStatements == null || batchStatements.isEmpty())
+    {
       return new int[0];
     }
 
@@ -943,7 +1083,8 @@ public class PgStatement implements Statement, BaseStatement {
     // to send anything dependent on the Desribe results, e.g. binary parameters.
     boolean preDescribe = false;
 
-    if (wantsGeneratedKeysAlways) {
+    if (wantsGeneratedKeysAlways)
+    {
       /*
        * This batch will return generated keys, tell the executor to
        * expect result rows. We also force a Describe later so we know
@@ -957,16 +1098,19 @@ public class PgStatement implements Statement, BaseStatement {
        */
       flags = QueryExecutor.QUERY_BOTH_ROWS_AND_STATUS
           | QueryExecutor.QUERY_NO_BINARY_TRANSFER;
-    } else {
+    } else
+    {
       // If a batch hasn't specified that it wants generated keys, using the appropriate
       // Connection.createStatement(...) interfaces, disallow any result set.
       flags = QueryExecutor.QUERY_NO_RESULTS;
     }
 
     // Only use named statements after we hit the threshold
-    if (isOneShotQuery(null)) {
+    if (isOneShotQuery(null))
+    {
       flags |= QueryExecutor.QUERY_ONESHOT;
-    } else {
+    } else
+    {
       // If a batch requests generated keys and isn't already described,
       // force a Describe of the query before proceeding. That way we can
       // determine the appropriate size of each batch by estimating the
@@ -982,11 +1126,13 @@ public class PgStatement implements Statement, BaseStatement {
       flags |= QueryExecutor.QUERY_FORCE_DESCRIBE_PORTAL;
     }
 
-    if (connection.getAutoCommit()) {
+    if (connection.getAutoCommit())
+    {
       flags |= QueryExecutor.QUERY_SUPPRESS_BEGIN;
     }
 
-    if (preDescribe || forceBinaryTransfers) {
+    if (preDescribe || forceBinaryTransfers)
+    {
       // Do a client-server round trip, parsing and describing the query so we
       // can determine its result types for use in binary parameters, batch sizing,
       // etc.
@@ -994,7 +1140,8 @@ public class PgStatement implements Statement, BaseStatement {
       StatementResultHandler handler2 = new StatementResultHandler();
       connection.getQueryExecutor().execute(queries[0], parameterLists[0], handler2, 0, 0, flags2);
       ResultWrapper result2 = handler2.getResults();
-      if (result2 != null) {
+      if (result2 != null)
+      {
         result2.getResultSet().close();
       }
     }
@@ -1004,7 +1151,8 @@ public class PgStatement implements Statement, BaseStatement {
     ResultHandler handler;
     handler = createBatchHandler(updateCounts, queries, parameterLists);
 
-    try {
+    try
+    {
       startTimer();
       connection.getQueryExecutor().execute(queries,
           parameterLists,
@@ -1012,53 +1160,67 @@ public class PgStatement implements Statement, BaseStatement {
           maxrows,
           fetchSize,
           flags);
-    } finally {
+    } finally
+    {
       killTimerTask();
     }
 
-    if (wantsGeneratedKeysAlways) {
+    if (wantsGeneratedKeysAlways)
+    {
       generatedKeys = new ResultWrapper(((BatchResultHandler) handler).getGeneratedKeys());
     }
 
     return updateCounts;
   }
 
-  public void cancel() throws SQLException {
-    if (!STATE_UPDATER.compareAndSet(this, STATE_IN_QUERY, STATE_CANCELLING)) {
+  public void cancel() throws SQLException
+  {
+    if (!STATE_UPDATER.compareAndSet(this, STATE_IN_QUERY, STATE_CANCELLING))
+    {
       // Not in query, there's nothing to cancel
       return;
     }
-    try {
+    try
+    {
       // Synchronize on connection to avoid spinning in killTimerTask
-      synchronized (connection) {
+      synchronized (connection)
+      {
         connection.cancelQuery();
       }
-    } finally {
+    } finally
+    {
       STATE_UPDATER.set(this, STATE_CANCELLED);
-      synchronized (connection) {
+      synchronized (connection)
+      {
         connection.notifyAll(); // wake-up killTimerTask
       }
     }
   }
 
-  public Connection getConnection() throws SQLException {
+  public Connection getConnection() throws SQLException
+  {
     return (Connection) connection;
   }
 
-  public int getFetchDirection() {
+  public int getFetchDirection()
+  {
     return fetchdirection;
   }
 
-  public int getResultSetConcurrency() {
+  public int getResultSetConcurrency()
+  {
     return concurrency;
   }
 
-  public int getResultSetType() {
+  public int getResultSetType()
+  {
     return resultsettype;
   }
 
-  public void setFetchDirection(int direction) throws SQLException {
-    switch (direction) {
+  public void setFetchDirection(int direction) throws SQLException
+  {
+    switch (direction)
+    {
       case ResultSet.FETCH_FORWARD:
       case ResultSet.FETCH_REVERSE:
       case ResultSet.FETCH_UNKNOWN:
@@ -1070,16 +1232,19 @@ public class PgStatement implements Statement, BaseStatement {
     }
   }
 
-  public void setFetchSize(int rows) throws SQLException {
+  public void setFetchSize(int rows) throws SQLException
+  {
     checkClosed();
-    if (rows < 0) {
+    if (rows < 0)
+    {
       throw new PSQLException(GT.tr("Fetch size must be a value greater to or equal to 0."),
           PSQLState.INVALID_PARAMETER_VALUE);
     }
     fetchSize = rows;
   }
 
-  private void startTimer() {
+  private void startTimer()
+  {
     /*
      * there shouldn't be any previous timer active, but better safe than
      * sorry.
@@ -1088,18 +1253,24 @@ public class PgStatement implements Statement, BaseStatement {
 
     STATE_UPDATER.set(this, STATE_IN_QUERY);
 
-    if (timeout == 0) {
+    if (timeout == 0)
+    {
       return;
     }
 
-    TimerTask cancelTask = new TimerTask() {
-      public void run() {
-        try {
-          if (!CANCEL_TIMER_UPDATER.compareAndSet(PgStatement.this, this, null)) {
+    TimerTask cancelTask = new TimerTask()
+    {
+      public void run()
+      {
+        try
+        {
+          if (!CANCEL_TIMER_UPDATER.compareAndSet(PgStatement.this, this, null))
+          {
             return; // Nothing to do here, statement has already finished and cleared cancelTimerTask reference
           }
           PgStatement.this.cancel();
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
         }
       }
     };
@@ -1112,13 +1283,16 @@ public class PgStatement implements Statement, BaseStatement {
    * Clears {@link #cancelTimerTask} if any. Returns true if and only if "cancel" timer task would
    * never invoke {@link #cancel()}.
    */
-  private boolean cleanupTimer() {
+  private boolean cleanupTimer()
+  {
     TimerTask timerTask = CANCEL_TIMER_UPDATER.get(this);
-    if (timerTask == null) {
+    if (timerTask == null)
+    {
       // If timeout is zero, then timer task did not exist, so we safely report "all clear"
       return timeout == 0;
     }
-    if (!CANCEL_TIMER_UPDATER.compareAndSet(this, timerTask, null)) {
+    if (!CANCEL_TIMER_UPDATER.compareAndSet(this, timerTask, null))
+    {
       // Failed to update reference -> timer has just fired, so we must wait for the query state to become "cancelling".
       return false;
     }
@@ -1128,54 +1302,67 @@ public class PgStatement implements Statement, BaseStatement {
     return true;
   }
 
-  private void killTimerTask() {
+  private void killTimerTask()
+  {
     boolean timerTaskIsClear = cleanupTimer();
     // The order is important here: in case we need to wait for the cancel task, the state must be
     // kept STATE_IN_QUERY, so cancelTask would be able to cancel the query.
     // It is believed that this case is very rare, so "additional cancel and wait below" would not harm it.
-    if (timerTaskIsClear && STATE_UPDATER.compareAndSet(this, STATE_IN_QUERY, STATE_IDLE)) {
+    if (timerTaskIsClear && STATE_UPDATER.compareAndSet(this, STATE_IN_QUERY, STATE_IDLE))
+    {
       return;
     }
 
     // Being here means someone managed to call .cancel() and our connection did not receive "timeout error"
     // We wait till state becomes "cancelled"
     boolean interrupted = false;
-    while (!STATE_UPDATER.compareAndSet(this, STATE_CANCELLED, STATE_IDLE)) {
-      synchronized (connection) {
-        try {
+    while (!STATE_UPDATER.compareAndSet(this, STATE_CANCELLED, STATE_IDLE))
+    {
+      synchronized (connection)
+      {
+        try
+        {
           // Note: wait timeout here is irrelevant since synchronized(connection) would block until .cancel finishes
           connection.wait(10);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException e)
+        {
           interrupted = true;
         }
       }
     }
-    if (interrupted) {
+    if (interrupted)
+    {
       Thread.currentThread().interrupt();
     }
   }
 
-  protected boolean getForceBinaryTransfer() {
+  protected boolean getForceBinaryTransfer()
+  {
     return forceBinaryTransfers;
   }
 
   static String addReturning(BaseConnection connection, String sql, String columns[],
-      boolean escape) throws SQLException {
-    if (!connection.haveMinimumServerVersion(ServerVersion.v8_2)) {
+      boolean escape) throws SQLException
+  {
+    if (!connection.haveMinimumServerVersion(ServerVersion.v8_2))
+    {
       throw new PSQLException(
           GT.tr("Returning autogenerated keys is only supported for 8.2 and later servers."),
           PSQLState.NOT_IMPLEMENTED);
     }
 
     sql = sql.trim();
-    if (sql.endsWith(";")) {
+    if (sql.endsWith(";"))
+    {
       sql = sql.substring(0, sql.length() - 1);
     }
 
     StringBuilder sb = new StringBuilder(sql);
     sb.append(" RETURNING ");
-    for (int i = 0; i < columns.length; i++) {
-      if (i != 0) {
+    for (int i = 0; i < columns.length; i++)
+    {
+      if (i != 0)
+      {
         sb.append(", ");
       }
       // If given user provided column names, quote and escape them.
@@ -1183,9 +1370,11 @@ public class PgStatement implements Statement, BaseStatement {
       // but it does match up with our handling of things like
       // DatabaseMetaData.getColumns and is necessary for the same
       // reasons.
-      if (escape) {
+      if (escape)
+      {
         Utils.escapeIdentifier(sb, columns[i]);
-      } else {
+      } else
+      {
         sb.append(columns[i]);
       }
     }
@@ -1193,87 +1382,109 @@ public class PgStatement implements Statement, BaseStatement {
     return sb.toString();
   }
 
-  public long getLargeUpdateCount() throws SQLException {
+  public long getLargeUpdateCount() throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "getLargeUpdateCount");
   }
 
-  public void setLargeMaxRows(long max) throws SQLException {
+  public void setLargeMaxRows(long max) throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "setLargeMaxRows");
   }
 
-  public long getLargeMaxRows() throws SQLException {
+  public long getLargeMaxRows() throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "getLargeMaxRows");
   }
 
-  public long[] executeLargeBatch() throws SQLException {
+  public long[] executeLargeBatch() throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "executeLargeBatch");
   }
 
-  public long executeLargeUpdate(String sql) throws SQLException {
+  public long executeLargeUpdate(String sql) throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "executeLargeUpdate");
   }
 
-  public long executeLargeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
+  public long executeLargeUpdate(String sql, int autoGeneratedKeys) throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "executeLargeUpdate");
   }
 
-  public long executeLargeUpdate(String sql, int columnIndexes[]) throws SQLException {
+  public long executeLargeUpdate(String sql, int columnIndexes[]) throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "executeLargeUpdate");
   }
 
-  public long executeLargeUpdate(String sql, String columnNames[]) throws SQLException {
+  public long executeLargeUpdate(String sql, String columnNames[]) throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "executeLargeUpdate");
   }
 
-  public long executeLargeUpdate() throws SQLException {
+  public long executeLargeUpdate() throws SQLException
+  {
     throw Driver.notImplemented(this.getClass(), "executeLargeUpdate");
   }
 
-  public boolean isClosed() throws SQLException {
+  public boolean isClosed() throws SQLException
+  {
     return isClosed;
   }
 
-  public void setPoolable(boolean poolable) throws SQLException {
+  public void setPoolable(boolean poolable) throws SQLException
+  {
     checkClosed();
     this.poolable = poolable;
   }
 
-  public boolean isPoolable() throws SQLException {
+  public boolean isPoolable() throws SQLException
+  {
     checkClosed();
     return poolable;
   }
 
-  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+  public boolean isWrapperFor(Class<?> iface) throws SQLException
+  {
     return iface.isAssignableFrom(getClass());
   }
 
-  public <T> T unwrap(Class<T> iface) throws SQLException {
-    if (iface.isAssignableFrom(getClass())) {
+  public <T> T unwrap(Class<T> iface) throws SQLException
+  {
+    if (iface.isAssignableFrom(getClass()))
+    {
       return iface.cast(this);
     }
     throw new SQLException("Cannot unwrap to " + iface.getName());
   }
 
-  public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+  public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException
+  {
     throw Driver.notImplemented(this.getClass(), "getParentLogger()");
   }
 
-  public void closeOnCompletion() throws SQLException {
+  public void closeOnCompletion() throws SQLException
+  {
     closeOnCompletion = true;
   }
 
-  public boolean isCloseOnCompletion() throws SQLException {
+  public boolean isCloseOnCompletion() throws SQLException
+  {
     return closeOnCompletion;
   }
 
-  protected void checkCompletion() throws SQLException {
-    if (!closeOnCompletion) {
+  protected void checkCompletion() throws SQLException
+  {
+    if (!closeOnCompletion)
+    {
       return;
     }
 
     ResultWrapper result = firstUnclosedResult;
-    while (result != null) {
-      if (result.getResultSet() != null && !result.getResultSet().isClosed()) {
+    while (result != null)
+    {
+      if (result.getResultSet() != null && !result.getResultSet().isClosed())
+      {
         return;
       }
       result = result.getNext();
@@ -1281,31 +1492,39 @@ public class PgStatement implements Statement, BaseStatement {
 
     // prevent all ResultSet.close arising from Statement.close to loop here
     closeOnCompletion = false;
-    try {
+    try
+    {
       close();
-    } finally {
+    } finally
+    {
       // restore the status if one rely on isCloseOnCompletion
       closeOnCompletion = true;
     }
   }
 
-  public boolean getMoreResults(int current) throws SQLException {
+  public boolean getMoreResults(int current) throws SQLException
+  {
     // CLOSE_CURRENT_RESULT
     if (current == Statement.CLOSE_CURRENT_RESULT && result != null
-        && result.getResultSet() != null) {
+        && result.getResultSet() != null)
+    {
       result.getResultSet().close();
     }
 
     // Advance resultset.
-    if (result != null) {
+    if (result != null)
+    {
       result = result.getNext();
     }
 
     // CLOSE_ALL_RESULTS
-    if (current == Statement.CLOSE_ALL_RESULTS) {
+    if (current == Statement.CLOSE_ALL_RESULTS)
+    {
       // Close preceding resultsets.
-      while (firstUnclosedResult != result) {
-        if (firstUnclosedResult.getResultSet() != null) {
+      while (firstUnclosedResult != result)
+      {
+        if (firstUnclosedResult.getResultSet() != null)
+        {
           firstUnclosedResult.getResultSet().close();
         }
         firstUnclosedResult = firstUnclosedResult.getNext();
@@ -1316,17 +1535,21 @@ public class PgStatement implements Statement, BaseStatement {
     return (result != null && result.getResultSet() != null);
   }
 
-  public ResultSet getGeneratedKeys() throws SQLException {
+  public ResultSet getGeneratedKeys() throws SQLException
+  {
     checkClosed();
-    if (generatedKeys == null || generatedKeys.getResultSet() == null) {
+    if (generatedKeys == null || generatedKeys.getResultSet() == null)
+    {
       return createDriverResultSet(new Field[0], new ArrayList<byte[][]>());
     }
 
     return generatedKeys.getResultSet();
   }
 
-  public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
-    if (autoGeneratedKeys == Statement.NO_GENERATED_KEYS) {
+  public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException
+  {
+    if (autoGeneratedKeys == Statement.NO_GENERATED_KEYS)
+    {
       return executeUpdate(sql);
     }
 
@@ -1336,8 +1559,10 @@ public class PgStatement implements Statement, BaseStatement {
     return executeUpdate(sql);
   }
 
-  public int executeUpdate(String sql, int columnIndexes[]) throws SQLException {
-    if (columnIndexes == null || columnIndexes.length == 0) {
+  public int executeUpdate(String sql, int columnIndexes[]) throws SQLException
+  {
+    if (columnIndexes == null || columnIndexes.length == 0)
+    {
       return executeUpdate(sql);
     }
 
@@ -1345,8 +1570,10 @@ public class PgStatement implements Statement, BaseStatement {
         PSQLState.NOT_IMPLEMENTED);
   }
 
-  public int executeUpdate(String sql, String columnNames[]) throws SQLException {
-    if (columnNames == null || columnNames.length == 0) {
+  public int executeUpdate(String sql, String columnNames[]) throws SQLException
+  {
+    if (columnNames == null || columnNames.length == 0)
+    {
       return executeUpdate(sql);
     }
 
@@ -1356,8 +1583,10 @@ public class PgStatement implements Statement, BaseStatement {
     return executeUpdate(sql);
   }
 
-  public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
-    if (autoGeneratedKeys == Statement.NO_GENERATED_KEYS) {
+  public boolean execute(String sql, int autoGeneratedKeys) throws SQLException
+  {
+    if (autoGeneratedKeys == Statement.NO_GENERATED_KEYS)
+    {
       return execute(sql);
     }
 
@@ -1367,8 +1596,10 @@ public class PgStatement implements Statement, BaseStatement {
     return execute(sql);
   }
 
-  public boolean execute(String sql, int columnIndexes[]) throws SQLException {
-    if (columnIndexes == null || columnIndexes.length == 0) {
+  public boolean execute(String sql, int columnIndexes[]) throws SQLException
+  {
+    if (columnIndexes == null || columnIndexes.length == 0)
+    {
       return execute(sql);
     }
 
@@ -1376,8 +1607,10 @@ public class PgStatement implements Statement, BaseStatement {
         PSQLState.NOT_IMPLEMENTED);
   }
 
-  public boolean execute(String sql, String columnNames[]) throws SQLException {
-    if (columnNames == null || columnNames.length == 0) {
+  public boolean execute(String sql, String columnNames[]) throws SQLException
+  {
+    if (columnNames == null || columnNames.length == 0)
+    {
       return execute(sql);
     }
 
@@ -1387,12 +1620,14 @@ public class PgStatement implements Statement, BaseStatement {
     return execute(sql);
   }
 
-  public int getResultSetHoldability() throws SQLException {
+  public int getResultSetHoldability() throws SQLException
+  {
     return rsHoldability;
   }
 
   public ResultSet createDriverResultSet(Field[] fields, List<byte[][]> tuples)
-      throws SQLException {
+      throws SQLException
+  {
     return createResultSet(null, fields, tuples, null);
   }
 }

@@ -24,29 +24,34 @@ import java.sql.SQLException;
  * assertTrue(dbmd.nullPlusNonNullIsNull());
  */
 
-public class DatabaseMetaDataPropertiesTest extends TestCase {
+public class DatabaseMetaDataPropertiesTest extends TestCase
+{
 
   private Connection con;
 
   /*
    * Constructor
    */
-  public DatabaseMetaDataPropertiesTest(String name) {
+  public DatabaseMetaDataPropertiesTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.closeDB(con);
   }
 
   /*
    * The spec says this may return null, but we always do!
    */
-  public void testGetMetaData() throws SQLException {
+  public void testGetMetaData() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
   }
@@ -54,7 +59,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
   /*
    * Test default capabilities
    */
-  public void testCapabilities() throws SQLException {
+  public void testCapabilities() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -73,9 +79,11 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(dbmd.supportsMinimumSQLGrammar());
     assertTrue(!dbmd.supportsCoreSQLGrammar());
     assertTrue(!dbmd.supportsExtendedSQLGrammar());
-    if (TestUtil.haveMinimumServerVersion(con, "7.3")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       assertTrue(dbmd.supportsANSI92EntryLevelSQL());
-    } else {
+    } else
+    {
       assertTrue(!dbmd.supportsANSI92EntryLevelSQL());
     }
     assertTrue(!dbmd.supportsANSI92IntermediateSQL());
@@ -85,7 +93,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
 
   }
 
-  public void testJoins() throws SQLException {
+  public void testJoins() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -94,7 +103,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(dbmd.supportsLimitedOuterJoins());
   }
 
-  public void testCursors() throws SQLException {
+  public void testCursors() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -102,18 +112,22 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(!dbmd.supportsPositionedUpdate());
   }
 
-  public void testValues() throws SQLException {
+  public void testValues() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
     int indexMaxKeys = dbmd.getMaxColumnsInIndex();
-    if (TestUtil.haveMinimumServerVersion(con, "7.3")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       assertEquals(32, indexMaxKeys);
-    } else {
+    } else
+    {
       assertEquals(16, indexMaxKeys);
     }
   }
 
-  public void testNulls() throws SQLException {
+  public void testNulls() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -127,7 +141,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(dbmd.supportsNonNullableColumns());
   }
 
-  public void testLocalFiles() throws SQLException {
+  public void testLocalFiles() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -135,7 +150,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(!dbmd.usesLocalFiles());
   }
 
-  public void testIdentifiers() throws SQLException {
+  public void testIdentifiers() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -152,7 +168,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
 
   }
 
-  public void testTables() throws SQLException {
+  public void testTables() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -160,14 +177,17 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(dbmd.supportsAlterTableWithAddColumn());
 
     // we can only drop columns in >= 7.3
-    if (TestUtil.haveMinimumServerVersion(con, "7.3")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       assertTrue(dbmd.supportsAlterTableWithDropColumn());
-    } else {
+    } else
+    {
       assertTrue(!dbmd.supportsAlterTableWithDropColumn());
     }
   }
 
-  public void testSelect() throws SQLException {
+  public void testSelect() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -186,7 +206,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(dbmd.supportsGroupByBeyondSelect()); // needs checking
   }
 
-  public void testDBParams() throws SQLException {
+  public void testDBParams() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -194,7 +215,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(dbmd.getUserName().equals(TestUtil.getUser()));
   }
 
-  public void testDbProductDetails() throws SQLException {
+  public void testDbProductDetails() throws SQLException
+  {
     assertTrue(con instanceof org.postgresql.PGConnection);
 
     DatabaseMetaData dbmd = con.getMetaData();
@@ -203,7 +225,8 @@ public class DatabaseMetaDataPropertiesTest extends TestCase {
     assertTrue(dbmd.getDatabaseProductName().equals("PostgreSQL"));
   }
 
-  public void testDriverVersioning() throws SQLException {
+  public void testDriverVersioning() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 

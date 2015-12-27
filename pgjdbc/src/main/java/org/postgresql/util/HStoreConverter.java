@@ -9,14 +9,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class HStoreConverter {
-  public static Map<String, String> fromBytes(byte[] b, Encoding encoding) throws SQLException {
+public class HStoreConverter
+{
+  public static Map<String, String> fromBytes(byte[] b, Encoding encoding) throws SQLException
+  {
     Map<String, String> m = new HashMap<String, String>();
     int pos = 0;
     int numElements = ByteConverter.int4(b, pos);
     pos += 4;
-    try {
-      for (int i = 0; i < numElements; ++i) {
+    try
+    {
+      for (int i = 0; i < numElements; ++i)
+      {
         int keyLen = ByteConverter.int4(b, pos);
         pos += 4;
         String key = encoding.decode(b, pos, keyLen);
@@ -24,15 +28,18 @@ public class HStoreConverter {
         int valLen = ByteConverter.int4(b, pos);
         pos += 4;
         String val;
-        if (valLen == -1) {
+        if (valLen == -1)
+        {
           val = null;
-        } else {
+        } else
+        {
           val = encoding.decode(b, pos, valLen);
           pos += valLen;
         }
         m.put(key, val);
       }
-    } catch (IOException ioe) {
+    } catch (IOException ioe)
+    {
       throw new PSQLException(GT.tr(
           "Invalid character data was found.  This is most likely caused by stored data containing characters that are invalid for the character set the database was created in.  The most common example of this is storing 8bit data in a SQL_ASCII database."),
           PSQLState.DATA_ERROR, ioe);
@@ -40,29 +47,35 @@ public class HStoreConverter {
     return m;
   }
 
-  public static byte[] toBytes(Map<?, ?> m, Encoding encoding) throws SQLException {
+  public static byte[] toBytes(Map<?, ?> m, Encoding encoding) throws SQLException
+  {
     ByteArrayOutputStream baos = new ByteArrayOutputStream(4 + 10 * m.size());
     byte[] lenBuf = new byte[4];
-    try {
+    try
+    {
       ByteConverter.int4(lenBuf, 0, m.size());
       baos.write(lenBuf);
-      for (Entry<?, ?> e : m.entrySet()) {
+      for (Entry<?, ?> e : m.entrySet())
+      {
         byte[] key = encoding.encode(e.getKey().toString());
         ByteConverter.int4(lenBuf, 0, key.length);
         baos.write(lenBuf);
         baos.write(key);
 
-        if (e.getValue() == null) {
+        if (e.getValue() == null)
+        {
           ByteConverter.int4(lenBuf, 0, -1);
           baos.write(lenBuf);
-        } else {
+        } else
+        {
           byte[] val = encoding.encode(e.getValue().toString());
           ByteConverter.int4(lenBuf, 0, val.length);
           baos.write(lenBuf);
           baos.write(val);
         }
       }
-    } catch (IOException ioe) {
+    } catch (IOException ioe)
+    {
       throw new PSQLException(GT.tr(
           "Invalid character data was found.  This is most likely caused by stored data containing characters that are invalid for the character set the database was created in.  The most common example of this is storing 8bit data in a SQL_ASCII database."),
           PSQLState.DATA_ERROR, ioe);
@@ -70,12 +83,15 @@ public class HStoreConverter {
     return baos.toByteArray();
   }
 
-  public static String toString(Map<?, ?> map) {
-    if (map.isEmpty()) {
+  public static String toString(Map<?, ?> map)
+  {
+    if (map.isEmpty())
+    {
       return "";
     }
     StringBuilder sb = new StringBuilder(map.size() * 8);
-    for (Entry<?, ?> e : map.entrySet()) {
+    for (Entry<?, ?> e : map.entrySet())
+    {
       appendEscaped(sb, e.getKey());
       sb.append("=>");
       appendEscaped(sb, e.getValue());
@@ -85,28 +101,35 @@ public class HStoreConverter {
     return sb.toString();
   }
 
-  private static void appendEscaped(StringBuilder sb, Object val) {
-    if (val != null) {
+  private static void appendEscaped(StringBuilder sb, Object val)
+  {
+    if (val != null)
+    {
       sb.append('"');
       String s = val.toString();
-      for (int pos = 0; pos < s.length(); pos++) {
+      for (int pos = 0; pos < s.length(); pos++)
+      {
         char ch = s.charAt(pos);
-        if (ch == '"' || ch == '\\') {
+        if (ch == '"' || ch == '\\')
+        {
           sb.append('\\');
         }
         sb.append(ch);
       }
       sb.append('"');
-    } else {
+    } else
+    {
       sb.append("NULL");
     }
   }
 
-  public static Map<String, String> fromString(String s) {
+  public static Map<String, String> fromString(String s)
+  {
     Map<String, String> m = new HashMap<String, String>();
     int pos = 0;
     StringBuilder sb = new StringBuilder();
-    while (pos < s.length()) {
+    while (pos < s.length())
+    {
       sb.setLength(0);
       int start = s.indexOf('"', pos);
       int end = appendUntilQuote(sb, s, start);
@@ -114,10 +137,12 @@ public class HStoreConverter {
       pos = end + 3;
 
       String val;
-      if (s.charAt(pos) == 'N') {
+      if (s.charAt(pos) == 'N')
+      {
         val = null;
         pos += 4;
-      } else {
+      } else
+      {
         sb.setLength(0);
         end = appendUntilQuote(sb, s, pos);
         val = sb.toString();
@@ -129,13 +154,17 @@ public class HStoreConverter {
     return m;
   }
 
-  private static int appendUntilQuote(StringBuilder sb, String s, int pos) {
-    for (pos += 1; pos < s.length(); pos++) {
+  private static int appendUntilQuote(StringBuilder sb, String s, int pos)
+  {
+    for (pos += 1; pos < s.length(); pos++)
+    {
       char ch = s.charAt(pos);
-      if (ch == '"') {
+      if (ch == '"')
+      {
         break;
       }
-      if (ch == '\\') {
+      if (ch == '\\')
+      {
         pos++;
         ch = s.charAt(pos);
       }

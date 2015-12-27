@@ -19,7 +19,8 @@ import java.util.TimerTask;
 /**
  * Driver-internal connection interface. Application code should not use this interface.
  */
-public interface BaseConnection extends PGConnection, Connection {
+public interface BaseConnection extends PGConnection, Connection
+{
   /**
    * Cancel the current query executing on this connection.
    *

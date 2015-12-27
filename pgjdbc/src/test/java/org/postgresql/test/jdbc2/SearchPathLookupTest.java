@@ -22,14 +22,16 @@ import java.sql.Statement;
  *
  */
 
-public class SearchPathLookupTest extends TestCase {
+public class SearchPathLookupTest extends TestCase
+{
 
   private BaseConnection con;
 
   /*
    * Constructor
    */
-  public SearchPathLookupTest(String name) {
+  public SearchPathLookupTest(String name)
+  {
     super(name);
   }
 
@@ -39,10 +41,12 @@ public class SearchPathLookupTest extends TestCase {
    * This usecase is most common, here the object we are searching for is in the current_schema (the
    * first schema in the search_path)
    */
-  public void testSearchPathNormalLookup() throws Exception {
+  public void testSearchPathNormalLookup() throws Exception
+  {
     con = (BaseConnection) TestUtil.openDB();
     Statement stmt = con.createStatement();
-    try {
+    try
+    {
       TestUtil.createSchema(con, "first_schema");
       TestUtil.createTable(con, "first_schema.x", "first_schema_field_n int4");
       TestUtil.createSchema(con, "second_schema");
@@ -62,8 +66,10 @@ public class SearchPathLookupTest extends TestCase {
       TestUtil.dropSchema(con, "second_schema");
       TestUtil.dropSchema(con, "third_schema");
       TestUtil.dropSchema(con, "last_schema");
-    } finally {
-      if (stmt != null) {
+    } finally
+    {
+      if (stmt != null)
+      {
         stmt.close();
       }
       TestUtil.closeDB(con);
@@ -75,10 +81,12 @@ public class SearchPathLookupTest extends TestCase {
    * search_path, but not in the current_schema, for example a public schema or some kind of schema,
    * that is used for keeping utility objects.
    */
-  public void testSearchPathHiddenLookup() throws Exception {
+  public void testSearchPathHiddenLookup() throws Exception
+  {
     con = (BaseConnection) TestUtil.openDB();
     Statement stmt = con.createStatement();
-    try {
+    try
+    {
       TestUtil.createSchema(con, "first_schema");
       TestUtil.createTable(con, "first_schema.x", "first_schema_field_n int4");
       TestUtil.createSchema(con, "second_schema");
@@ -98,18 +106,22 @@ public class SearchPathLookupTest extends TestCase {
       TestUtil.dropSchema(con, "second_schema");
       TestUtil.dropSchema(con, "third_schema");
       TestUtil.dropSchema(con, "last_schema");
-    } finally {
-      if (stmt != null) {
+    } finally
+    {
+      if (stmt != null)
+      {
         stmt.close();
       }
       TestUtil.closeDB(con);
     }
   }
 
-  public void testSearchPathBackwardsCompatibleLookup() throws Exception {
+  public void testSearchPathBackwardsCompatibleLookup() throws Exception
+  {
     con = (BaseConnection) TestUtil.openDB();
     Statement stmt = con.createStatement();
-    try {
+    try
+    {
       TestUtil.createSchema(con, "first_schema");
       TestUtil.createTable(con, "first_schema.x", "first_schema_field int4");
       TestUtil.createSchema(con, "second_schema");
@@ -123,7 +135,8 @@ public class SearchPathLookupTest extends TestCase {
       assertTrue(!rs.next());
       TestUtil.dropSchema(con, "first_schema");
       TestUtil.dropSchema(con, "second_schema");
-    } finally {
+    } finally
+    {
       TestUtil.closeDB(con);
     }
   }

@@ -28,19 +28,22 @@ import java.util.Map;
  *
  */
 
-public class ConnectionTest extends TestCase {
+public class ConnectionTest extends TestCase
+{
 
   private Connection con;
 
   /*
    * Constructor
    */
-  public ConnectionTest(String name) {
+  public ConnectionTest(String name)
+  {
     super(name);
   }
 
   // Set up the fixture for this testcase: the tables for this test.
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
 
     TestUtil.createTable(con, "test_a", "imagename name,image oid,id int4");
@@ -50,7 +53,8 @@ public class ConnectionTest extends TestCase {
   }
 
   // Tear down the fixture for this test case.
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.closeDB(con);
 
     con = TestUtil.openDB();
@@ -64,7 +68,8 @@ public class ConnectionTest extends TestCase {
   /*
    * Tests the two forms of createStatement()
    */
-  public void testCreateStatement() throws Exception {
+  public void testCreateStatement() throws Exception
+  {
     con = TestUtil.openDB();
 
     // A standard Statement
@@ -81,7 +86,8 @@ public class ConnectionTest extends TestCase {
   /*
    * Tests the two forms of prepareStatement()
    */
-  public void testPrepareStatement() throws Exception {
+  public void testPrepareStatement() throws Exception
+  {
     con = TestUtil.openDB();
 
     String sql = "select source,cost,imageid from test_c";
@@ -100,13 +106,15 @@ public class ConnectionTest extends TestCase {
   /*
    * Put the test for createPrepareCall here
    */
-  public void testPrepareCall() {
+  public void testPrepareCall()
+  {
   }
 
   /*
    * Test nativeSQL
    */
-  public void testNativeSQL() throws Exception {
+  public void testNativeSQL() throws Exception
+  {
     // test a simple escape
     con = TestUtil.openDB();
     assertEquals("DATE  '2005-01-24'", con.nativeSQL("{d '2005-01-24'}"));
@@ -115,7 +123,8 @@ public class ConnectionTest extends TestCase {
   /*
    * Test autoCommit (both get & set)
    */
-  public void testTransactions() throws Exception {
+  public void testTransactions() throws Exception
+  {
     con = TestUtil.openDB();
     Statement st;
     ResultSet rs;
@@ -156,7 +165,8 @@ public class ConnectionTest extends TestCase {
   /*
    * Simple test to see if isClosed works.
    */
-  public void testIsClosed() throws Exception {
+  public void testIsClosed() throws Exception
+  {
     con = TestUtil.openDB();
 
     // Should not say closed
@@ -171,7 +181,8 @@ public class ConnectionTest extends TestCase {
   /*
    * Test the warnings system
    */
-  public void testWarnings() throws Exception {
+  public void testWarnings() throws Exception
+  {
     con = TestUtil.openDB();
 
     String testStr = "This Is OuR TeSt message";
@@ -200,7 +211,8 @@ public class ConnectionTest extends TestCase {
   /*
    * Transaction Isolation Levels
    */
-  public void testTransactionIsolation() throws Exception {
+  public void testTransactionIsolation() throws Exception
+  {
     con = TestUtil.openDB();
 
     int defaultLevel = con.getTransactionIsolation();
@@ -253,10 +265,12 @@ public class ConnectionTest extends TestCase {
     stmt.executeQuery("SELECT 1");          // Start transaction.
     stmt.close();
 
-    try {
+    try
+    {
       con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
       fail("Expected an exception when changing transaction isolation mid-transaction");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       // Ok.
     }
 
@@ -267,7 +281,8 @@ public class ConnectionTest extends TestCase {
   /*
    * JDBC2 Type mappings
    */
-  public void testTypeMaps() throws Exception {
+  public void testTypeMaps() throws Exception
+  {
     con = TestUtil.openDB();
 
     // preserve the current map
@@ -288,7 +303,8 @@ public class ConnectionTest extends TestCase {
   /**
    * Closing a Connection more than once is not an error.
    */
-  public void testDoubleClose() throws Exception {
+  public void testDoubleClose() throws Exception
+  {
     con = TestUtil.openDB();
     con.close();
     con.close();

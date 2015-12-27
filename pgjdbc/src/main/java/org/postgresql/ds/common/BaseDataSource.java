@@ -34,14 +34,18 @@ import javax.naming.StringRefAddr;
  *
  * @author Aaron Mulder (ammulder@chariotsolutions.com)
  */
-public abstract class BaseDataSource implements Referenceable {
+public abstract class BaseDataSource implements Referenceable
+{
   // Load the normal driver, since we'll use it to actually connect to the
   // database.  That way we don't have to maintain the connecting code in
   // multiple places.
-  static {
-    try {
+  static
+  {
+    try
+    {
       Class.forName("org.postgresql.Driver");
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException e)
+    {
       System.err.println("PostgreSQL DataSource unable to load PostgreSQL JDBC Driver");
     }
   }
@@ -67,7 +71,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return A valid database connection.
    * @throws SQLException Occurs when the database connection cannot be established.
    */
-  public Connection getConnection() throws SQLException {
+  public Connection getConnection() throws SQLException
+  {
     return getConnection(user, password);
   }
 
@@ -81,15 +86,20 @@ public abstract class BaseDataSource implements Referenceable {
    * @return A valid database connection.
    * @throws SQLException Occurs when the database connection cannot be established.
    */
-  public Connection getConnection(String user, String password) throws SQLException {
-    try {
+  public Connection getConnection(String user, String password) throws SQLException
+  {
+    try
+    {
       Connection con = DriverManager.getConnection(getUrl(), user, password);
-      if (logger != null) {
+      if (logger != null)
+      {
         logger.println("Created a non-pooled connection for " + user + " at " + getUrl());
       }
       return con;
-    } catch (SQLException e) {
-      if (logger != null) {
+    } catch (SQLException e)
+    {
+      if (logger != null)
+      {
         logger.println(
             "Failed to create a non-pooled connection for " + user + " at " + getUrl() + ": " + e);
       }
@@ -102,7 +112,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return log writer used to log connections opened
    */
-  public PrintWriter getLogWriter() {
+  public PrintWriter getLogWriter()
+  {
     return logger;
   }
 
@@ -111,7 +122,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @param printWriter log writer used to log connections opened
    */
-  public void setLogWriter(PrintWriter printWriter) {
+  public void setLogWriter(PrintWriter printWriter)
+  {
     logger = printWriter;
   }
 
@@ -120,7 +132,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return name of the host the PostgreSQL database is running on
    */
-  public String getServerName() {
+  public String getServerName()
+  {
     return serverName;
   }
 
@@ -130,10 +143,13 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @param serverName name of the host the PostgreSQL database is running on
    */
-  public void setServerName(String serverName) {
-    if (serverName == null || serverName.equals("")) {
+  public void setServerName(String serverName)
+  {
+    if (serverName == null || serverName.equals(""))
+    {
       this.serverName = "localhost";
-    } else {
+    } else
+    {
       this.serverName = serverName;
     }
   }
@@ -144,7 +160,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return name of the PostgreSQL database
    */
-  public String getDatabaseName() {
+  public String getDatabaseName()
+  {
     return databaseName;
   }
 
@@ -154,7 +171,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @param databaseName name of the PostgreSQL database
    */
-  public void setDatabaseName(String databaseName) {
+  public void setDatabaseName(String databaseName)
+  {
     this.databaseName = databaseName;
   }
 
@@ -171,7 +189,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return user to connect as by default
    */
-  public String getUser() {
+  public String getUser()
+  {
     return user;
   }
 
@@ -182,7 +201,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @param user user to connect as by default
    */
-  public void setUser(String user) {
+  public void setUser(String user)
+  {
     this.user = user;
   }
 
@@ -193,7 +213,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return password to connect with by default
    */
-  public String getPassword() {
+  public String getPassword()
+  {
     return password;
   }
 
@@ -204,7 +225,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @param password password to connect with by default
    */
-  public void setPassword(String password) {
+  public void setPassword(String password)
+  {
     this.password = password;
   }
 
@@ -213,7 +235,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return The port, or 0 if the default port will be used.
    */
-  public int getPortNumber() {
+  public int getPortNumber()
+  {
     return portNumber;
   }
 
@@ -224,7 +247,8 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @param portNumber port which the PostgreSQL server is listening on for TCP/IP
    */
-  public void setPortNumber(int portNumber) {
+  public void setPortNumber(int portNumber)
+  {
     this.portNumber = portNumber;
   }
 
@@ -232,7 +256,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return value of compatible parameter
    * @see PGProperty#COMPATIBLE
    */
-  public String getCompatible() {
+  public String getCompatible()
+  {
     return PGProperty.COMPATIBLE.get(properties);
   }
 
@@ -240,7 +265,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param compatible value of compatible parameter
    * @see PGProperty#COMPATIBLE
    */
-  public void setCompatible(String compatible) {
+  public void setCompatible(String compatible)
+  {
     PGProperty.COMPATIBLE.set(properties, compatible);
   }
 
@@ -248,7 +274,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return login timeout
    * @see PGProperty#LOGIN_TIMEOUT
    */
-  public int getLoginTimeout() {
+  public int getLoginTimeout()
+  {
     return PGProperty.LOGIN_TIMEOUT.getIntNoCheck(properties);
   }
 
@@ -256,7 +283,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param loginTimeout login timeout
    * @see PGProperty#LOGIN_TIMEOUT
    */
-  public void setLoginTimeout(int loginTimeout) {
+  public void setLoginTimeout(int loginTimeout)
+  {
     PGProperty.LOGIN_TIMEOUT.set(properties, loginTimeout);
   }
 
@@ -264,7 +292,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return connect timeout
    * @see PGProperty#CONNECT_TIMEOUT
    */
-  public int getConnectTimeout() {
+  public int getConnectTimeout()
+  {
     return PGProperty.CONNECT_TIMEOUT.getIntNoCheck(properties);
   }
 
@@ -272,7 +301,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param connectTimeout connect timeout
    * @see PGProperty#CONNECT_TIMEOUT
    */
-  public void setConnectTimeout(int connectTimeout) {
+  public void setConnectTimeout(int connectTimeout)
+  {
     PGProperty.CONNECT_TIMEOUT.set(properties, connectTimeout);
   }
 
@@ -280,7 +310,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return log level
    * @see PGProperty#LOG_LEVEL
    */
-  public int getLogLevel() {
+  public int getLogLevel()
+  {
     return PGProperty.LOG_LEVEL.getIntNoCheck(properties);
   }
 
@@ -288,7 +319,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param logLevel log level
    * @see PGProperty#LOG_LEVEL
    */
-  public void setLogLevel(int logLevel) {
+  public void setLogLevel(int logLevel)
+  {
     PGProperty.LOG_LEVEL.set(properties, logLevel);
   }
 
@@ -296,10 +328,13 @@ public abstract class BaseDataSource implements Referenceable {
    * @return protocol version
    * @see PGProperty#PROTOCOL_VERSION
    */
-  public int getProtocolVersion() {
-    if (!PGProperty.PROTOCOL_VERSION.isPresent(properties)) {
+  public int getProtocolVersion()
+  {
+    if (!PGProperty.PROTOCOL_VERSION.isPresent(properties))
+    {
       return 0;
-    } else {
+    } else
+    {
       return PGProperty.PROTOCOL_VERSION.getIntNoCheck(properties);
     }
   }
@@ -308,10 +343,13 @@ public abstract class BaseDataSource implements Referenceable {
    * @param protocolVersion protocol version
    * @see PGProperty#PROTOCOL_VERSION
    */
-  public void setProtocolVersion(int protocolVersion) {
-    if (protocolVersion == 0) {
+  public void setProtocolVersion(int protocolVersion)
+  {
+    if (protocolVersion == 0)
+    {
       PGProperty.PROTOCOL_VERSION.set(properties, null);
-    } else {
+    } else
+    {
       PGProperty.PROTOCOL_VERSION.set(properties, protocolVersion);
     }
   }
@@ -320,7 +358,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return receive buffer size
    * @see PGProperty#RECEIVE_BUFFER_SIZE
    */
-  public int getReceiveBufferSize() {
+  public int getReceiveBufferSize()
+  {
     return PGProperty.RECEIVE_BUFFER_SIZE.getIntNoCheck(properties);
   }
 
@@ -328,7 +367,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param nbytes receive buffer size
    * @see PGProperty#RECEIVE_BUFFER_SIZE
    */
-  public void setReceiveBufferSize(int nbytes) {
+  public void setReceiveBufferSize(int nbytes)
+  {
     PGProperty.RECEIVE_BUFFER_SIZE.set(properties, nbytes);
   }
 
@@ -336,7 +376,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return send buffer size
    * @see PGProperty#SEND_BUFFER_SIZE
    */
-  public int getSendBufferSize() {
+  public int getSendBufferSize()
+  {
     return PGProperty.SEND_BUFFER_SIZE.getIntNoCheck(properties);
   }
 
@@ -344,7 +385,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param nbytes send buffer size
    * @see PGProperty#SEND_BUFFER_SIZE
    */
-  public void setSendBufferSize(int nbytes) {
+  public void setSendBufferSize(int nbytes)
+  {
     PGProperty.SEND_BUFFER_SIZE.set(properties, nbytes);
   }
 
@@ -352,7 +394,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param count prepare threshold
    * @see PGProperty#PREPARE_THRESHOLD
    */
-  public void setPrepareThreshold(int count) {
+  public void setPrepareThreshold(int count)
+  {
     PGProperty.PREPARE_THRESHOLD.set(properties, count);
   }
 
@@ -360,7 +403,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return prepare threshold
    * @see PGProperty#PREPARE_THRESHOLD
    */
-  public int getPrepareThreshold() {
+  public int getPrepareThreshold()
+  {
     return PGProperty.PREPARE_THRESHOLD.getIntNoCheck(properties);
   }
 
@@ -368,7 +412,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return prepared statement cache size (number of statements per connection)
    * @see PGProperty#PREPARED_STATEMENT_CACHE_QUERIES
    */
-  public int getPreparedStatementCacheQueries() {
+  public int getPreparedStatementCacheQueries()
+  {
     return PGProperty.PREPARED_STATEMENT_CACHE_QUERIES.getIntNoCheck(properties);
   }
 
@@ -376,7 +421,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param cacheSize prepared statement cache size (number of statements per connection)
    * @see PGProperty#PREPARED_STATEMENT_CACHE_QUERIES
    */
-  public void setPreparedStatementCacheQueries(int cacheSize) {
+  public void setPreparedStatementCacheQueries(int cacheSize)
+  {
     PGProperty.PREPARED_STATEMENT_CACHE_QUERIES.set(properties, cacheSize);
   }
 
@@ -384,7 +430,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return prepared statement cache size (number of megabytes per connection)
    * @see PGProperty#PREPARED_STATEMENT_CACHE_SIZE_MIB
    */
-  public int getPreparedStatementCacheSizeMiB() {
+  public int getPreparedStatementCacheSizeMiB()
+  {
     return PGProperty.PREPARED_STATEMENT_CACHE_SIZE_MIB.getIntNoCheck(properties);
   }
 
@@ -392,7 +439,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param cacheSize statement cache size (number of megabytes per connection)
    * @see PGProperty#PREPARED_STATEMENT_CACHE_SIZE_MIB
    */
-  public void setPreparedStatementCacheSizeMiB(int cacheSize) {
+  public void setPreparedStatementCacheSizeMiB(int cacheSize)
+  {
     PGProperty.PREPARED_STATEMENT_CACHE_SIZE_MIB.set(properties, cacheSize);
   }
 
@@ -400,7 +448,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param fetchSize default fetch size
    * @see PGProperty#DEFAULT_ROW_FETCH_SIZE
    */
-  public void setDefaultRowFetchSize(int fetchSize) {
+  public void setDefaultRowFetchSize(int fetchSize)
+  {
     PGProperty.DEFAULT_ROW_FETCH_SIZE.set(properties, fetchSize);
   }
 
@@ -408,7 +457,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return default fetch size
    * @see PGProperty#DEFAULT_ROW_FETCH_SIZE
    */
-  public int getDefaultRowFetchSize() {
+  public int getDefaultRowFetchSize()
+  {
     return PGProperty.DEFAULT_ROW_FETCH_SIZE.getIntNoCheck(properties);
   }
 
@@ -416,7 +466,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param unknownLength unknown length
    * @see PGProperty#UNKNOWN_LENGTH
    */
-  public void setUnknownLength(int unknownLength) {
+  public void setUnknownLength(int unknownLength)
+  {
     PGProperty.UNKNOWN_LENGTH.set(properties, unknownLength);
   }
 
@@ -424,7 +475,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return unknown length
    * @see PGProperty#UNKNOWN_LENGTH
    */
-  public int getUnknownLength() {
+  public int getUnknownLength()
+  {
     return PGProperty.UNKNOWN_LENGTH.getIntNoCheck(properties);
   }
 
@@ -432,7 +484,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param seconds socket timeout
    * @see PGProperty#SOCKET_TIMEOUT
    */
-  public void setSocketTimeout(int seconds) {
+  public void setSocketTimeout(int seconds)
+  {
     PGProperty.SOCKET_TIMEOUT.set(properties, seconds);
   }
 
@@ -440,7 +493,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return socket timeout
    * @see PGProperty#SOCKET_TIMEOUT
    */
-  public int getSocketTimeout() {
+  public int getSocketTimeout()
+  {
     return PGProperty.SOCKET_TIMEOUT.getIntNoCheck(properties);
   }
 
@@ -449,10 +503,13 @@ public abstract class BaseDataSource implements Referenceable {
    * @param enabled if SSL is enabled
    * @see PGProperty#SSL
    */
-  public void setSsl(boolean enabled) {
-    if (enabled) {
+  public void setSsl(boolean enabled)
+  {
+    if (enabled)
+    {
       PGProperty.SSL.set(properties, true);
-    } else {
+    } else
+    {
       PGProperty.SSL.set(properties, null);
     }
   }
@@ -461,7 +518,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if SSL is enabled
    * @see PGProperty#SSL
    */
-  public boolean getSsl() {
+  public boolean getSsl()
+  {
     return PGProperty.SSL.isPresent(properties);
   }
 
@@ -469,7 +527,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param classname SSL factory class name
    * @see PGProperty#SSL_FACTORY
    */
-  public void setSslfactory(String classname) {
+  public void setSslfactory(String classname)
+  {
     PGProperty.SSL_FACTORY.set(properties, classname);
   }
 
@@ -477,7 +536,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSL factory class name
    * @see PGProperty#SSL_FACTORY
    */
-  public String getSslfactory() {
+  public String getSslfactory()
+  {
     return PGProperty.SSL_FACTORY.get(properties);
   }
 
@@ -485,7 +545,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSL mode
    * @see PGProperty#SSL_MODE
    */
-  public String getSslMode() {
+  public String getSslMode()
+  {
     return PGProperty.SSL_MODE.get(properties);
   }
 
@@ -493,7 +554,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param mode SSL mode
    * @see PGProperty#SSL_MODE
    */
-  public void setSslMode(String mode) {
+  public void setSslMode(String mode)
+  {
     PGProperty.SSL_MODE.set(properties, mode);
   }
 
@@ -501,7 +563,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSL mode
    * @see PGProperty#SSL_FACTORY_ARG
    */
-  public String getSslFactoryArg() {
+  public String getSslFactoryArg()
+  {
     return PGProperty.SSL_FACTORY_ARG.get(properties);
   }
 
@@ -509,7 +572,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param arg argument forwarded to SSL factory
    * @see PGProperty#SSL_FACTORY_ARG
    */
-  public void setSslFactoryArg(String arg) {
+  public void setSslFactoryArg(String arg)
+  {
     PGProperty.SSL_FACTORY_ARG.set(properties, arg);
   }
 
@@ -517,7 +581,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return argument forwarded to SSL factory
    * @see PGProperty#SSL_HOSTNAME_VERIFIER
    */
-  public String getSslHostnameVerifier() {
+  public String getSslHostnameVerifier()
+  {
     return PGProperty.SSL_HOSTNAME_VERIFIER.get(properties);
   }
 
@@ -525,7 +590,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param className SSL hostname verifier
    * @see PGProperty#SSL_HOSTNAME_VERIFIER
    */
-  public void setSslHostnameVerifier(String className) {
+  public void setSslHostnameVerifier(String className)
+  {
     PGProperty.SSL_HOSTNAME_VERIFIER.set(properties, className);
   }
 
@@ -533,7 +599,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return className SSL hostname verifier
    * @see PGProperty#SSL_CERT
    */
-  public String getSslCert() {
+  public String getSslCert()
+  {
     return PGProperty.SSL_CERT.get(properties);
   }
 
@@ -541,7 +608,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param file SSL certificate
    * @see PGProperty#SSL_CERT
    */
-  public void setSslCert(String file) {
+  public void setSslCert(String file)
+  {
     PGProperty.SSL_CERT.set(properties, file);
   }
 
@@ -549,7 +617,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSL certificate
    * @see PGProperty#SSL_KEY
    */
-  public String getSslKey() {
+  public String getSslKey()
+  {
     return PGProperty.SSL_KEY.get(properties);
   }
 
@@ -557,7 +626,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param file SSL key
    * @see PGProperty#SSL_KEY
    */
-  public void setSslKey(String file) {
+  public void setSslKey(String file)
+  {
     PGProperty.SSL_KEY.set(properties, file);
   }
 
@@ -565,7 +635,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSL root certificate
    * @see PGProperty#SSL_ROOT_CERT
    */
-  public String getSslRootCert() {
+  public String getSslRootCert()
+  {
     return PGProperty.SSL_ROOT_CERT.get(properties);
   }
 
@@ -573,7 +644,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param file SSL root certificate
    * @see PGProperty#SSL_ROOT_CERT
    */
-  public void setSslRootCert(String file) {
+  public void setSslRootCert(String file)
+  {
     PGProperty.SSL_ROOT_CERT.set(properties, file);
   }
 
@@ -581,7 +653,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSL password
    * @see PGProperty#SSL_PASSWORD
    */
-  public String getSslPassword() {
+  public String getSslPassword()
+  {
     return PGProperty.SSL_PASSWORD.get(properties);
   }
 
@@ -589,7 +662,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param password SSL password
    * @see PGProperty#SSL_PASSWORD
    */
-  public void setSslPassword(String password) {
+  public void setSslPassword(String password)
+  {
     PGProperty.SSL_PASSWORD.set(properties, password);
   }
 
@@ -597,7 +671,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSL password callback
    * @see PGProperty#SSL_PASSWORD_CALLBACK
    */
-  public String getSslPasswordCallback() {
+  public String getSslPasswordCallback()
+  {
     return PGProperty.SSL_PASSWORD_CALLBACK.get(properties);
   }
 
@@ -605,7 +680,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param className SSL password callback class name
    * @see PGProperty#SSL_PASSWORD_CALLBACK
    */
-  public void setSslPasswordCallback(String className) {
+  public void setSslPasswordCallback(String className)
+  {
     PGProperty.SSL_PASSWORD_CALLBACK.set(properties, className);
   }
 
@@ -613,7 +689,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param applicationName application name
    * @see PGProperty#APPLICATION_NAME
    */
-  public void setApplicationName(String applicationName) {
+  public void setApplicationName(String applicationName)
+  {
     PGProperty.APPLICATION_NAME.set(properties, applicationName);
   }
 
@@ -621,7 +698,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return application name
    * @see PGProperty#APPLICATION_NAME
    */
-  public String getApplicationName() {
+  public String getApplicationName()
+  {
     return PGProperty.APPLICATION_NAME.get(properties);
   }
 
@@ -629,7 +707,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param targetServerType target server type
    * @see PGProperty#TARGET_SERVER_TYPE
    */
-  public void setTargetServerType(String targetServerType) {
+  public void setTargetServerType(String targetServerType)
+  {
     PGProperty.TARGET_SERVER_TYPE.set(properties, targetServerType);
   }
 
@@ -637,7 +716,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return target server type
    * @see PGProperty#TARGET_SERVER_TYPE
    */
-  public String getTargetServerType() {
+  public String getTargetServerType()
+  {
     return PGProperty.TARGET_SERVER_TYPE.get(properties);
   }
 
@@ -645,7 +725,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param loadBalanceHosts load balance hosts
    * @see PGProperty#LOAD_BALANCE_HOSTS
    */
-  public void setLoadBalanceHosts(boolean loadBalanceHosts) {
+  public void setLoadBalanceHosts(boolean loadBalanceHosts)
+  {
     PGProperty.LOAD_BALANCE_HOSTS.set(properties, loadBalanceHosts);
   }
 
@@ -653,7 +734,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return load balance hosts
    * @see PGProperty#LOAD_BALANCE_HOSTS
    */
-  public boolean getLoadBalanceHosts() {
+  public boolean getLoadBalanceHosts()
+  {
     return PGProperty.LOAD_BALANCE_HOSTS.isPresent(properties);
   }
 
@@ -661,7 +743,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param hostRecheckSeconds host recheck seconds
    * @see PGProperty#HOST_RECHECK_SECONDS
    */
-  public void setHostRecheckSeconds(int hostRecheckSeconds) {
+  public void setHostRecheckSeconds(int hostRecheckSeconds)
+  {
     PGProperty.HOST_RECHECK_SECONDS.set(properties, hostRecheckSeconds);
   }
 
@@ -669,7 +752,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return host recheck seconds
    * @see PGProperty#HOST_RECHECK_SECONDS
    */
-  public int getHostRecheckSeconds() {
+  public int getHostRecheckSeconds()
+  {
     return PGProperty.HOST_RECHECK_SECONDS.getIntNoCheck(properties);
   }
 
@@ -677,7 +761,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param enabled if TCP keep alive should be enabled
    * @see PGProperty#TCP_KEEP_ALIVE
    */
-  public void setTcpKeepAlive(boolean enabled) {
+  public void setTcpKeepAlive(boolean enabled)
+  {
     PGProperty.TCP_KEEP_ALIVE.set(properties, enabled);
   }
 
@@ -685,7 +770,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if TCP keep alive is enabled
    * @see PGProperty#TCP_KEEP_ALIVE
    */
-  public boolean getTcpKeepAlive() {
+  public boolean getTcpKeepAlive()
+  {
     return PGProperty.TCP_KEEP_ALIVE.getBoolean(properties);
   }
 
@@ -693,7 +779,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param enabled if binary transfer should be enabled
    * @see PGProperty#BINARY_TRANSFER
    */
-  public void setBinaryTransfer(boolean enabled) {
+  public void setBinaryTransfer(boolean enabled)
+  {
     PGProperty.BINARY_TRANSFER.set(properties, enabled);
   }
 
@@ -701,7 +788,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if binary transfer is enabled
    * @see PGProperty#BINARY_TRANSFER
    */
-  public boolean getBinaryTransfer() {
+  public boolean getBinaryTransfer()
+  {
     return PGProperty.BINARY_TRANSFER.getBoolean(properties);
   }
 
@@ -709,7 +797,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param oidList list of OIDs that are allowed to use binary transfer
    * @see PGProperty#BINARY_TRANSFER_ENABLE
    */
-  public void setBinaryTransferEnable(String oidList) {
+  public void setBinaryTransferEnable(String oidList)
+  {
     PGProperty.BINARY_TRANSFER_ENABLE.set(properties, oidList);
   }
 
@@ -717,7 +806,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return list of OIDs that are allowed to use binary transfer
    * @see PGProperty#BINARY_TRANSFER_ENABLE
    */
-  public String getBinaryTransferEnable() {
+  public String getBinaryTransferEnable()
+  {
     return PGProperty.BINARY_TRANSFER_ENABLE.get(properties);
   }
 
@@ -725,7 +815,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param oidList list of OIDs that are not allowed to use binary transfer
    * @see PGProperty#BINARY_TRANSFER_DISABLE
    */
-  public void setBinaryTransferDisable(String oidList) {
+  public void setBinaryTransferDisable(String oidList)
+  {
     PGProperty.BINARY_TRANSFER_DISABLE.set(properties, oidList);
   }
 
@@ -733,7 +824,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return list of OIDs that are not allowed to use binary transfer
    * @see PGProperty#BINARY_TRANSFER_DISABLE
    */
-  public String getBinaryTransferDisable() {
+  public String getBinaryTransferDisable()
+  {
     return PGProperty.BINARY_TRANSFER_DISABLE.get(properties);
   }
 
@@ -741,7 +833,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return string type
    * @see PGProperty#STRING_TYPE
    */
-  public String getStringType() {
+  public String getStringType()
+  {
     return PGProperty.STRING_TYPE.get(properties);
   }
 
@@ -749,7 +842,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param stringType string type
    * @see PGProperty#STRING_TYPE
    */
-  public void setStringType(String stringType) {
+  public void setStringType(String stringType)
+  {
     PGProperty.STRING_TYPE.set(properties, stringType);
   }
 
@@ -757,7 +851,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if column sanitizer is disabled
    * @see PGProperty#DISABLE_COLUMN_SANITISER
    */
-  public boolean isColumnSanitiserDisabled() {
+  public boolean isColumnSanitiserDisabled()
+  {
     return PGProperty.DISABLE_COLUMN_SANITISER.getBoolean(properties);
   }
 
@@ -765,7 +860,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if column sanitizer is disabled
    * @see PGProperty#DISABLE_COLUMN_SANITISER
    */
-  public boolean getDisableColumnSanitiser() {
+  public boolean getDisableColumnSanitiser()
+  {
     return PGProperty.DISABLE_COLUMN_SANITISER.getBoolean(properties);
   }
 
@@ -773,7 +869,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param disableColumnSanitiser if column sanitizer should be disabled
    * @see PGProperty#DISABLE_COLUMN_SANITISER
    */
-  public void setDisableColumnSanitiser(boolean disableColumnSanitiser) {
+  public void setDisableColumnSanitiser(boolean disableColumnSanitiser)
+  {
     PGProperty.DISABLE_COLUMN_SANITISER.set(properties, disableColumnSanitiser);
   }
 
@@ -781,7 +878,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return current schema
    * @see PGProperty#CURRENT_SCHEMA
    */
-  public String getCurrentSchema() {
+  public String getCurrentSchema()
+  {
     return PGProperty.CURRENT_SCHEMA.get(properties);
   }
 
@@ -789,7 +887,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param currentSchema current schema
    * @see PGProperty#CURRENT_SCHEMA
    */
-  public void setCurrentSchema(String currentSchema) {
+  public void setCurrentSchema(String currentSchema)
+  {
     PGProperty.CURRENT_SCHEMA.set(properties, currentSchema);
   }
 
@@ -797,7 +896,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if connection is readonly
    * @see PGProperty#READ_ONLY
    */
-  public boolean getReadOnly() {
+  public boolean getReadOnly()
+  {
     return PGProperty.READ_ONLY.getBoolean(properties);
   }
 
@@ -805,7 +905,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param readOnly if connection should be readonly
    * @see PGProperty#READ_ONLY
    */
-  public void setReadOnly(boolean readOnly) {
+  public void setReadOnly(boolean readOnly)
+  {
     PGProperty.READ_ONLY.set(properties, readOnly);
   }
 
@@ -813,7 +914,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if driver should log unclosed connections
    * @see PGProperty#LOG_UNCLOSED_CONNECTIONS
    */
-  public boolean getLogUnclosedConnections() {
+  public boolean getLogUnclosedConnections()
+  {
     return PGProperty.LOG_UNCLOSED_CONNECTIONS.getBoolean(properties);
   }
 
@@ -821,7 +923,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param enabled true if driver should log unclosed connections
    * @see PGProperty#LOG_UNCLOSED_CONNECTIONS
    */
-  public void setLogUnclosedConnections(boolean enabled) {
+  public void setLogUnclosedConnections(boolean enabled)
+  {
     PGProperty.LOG_UNCLOSED_CONNECTIONS.set(properties, enabled);
   }
 
@@ -829,7 +932,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return assumed minimal server version
    * @see PGProperty#ASSUME_MIN_SERVER_VERSION
    */
-  public String getAssumeMinServerVersion() {
+  public String getAssumeMinServerVersion()
+  {
     return PGProperty.ASSUME_MIN_SERVER_VERSION.get(properties);
   }
 
@@ -837,7 +941,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param minVersion assumed minimal server version
    * @see PGProperty#ASSUME_MIN_SERVER_VERSION
    */
-  public void setAssumeMinServerVersion(String minVersion) {
+  public void setAssumeMinServerVersion(String minVersion)
+  {
     PGProperty.ASSUME_MIN_SERVER_VERSION.set(properties, minVersion);
   }
 
@@ -845,7 +950,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return JAAS application name
    * @see PGProperty#JAAS_APPLICATION_NAME
    */
-  public String getJaasApplicationName() {
+  public String getJaasApplicationName()
+  {
     return PGProperty.JAAS_APPLICATION_NAME.get(properties);
   }
 
@@ -853,7 +959,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param name JAAS application name
    * @see PGProperty#JAAS_APPLICATION_NAME
    */
-  public void setJaasApplicationName(String name) {
+  public void setJaasApplicationName(String name)
+  {
     PGProperty.JAAS_APPLICATION_NAME.set(properties, name);
   }
 
@@ -861,7 +968,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return Kerberos server name
    * @see PGProperty#KERBEROS_SERVER_NAME
    */
-  public String getKerberosServerName() {
+  public String getKerberosServerName()
+  {
     return PGProperty.KERBEROS_SERVER_NAME.get(properties);
   }
 
@@ -869,7 +977,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param serverName Kerberos server name
    * @see PGProperty#KERBEROS_SERVER_NAME
    */
-  public void setKerberosServerName(String serverName) {
+  public void setKerberosServerName(String serverName)
+  {
     PGProperty.KERBEROS_SERVER_NAME.set(properties, serverName);
   }
 
@@ -877,7 +986,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return true if use SPNEGO
    * @see PGProperty#USE_SPNEGO
    */
-  public boolean getUseSpNego() {
+  public boolean getUseSpNego()
+  {
     return PGProperty.USE_SPNEGO.getBoolean(properties);
   }
 
@@ -885,7 +995,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param use true if use SPNEGO
    * @see PGProperty#USE_SPNEGO
    */
-  public void setUseSpNego(boolean use) {
+  public void setUseSpNego(boolean use)
+  {
     PGProperty.USE_SPNEGO.set(properties, use);
   }
 
@@ -893,7 +1004,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return GSS mode: auto, sspi, or gssapi
    * @see PGProperty#GSS_LIB
    */
-  public String getGssLib() {
+  public String getGssLib()
+  {
     return PGProperty.GSS_LIB.get(properties);
   }
 
@@ -901,7 +1013,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param lib GSS mode: auto, sspi, or gssapi
    * @see PGProperty#GSS_LIB
    */
-  public void setGssLib(String lib) {
+  public void setGssLib(String lib)
+  {
     PGProperty.GSS_LIB.set(properties, lib);
   }
 
@@ -909,7 +1022,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return SSPI service class
    * @see PGProperty#SSPI_SERVICE_CLASS
    */
-  public String getSspiServiceClass() {
+  public String getSspiServiceClass()
+  {
     return PGProperty.SSPI_SERVICE_CLASS.get(properties);
   }
 
@@ -917,7 +1031,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param serviceClass SSPI service class
    * @see PGProperty#SSPI_SERVICE_CLASS
    */
-  public void setSspiServiceClass(String serviceClass) {
+  public void setSspiServiceClass(String serviceClass)
+  {
     PGProperty.SSPI_SERVICE_CLASS.set(properties, serviceClass);
   }
 
@@ -925,7 +1040,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return character set to use for data sent to the database or received
    * @see PGProperty#CHARSET
    */
-  public String getCharset() {
+  public String getCharset()
+  {
     return PGProperty.CHARSET.get(properties);
   }
 
@@ -933,7 +1049,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @param charset character set to use for data sent to the database or received
    * @see PGProperty#CHARSET
    */
-  public void setCharset(String charset) {
+  public void setCharset(String charset)
+  {
     PGProperty.CHARSET.set(properties, charset);
   }
 
@@ -941,7 +1058,8 @@ public abstract class BaseDataSource implements Referenceable {
    * @return if connection allows encoding changes
    * @see PGProperty#ALLOW_ENCODING_CHANGES
    */
-  public boolean getAllowEncodingChanges() {
+  public boolean getAllowEncodingChanges()
+  {
     return PGProperty.ALLOW_ENCODING_CHANGES.getBoolean(properties);
   }
 
@@ -949,35 +1067,40 @@ public abstract class BaseDataSource implements Referenceable {
    * @param allow if connection allows encoding changes
    * @see PGProperty#ALLOW_ENCODING_CHANGES
    */
-  public void setAllowEncodingChanges(boolean allow) {
+  public void setAllowEncodingChanges(boolean allow)
+  {
     PGProperty.ALLOW_ENCODING_CHANGES.set(properties, allow);
   }
 
   /**
    * @see PGProperty#SOCKET_FACTORY
    */
-  public String getSocketFactory() {
+  public String getSocketFactory()
+  {
     return PGProperty.SOCKET_FACTORY.get(properties);
   }
 
   /**
    * @see PGProperty#SOCKET_FACTORY
    */
-  public void setSocketFactory(String socketFactoryClassName) {
+  public void setSocketFactory(String socketFactoryClassName)
+  {
     PGProperty.SOCKET_FACTORY.set(properties, socketFactoryClassName);
   }
 
   /**
    * @see PGProperty#SOCKET_FACTORY_ARG
    */
-  public String getSocketFactoryArg() {
+  public String getSocketFactoryArg()
+  {
     return PGProperty.SOCKET_FACTORY_ARG.get(properties);
   }
 
   /**
    * @see PGProperty#SOCKET_FACTORY_ARG
    */
-  public void setSocketFactoryArg(String socketFactoryArg) {
+  public void setSocketFactoryArg(String socketFactoryArg)
+  {
     PGProperty.SOCKET_FACTORY_ARG.set(properties, socketFactoryArg);
   }
 
@@ -986,19 +1109,24 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return {@link DriverManager} URL from the other properties supplied
    */
-  public String getUrl() {
+  public String getUrl()
+  {
     StringBuilder url = new StringBuilder(100);
     url.append("jdbc:postgresql://");
     url.append(serverName);
-    if (portNumber != 0) {
+    if (portNumber != 0)
+    {
       url.append(":").append(portNumber);
     }
     url.append("/").append(databaseName);
 
     StringBuilder query = new StringBuilder(100);
-    for (PGProperty property : PGProperty.values()) {
-      if (property.isPresent(properties)) {
-        if (query.length() != 0) {
+    for (PGProperty property : PGProperty.values())
+    {
+      if (property.isPresent(properties))
+      {
+        if (query.length() != 0)
+        {
           query.append("&");
         }
         query.append(property.getName());
@@ -1007,7 +1135,8 @@ public abstract class BaseDataSource implements Referenceable {
       }
     }
 
-    if (query.length() > 0) {
+    if (query.length() > 0)
+    {
       url.append("?");
       url.append(query);
     }
@@ -1020,53 +1149,67 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @param url properties to set
    */
-  public void setUrl(String url) {
+  public void setUrl(String url)
+  {
 
     Properties p = org.postgresql.Driver.parseURL(url, null);
 
-    for (PGProperty property : PGProperty.values()) {
+    for (PGProperty property : PGProperty.values())
+    {
       setProperty(property, property.get(p));
     }
   }
 
   public String getProperty(String name)
-      throws SQLException {
+      throws SQLException
+  {
     PGProperty pgProperty = PGProperty.forName(name);
-    if (pgProperty != null) {
+    if (pgProperty != null)
+    {
       return getProperty(pgProperty);
-    } else {
+    } else
+    {
       throw new PSQLException(GT.tr("Unsupported property name: {0}", name),
           PSQLState.INVALID_PARAMETER_VALUE);
     }
   }
 
   public void setProperty(String name, String value)
-      throws SQLException {
+      throws SQLException
+  {
     PGProperty pgProperty = PGProperty.forName(name);
-    if (pgProperty != null) {
+    if (pgProperty != null)
+    {
       setProperty(pgProperty, value);
-    } else {
+    } else
+    {
       throw new PSQLException(GT.tr("Unsupported property name: {0}", name),
           PSQLState.INVALID_PARAMETER_VALUE);
     }
   }
 
-  public String getProperty(PGProperty property) {
+  public String getProperty(PGProperty property)
+  {
     return property.get(properties);
   }
 
-  public void setProperty(PGProperty property, String value) {
-    if (value == null) {
+  public void setProperty(PGProperty property, String value)
+  {
+    if (value == null)
+    {
       return;
     }
-    switch (property) {
+    switch (property)
+    {
       case PG_HOST:
         serverName = value;
         break;
       case PG_PORT:
-        try {
+        try
+        {
           portNumber = Integer.parseInt(value);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException e)
+        {
           portNumber = 0;
         }
         break;
@@ -1089,29 +1232,36 @@ public abstract class BaseDataSource implements Referenceable {
    *
    * @return reference using the appropriate object factory
    */
-  protected Reference createReference() {
+  protected Reference createReference()
+  {
     return new Reference(
         getClass().getName(),
         PGObjectFactory.class.getName(),
         null);
   }
 
-  public Reference getReference() throws NamingException {
+  public Reference getReference() throws NamingException
+  {
     Reference ref = createReference();
     ref.add(new StringRefAddr("serverName", serverName));
-    if (portNumber != 0) {
+    if (portNumber != 0)
+    {
       ref.add(new StringRefAddr("portNumber", Integer.toString(portNumber)));
     }
     ref.add(new StringRefAddr("databaseName", databaseName));
-    if (user != null) {
+    if (user != null)
+    {
       ref.add(new StringRefAddr("user", user));
     }
-    if (password != null) {
+    if (password != null)
+    {
       ref.add(new StringRefAddr("password", password));
     }
 
-    for (PGProperty property : PGProperty.values()) {
-      if (property.isPresent(properties)) {
+    for (PGProperty property : PGProperty.values())
+    {
+      if (property.isPresent(properties))
+      {
         ref.add(new StringRefAddr(property.getName(), property.get(properties)));
       }
     }
@@ -1119,30 +1269,36 @@ public abstract class BaseDataSource implements Referenceable {
     return ref;
   }
 
-  public void setFromReference(Reference ref) {
+  public void setFromReference(Reference ref)
+  {
     databaseName = getReferenceProperty(ref, "databaseName");
     String port = getReferenceProperty(ref, "portNumber");
-    if (port != null) {
+    if (port != null)
+    {
       portNumber = Integer.parseInt(port);
     }
     serverName = getReferenceProperty(ref, "serverName");
     user = getReferenceProperty(ref, "user");
     password = getReferenceProperty(ref, "password");
 
-    for (PGProperty property : PGProperty.values()) {
+    for (PGProperty property : PGProperty.values())
+    {
       property.set(properties, getReferenceProperty(ref, property.getName()));
     }
   }
 
-  private String getReferenceProperty(Reference ref, String propertyName) {
+  private String getReferenceProperty(Reference ref, String propertyName)
+  {
     RefAddr addr = ref.get(propertyName);
-    if (addr == null) {
+    if (addr == null)
+    {
       return null;
     }
     return (String) addr.getContent();
   }
 
-  protected void writeBaseObject(ObjectOutputStream out) throws IOException {
+  protected void writeBaseObject(ObjectOutputStream out) throws IOException
+  {
     out.writeObject(serverName);
     out.writeObject(databaseName);
     out.writeObject(user);
@@ -1152,7 +1308,8 @@ public abstract class BaseDataSource implements Referenceable {
     out.writeObject(properties);
   }
 
-  protected void readBaseObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+  protected void readBaseObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
     serverName = (String) in.readObject();
     databaseName = (String) in.readObject();
     user = (String) in.readObject();
@@ -1162,7 +1319,8 @@ public abstract class BaseDataSource implements Referenceable {
     properties = (Properties) in.readObject();
   }
 
-  public void initializeFrom(BaseDataSource source) throws IOException, ClassNotFoundException {
+  public void initializeFrom(BaseDataSource source) throws IOException, ClassNotFoundException
+  {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     source.writeBaseObject(oos);
@@ -1172,11 +1330,13 @@ public abstract class BaseDataSource implements Referenceable {
     readBaseObject(ois);
   }
 
-  public void setLoglevel(int logLevel) {
+  public void setLoglevel(int logLevel)
+  {
     PGProperty.LOG_LEVEL.set(properties, logLevel);
   }
 
-  public int getLoglevel() {
+  public int getLoglevel()
+  {
     return PGProperty.LOG_LEVEL.getIntNoCheck(properties);
   }
 }

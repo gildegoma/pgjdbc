@@ -23,14 +23,17 @@ import java.util.Properties;
  * This test suite will check the behaviour of the findColumnIndex
  * method. This is testing the behaviour when sanitiser is disabled.
  */
-public class ColumnSanitiserDisabledTest extends TestCase {
+public class ColumnSanitiserDisabledTest extends TestCase
+{
   private Connection conn;
 
-  public ColumnSanitiserDisabledTest(String name) {
+  public ColumnSanitiserDisabledTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     Properties props = new Properties();
     props.setProperty("disableColumnSanitiser", Boolean.TRUE.toString());
     conn = TestUtil.openDB(props);
@@ -49,7 +52,8 @@ public class ColumnSanitiserDisabledTest extends TestCase {
     data.close();
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(conn, "allmixedup");
     TestUtil.closeDB(conn);
     System.setProperty("disableColumnSanitiser", "false");
@@ -61,55 +65,66 @@ public class ColumnSanitiserDisabledTest extends TestCase {
      */
 
   public void testTableColumnLowerNowFindFindLowerCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("id", true);
   }
 
   public void testTableColumnLowerNowFindFindUpperCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("ID", true);
   }
 
   public void testTableColumnLowerNowFindFindMixedCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("Id", false);
   }
 
   public void testTableColumnUpperNowFindFindLowerCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("description", true);
   }
 
   public void testTableColumnUpperNowFindFindUpperCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("DESCRIPTION", true);
   }
 
   public void testTableColumnUpperNowFindFindMixedCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("Description", false);
   }
 
   public void testTableColumnMixedNowFindLowerCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("foo", false);
   }
 
   public void testTableColumnMixedNowFindFindUpperCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("FOO", false);
   }
 
   public void testTableColumnMixedNowFindFindMixedCaseColumn()
-      throws SQLException {
+      throws SQLException
+  {
     findColumn("fOo", true);
   }
 
   private void findColumn(String label, boolean failOnNotFound)
-      throws SQLException {
+      throws SQLException
+  {
     PreparedStatement query = conn
         .prepareStatement("select * from allmixedup");
-    if (0 == TestUtil.findColumn(query, label) && failOnNotFound) {
+    if (0 == TestUtil.findColumn(query, label) && failOnNotFound)
+    {
       fail(String
           .format("Expected to find the column with the label [%1$s].",
               label));

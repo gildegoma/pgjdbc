@@ -20,7 +20,8 @@ import java.sql.SQLException;
 /**
  * This implements a path (a multiple segmented line, which may be closed)
  */
-public class PGpath extends PGobject implements Serializable, Cloneable {
+public class PGpath extends PGobject implements Serializable, Cloneable
+{
   /**
    * True if the path is open, false if closed
    */
@@ -35,7 +36,8 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
    * @param points the PGpoints that define the path
    * @param open   True if the path is open, false if closed
    */
-  public PGpath(PGpoint[] points, boolean open) {
+  public PGpath(PGpoint[] points, boolean open)
+  {
     this();
     this.points = points;
     this.open = open;
@@ -44,7 +46,8 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
   /**
    * Required by the driver
    */
-  public PGpath() {
+  public PGpath()
+  {
     setType("path");
   }
 
@@ -52,7 +55,8 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
    * @param s definition of the path in PostgreSQL's syntax.
    * @throws SQLException on conversion failure
    */
-  public PGpath(String s) throws SQLException {
+  public PGpath(String s) throws SQLException
+  {
     this();
     setValue(s);
   }
@@ -61,15 +65,19 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
    * @param s Definition of the path in PostgreSQL's syntax
    * @throws SQLException on conversion failure
    */
-  public void setValue(String s) throws SQLException {
+  public void setValue(String s) throws SQLException
+  {
     // First test to see if were open
-    if (s.startsWith("[") && s.endsWith("]")) {
+    if (s.startsWith("[") && s.endsWith("]"))
+    {
       open = true;
       s = PGtokenizer.removeBox(s);
-    } else if (s.startsWith("(") && s.endsWith(")")) {
+    } else if (s.startsWith("(") && s.endsWith(")"))
+    {
       open = false;
       s = PGtokenizer.removePara(s);
-    } else {
+    } else
+    {
       throw new PSQLException(GT.tr("Cannot tell if path is open or closed: {0}.", s),
           PSQLState.DATA_TYPE_MISMATCH);
     }
@@ -77,7 +85,8 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
     PGtokenizer t = new PGtokenizer(s, ',');
     int npoints = t.getSize();
     points = new PGpoint[npoints];
-    for (int p = 0; p < npoints; p++) {
+    for (int p = 0; p < npoints; p++)
+    {
       points[p] = new PGpoint(t.getToken(p));
     }
   }
@@ -86,20 +95,26 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
    * @param obj Object to compare with
    * @return true if the two paths are identical
    */
-  public boolean equals(Object obj) {
-    if (obj instanceof PGpath) {
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof PGpath)
+    {
       PGpath p = (PGpath) obj;
 
-      if (p.points.length != points.length) {
+      if (p.points.length != points.length)
+      {
         return false;
       }
 
-      if (p.open != open) {
+      if (p.open != open)
+      {
         return false;
       }
 
-      for (int i = 0; i < points.length; i++) {
-        if (!points[i].equals(p.points[i])) {
+      for (int i = 0; i < points.length; i++)
+      {
+        if (!points[i].equals(p.points[i]))
+        {
           return false;
         }
       }
@@ -109,20 +124,25 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
     return false;
   }
 
-  public int hashCode() {
+  public int hashCode()
+  {
     // XXX not very good..
     int hash = 0;
-    for (int i = 0; i < points.length && i < 5; ++i) {
+    for (int i = 0; i < points.length && i < 5; ++i)
+    {
       hash = hash ^ points[i].hashCode();
     }
     return hash;
   }
 
-  public Object clone() throws CloneNotSupportedException {
+  public Object clone() throws CloneNotSupportedException
+  {
     PGpath newPGpath = (PGpath) super.clone();
-    if (newPGpath.points != null) {
+    if (newPGpath.points != null)
+    {
       newPGpath.points = (PGpoint[]) newPGpath.points.clone();
-      for (int i = 0; i < newPGpath.points.length; ++i) {
+      for (int i = 0; i < newPGpath.points.length; ++i)
+      {
         newPGpath.points[i] = (PGpoint) newPGpath.points[i].clone();
       }
     }
@@ -132,11 +152,14 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
   /**
    * This returns the path in the syntax expected by org.postgresql
    */
-  public String getValue() {
+  public String getValue()
+  {
     StringBuilder b = new StringBuilder(open ? "[" : "(");
 
-    for (int p = 0; p < points.length; p++) {
-      if (p > 0) {
+    for (int p = 0; p < points.length; p++)
+    {
+      if (p > 0)
+      {
         b.append(",");
       }
       b.append(points[p].toString());
@@ -146,19 +169,23 @@ public class PGpath extends PGobject implements Serializable, Cloneable {
     return b.toString();
   }
 
-  public boolean isOpen() {
+  public boolean isOpen()
+  {
     return open;
   }
 
-  public boolean isClosed() {
+  public boolean isClosed()
+  {
     return !open;
   }
 
-  public void closePath() {
+  public void closePath()
+  {
     open = false;
   }
 
-  public void openPath() {
+  public void openPath()
+  {
     open = true;
   }
 }

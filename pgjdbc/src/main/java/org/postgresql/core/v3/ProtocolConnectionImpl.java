@@ -32,9 +32,11 @@ import java.util.Set;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-class ProtocolConnectionImpl implements ProtocolConnection {
+class ProtocolConnectionImpl implements ProtocolConnection
+{
   ProtocolConnectionImpl(PGStream pgStream, String user, String database, Properties info,
-      Logger logger, int connectTimeout) {
+      Logger logger, int connectTimeout)
+  {
     this.pgStream = pgStream;
     this.user = user;
     this.database = database;
@@ -45,59 +47,73 @@ class ProtocolConnectionImpl implements ProtocolConnection {
     this.connectTimeout = connectTimeout;
   }
 
-  public HostSpec getHostSpec() {
+  public HostSpec getHostSpec()
+  {
     return pgStream.getHostSpec();
   }
 
-  public String getUser() {
+  public String getUser()
+  {
     return user;
   }
 
-  public String getDatabase() {
+  public String getDatabase()
+  {
     return database;
   }
 
-  public String getServerVersion() {
+  public String getServerVersion()
+  {
     return serverVersion;
   }
 
-  public int getServerVersionNum() {
-    if (serverVersionNum != 0) {
+  public int getServerVersionNum()
+  {
+    if (serverVersionNum != 0)
+    {
       return serverVersionNum;
     }
     return serverVersionNum = Utils.parseServerVersionStr(serverVersion);
   }
 
-  public synchronized boolean getStandardConformingStrings() {
+  public synchronized boolean getStandardConformingStrings()
+  {
     return standardConformingStrings;
   }
 
-  public synchronized int getTransactionState() {
+  public synchronized int getTransactionState()
+  {
     return transactionState;
   }
 
-  public synchronized PGNotification[] getNotifications() throws SQLException {
+  public synchronized PGNotification[] getNotifications() throws SQLException
+  {
     PGNotification[] array = notifications.toArray(new PGNotification[notifications.size()]);
     notifications.clear();
     return array;
   }
 
-  public synchronized SQLWarning getWarnings() {
+  public synchronized SQLWarning getWarnings()
+  {
     SQLWarning chain = warnings;
     warnings = null;
     return chain;
   }
 
-  public QueryExecutor getQueryExecutor() {
+  public QueryExecutor getQueryExecutor()
+  {
     return executor;
   }
 
-  public void sendQueryCancel() throws SQLException {
+  public void sendQueryCancel() throws SQLException
+  {
     PGStream cancelStream = null;
 
     // Now we need to construct and send a cancel packet
-    try {
-      if (logger.logDebug()) {
+    try
+    {
+      if (logger.logDebug())
+      {
         logger.debug(" FE=> CancelRequest(pid=" + cancelPid + ",ckey=" + cancelKey + ")");
       }
 
@@ -112,29 +128,39 @@ class ProtocolConnectionImpl implements ProtocolConnection {
       cancelStream.ReceiveEOF();
       cancelStream.close();
       cancelStream = null;
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       // Safe to ignore.
-      if (logger.logDebug()) {
+      if (logger.logDebug())
+      {
         logger.debug("Ignoring exception on cancel request:", e);
       }
-    } finally {
-      if (cancelStream != null) {
-        try {
+    } finally
+    {
+      if (cancelStream != null)
+      {
+        try
+        {
           cancelStream.close();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
           // Ignored.
         }
       }
     }
   }
 
-  public void close() {
-    if (closed) {
+  public void close()
+  {
+    if (closed)
+    {
       return;
     }
 
-    try {
-      if (logger.logDebug()) {
+    try
+    {
+      if (logger.logDebug())
+      {
         logger.debug(" FE=> Terminate");
       }
 
@@ -142,9 +168,11 @@ class ProtocolConnectionImpl implements ProtocolConnection {
       pgStream.SendInteger4(4);
       pgStream.flush();
       pgStream.close();
-    } catch (IOException ioe) {
+    } catch (IOException ioe)
+    {
       // Forget it.
-      if (logger.logDebug()) {
+      if (logger.logDebug())
+      {
         logger.debug("Discarding IOException on close:", ioe);
       }
     }
@@ -152,11 +180,13 @@ class ProtocolConnectionImpl implements ProtocolConnection {
     closed = true;
   }
 
-  public Encoding getEncoding() {
+  public Encoding getEncoding()
+  {
     return pgStream.getEncoding();
   }
 
-  public boolean isClosed() {
+  public boolean isClosed()
+  {
     return closed;
   }
 
@@ -164,15 +194,18 @@ class ProtocolConnectionImpl implements ProtocolConnection {
   // Package-private accessors called during connection setup
   //
 
-  void setServerVersion(String serverVersion) {
+  void setServerVersion(String serverVersion)
+  {
     this.serverVersion = serverVersion;
   }
 
-  void setServerVersionNum(int serverVersionNum) {
+  void setServerVersionNum(int serverVersionNum)
+  {
     this.serverVersionNum = serverVersionNum;
   }
 
-  void setBackendKeyData(int cancelPid, int cancelKey) {
+  void setBackendKeyData(int cancelPid, int cancelKey)
+  {
     this.cancelPid = cancelPid;
     this.cancelKey = cancelKey;
   }
@@ -181,55 +214,70 @@ class ProtocolConnectionImpl implements ProtocolConnection {
   // Package-private accessors called by the query executor
   //
 
-  synchronized void addWarning(SQLWarning newWarning) {
-    if (warnings == null) {
+  synchronized void addWarning(SQLWarning newWarning)
+  {
+    if (warnings == null)
+    {
       warnings = newWarning;
-    } else {
+    } else
+    {
       warnings.setNextWarning(newWarning);
     }
   }
 
-  synchronized void addNotification(PGNotification notification) {
+  synchronized void addNotification(PGNotification notification)
+  {
     notifications.add(notification);
   }
 
-  synchronized void setTransactionState(int state) {
+  synchronized void setTransactionState(int state)
+  {
     transactionState = state;
   }
 
-  synchronized void setStandardConformingStrings(boolean value) {
+  synchronized void setStandardConformingStrings(boolean value)
+  {
     standardConformingStrings = value;
   }
 
-  public int getProtocolVersion() {
+  public int getProtocolVersion()
+  {
     return 3;
   }
 
-  public int getBackendPID() {
+  public int getBackendPID()
+  {
     return cancelPid;
   }
 
-  public boolean useBinaryForReceive(int oid) {
+  public boolean useBinaryForReceive(int oid)
+  {
     return useBinaryForOids.contains(oid);
   }
 
-  public void setBinaryReceiveOids(Set<Integer> oids) {
+  public void setBinaryReceiveOids(Set<Integer> oids)
+  {
     useBinaryForOids.clear();
     useBinaryForOids.addAll(oids);
   }
 
-  public void setIntegerDateTimes(boolean state) {
+  public void setIntegerDateTimes(boolean state)
+  {
     integerDateTimes = state;
   }
 
-  public boolean getIntegerDateTimes() {
+  public boolean getIntegerDateTimes()
+  {
     return integerDateTimes;
   }
 
-  public void abort() {
-    try {
+  public void abort()
+  {
+    try
+    {
       pgStream.getSocket().close();
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       // ignore
     }
     closed = true;

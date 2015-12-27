@@ -17,7 +17,8 @@ import org.ietf.jgss.Oid;
 import java.io.IOException;
 import java.security.PrivilegedAction;
 
-class GssAction implements PrivilegedAction<Exception> {
+class GssAction implements PrivilegedAction<Exception>
+{
   private final PGStream pgStream;
   private final String host;
   private final String user;
@@ -29,7 +30,8 @@ class GssAction implements PrivilegedAction<Exception> {
 
 
   public GssAction(PGStream pgStream, GSSCredential clientCredentials, String host, String user,
-      String password, String kerberosServerName, Logger logger, boolean useSpnego) {
+      String password, String kerberosServerName, Logger logger, boolean useSpnego)
+  {
     this.pgStream = pgStream;
     this.clientCredentials = clientCredentials;
     this.host = host;
@@ -40,13 +42,16 @@ class GssAction implements PrivilegedAction<Exception> {
     this.useSpnego = useSpnego;
   }
 
-  private static boolean hasSpnegoSupport(GSSManager manager) throws GSSException {
+  private static boolean hasSpnegoSupport(GSSManager manager) throws GSSException
+  {
 
     org.ietf.jgss.Oid spnego = new org.ietf.jgss.Oid("1.3.6.1.5.5.2");
     org.ietf.jgss.Oid mechs[] = manager.getMechs();
 
-    for (Oid mech : mechs) {
-      if (mech.equals(spnego)) {
+    for (Oid mech : mechs)
+    {
+      if (mech.equals(spnego))
+      {
         return true;
       }
     }
@@ -54,23 +59,29 @@ class GssAction implements PrivilegedAction<Exception> {
     return false;
   }
 
-  public Exception run() {
+  public Exception run()
+  {
 
-    try {
+    try
+    {
 
       GSSManager manager = GSSManager.getInstance();
       GSSCredential clientCreds = null;
       Oid desiredMechs[] = new Oid[1];
-      if (clientCredentials == null) {
-        if (useSpnego && hasSpnegoSupport(manager)) {
+      if (clientCredentials == null)
+      {
+        if (useSpnego && hasSpnegoSupport(manager))
+        {
           desiredMechs[0] = new Oid("1.3.6.1.5.5.2");
-        } else {
+        } else
+        {
           desiredMechs[0] = new Oid("1.2.840.113554.1.2.2");
         }
         GSSName clientName = manager.createName(user, GSSName.NT_USER_NAME);
         clientCreds = manager.createCredential(clientName, 8 * 3600, desiredMechs,
             GSSCredential.INITIATE_ONLY);
-      } else {
+      } else
+      {
         desiredMechs[0] = new Oid("1.2.840.113554.1.2.2");
         clientCreds = clientCredentials;
       }
@@ -86,12 +97,15 @@ class GssAction implements PrivilegedAction<Exception> {
       byte outToken[] = null;
 
       boolean established = false;
-      while (!established) {
+      while (!established)
+      {
         outToken = secContext.initSecContext(inToken, 0, inToken.length);
 
 
-        if (outToken != null) {
-          if (logger.logDebug()) {
+        if (outToken != null)
+        {
+          if (logger.logDebug())
+          {
             logger.debug(" FE=> Password(GSS Authentication Token)");
           }
 
@@ -101,23 +115,28 @@ class GssAction implements PrivilegedAction<Exception> {
           pgStream.flush();
         }
 
-        if (!secContext.isEstablished()) {
+        if (!secContext.isEstablished())
+        {
           int response = pgStream.ReceiveChar();
           // Error
-          if (response == 'E') {
+          if (response == 'E')
+          {
             int l_elen = pgStream.ReceiveInteger4();
             ServerErrorMessage l_errorMsg =
                 new ServerErrorMessage(pgStream.ReceiveString(l_elen - 4), logger.getLogLevel());
 
-            if (logger.logDebug()) {
+            if (logger.logDebug())
+            {
               logger.debug(" <=BE ErrorMessage(" + l_errorMsg + ")");
             }
 
             return new PSQLException(l_errorMsg);
 
-          } else if (response == 'R') {
+          } else if (response == 'R')
+          {
 
-            if (logger.logDebug()) {
+            if (logger.logDebug())
+            {
               logger.debug(" <=BE AuthenticationGSSContinue");
             }
 
@@ -125,19 +144,23 @@ class GssAction implements PrivilegedAction<Exception> {
             int type = pgStream.ReceiveInteger4();
             // should check type = 8
             inToken = pgStream.Receive(len - 8);
-          } else {
+          } else
+          {
             // Unknown/unexpected message type.
             return new PSQLException(GT.tr("Protocol error.  Session setup failed."),
                 PSQLState.CONNECTION_UNABLE_TO_CONNECT);
           }
-        } else {
+        } else
+        {
           established = true;
         }
       }
 
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       return e;
-    } catch (GSSException gsse) {
+    } catch (GSSException gsse)
+    {
       return new PSQLException(GT.tr("GSS Authentication failed"), PSQLState.CONNECTION_FAILURE,
           gsse);
     }

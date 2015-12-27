@@ -26,7 +26,8 @@ import java.sql.SQLException;
  *
  * @author craig
  */
-public class SSPIClient {
+public class SSPIClient
+{
 
   public static String SSPI_DEFAULT_SPN_SERVICE_CLASS = "POSTGRES";
 
@@ -56,16 +57,19 @@ public class SSPIClient {
   public SSPIClient(PGStream pgStream,
       String spnServiceClass,
       boolean enableNegotiate,
-      Logger logger) {
+      Logger logger)
+  {
     this.logger = logger;
     this.pgStream = pgStream;
 
     /* If blank or unspecified, SPN service class should be POSTGRES */
     String realServiceClass = spnServiceClass;
-    if (spnServiceClass != null && spnServiceClass.isEmpty()) {
+    if (spnServiceClass != null && spnServiceClass.isEmpty())
+    {
       spnServiceClass = null;
     }
-    if (spnServiceClass == null) {
+    if (spnServiceClass == null)
+    {
       spnServiceClass = SSPI_DEFAULT_SPN_SERVICE_CLASS;
     }
     this.spnServiceClass = spnServiceClass;
@@ -80,41 +84,51 @@ public class SSPIClient {
    *
    * @return true if it's safe to attempt SSPI authentication
    */
-  public boolean isSSPISupported() {
-    try {
+  public boolean isSSPISupported()
+  {
+    try
+    {
       /*
        * SSPI is windows-only. Attempt to use JNA to identify the platform.
        * If Waffle is missing we won't have JNA and this will throw a
        * NoClassDefFoundError.
        */
-      if (!Platform.isWindows()) {
+      if (!Platform.isWindows())
+      {
         logger.debug("SSPI not supported: non-Windows host");
         return false;
       }
       /* Waffle must be on the CLASSPATH */
       Class.forName("waffle.windows.auth.impl.WindowsSecurityContextImpl");
       return true;
-    } catch (NoClassDefFoundError ex) {
-      if (logger.logDebug()) {
+    } catch (NoClassDefFoundError ex)
+    {
+      if (logger.logDebug())
+      {
         logger.debug("SSPI unavailable (no Waffle/JNA libraries?)", ex);
       }
       return false;
-    } catch (ClassNotFoundException ex) {
-      if (logger.logDebug()) {
+    } catch (ClassNotFoundException ex)
+    {
+      if (logger.logDebug())
+      {
         logger.debug("SSPI unavailable (no Waffle/JNA libraries?)", ex);
       }
       return false;
     }
   }
 
-  private String makeSPN() throws PSQLException {
+  private String makeSPN() throws PSQLException
+  {
     final HostSpec hs = pgStream.getHostSpec();
 
-    try {
+    try
+    {
       return NTDSAPIWrapper.instance.DsMakeSpn(
           spnServiceClass, hs.getHost(),
           null, (short) hs.getPort(), null);
-    } catch (LastErrorException ex) {
+    } catch (LastErrorException ex)
+    {
       throw new PSQLException("SSPI setup failed to determine SPN",
           PSQLState.CONNECTION_UNABLE_TO_CONNECT, ex);
     }
@@ -128,7 +142,8 @@ public class SSPIClient {
    * @throws SQLException on SSPI authentication handshake failure
    * @throws IOException  on network I/O issues
    */
-  public void startSSPI() throws SQLException, IOException {
+  public void startSSPI() throws SQLException, IOException
+  {
 
     /*
      * We usually use SSPI negotiation (spnego), but it's disabled if the client
@@ -136,11 +151,13 @@ public class SSPIClient {
      */
     final String securityPackage = enableNegotiate ? "negotiate" : "kerberos";
 
-    if (logger.logDebug()) {
+    if (logger.logDebug())
+    {
       logger.debug("Beginning SSPI/Kerberos negotiation with SSPI package: " + securityPackage);
     }
 
-    try {
+    try
+    {
       /*
        * Acquire a handle for the local Windows login credentials for the current user
        *
@@ -148,20 +165,24 @@ public class SSPIClient {
        *
        * This corresponds to pg_SSPI_startup in libpq/fe-auth.c .
        */
-      try {
+      try
+      {
         clientCredentials = WindowsCredentialsHandleImpl.getCurrent(securityPackage);
         clientCredentials.initialize();
-      } catch (Win32Exception ex) {
+      } catch (Win32Exception ex)
+      {
         throw new PSQLException(
             "Could not obtain local Windows credentials for SSPI",
             PSQLState.CONNECTION_UNABLE_TO_CONNECT /* TODO: Should be authentication error */,
             ex);
       }
 
-      try {
+      try
+      {
         targetName = makeSPN();
 
-        if (logger.logDebug()) {
+        if (logger.logDebug())
+        {
           logger.debug("SSPI target name: " + targetName);
         }
 
@@ -170,7 +191,8 @@ public class SSPIClient {
         sspiContext.setCredentialsHandle(clientCredentials.getHandle());
         sspiContext.setSecurityPackage(securityPackage);
         sspiContext.initialize(null, null, targetName);
-      } catch (Win32Exception ex) {
+      } catch (Win32Exception ex)
+      {
         throw new PSQLException(
             "Could not initialize SSPI security context",
             PSQLState.CONNECTION_UNABLE_TO_CONNECT /* TODO: Should be auth error */,
@@ -179,7 +201,8 @@ public class SSPIClient {
 
       sendSSPIResponse(sspiContext.getToken());
       logger.debug("Sent first SSPI negotiation message");
-    } catch (NoClassDefFoundError ex) {
+    } catch (NoClassDefFoundError ex)
+    {
       throw new PSQLException(
           "SSPI cannot be used, Waffle or its dependencies are missing from the classpath",
           PSQLState.NOT_IMPLEMENTED, ex);
@@ -194,9 +217,11 @@ public class SSPIClient {
    * @throws SQLException if something wrong happens
    * @throws IOException  if something wrong happens
    */
-  public void continueSSPI(int msgLength) throws SQLException, IOException {
+  public void continueSSPI(int msgLength) throws SQLException, IOException
+  {
 
-    if (sspiContext == null) {
+    if (sspiContext == null)
+    {
       throw new IllegalStateException(
           "Cannot continue SSPI authentication that we didn't begin");
     }
@@ -217,15 +242,18 @@ public class SSPIClient {
      * in libpq for details.
      */
     byte[] responseToken = sspiContext.getToken();
-    if (responseToken.length > 0) {
+    if (responseToken.length > 0)
+    {
       sendSSPIResponse(responseToken);
       logger.debug("Sent SSPI negotiation continuation message");
-    } else {
+    } else
+    {
       logger.debug("SSPI authentication complete, no reply required");
     }
   }
 
-  private void sendSSPIResponse(byte[] outToken) throws IOException {
+  private void sendSSPIResponse(byte[] outToken) throws IOException
+  {
     /*
      * The sspiContext now contains a token we can send to the server to
      * start the handshake. Send a 'password' message containing the
@@ -242,12 +270,15 @@ public class SSPIClient {
    * Clean up native win32 resources after completion or failure of SSPI authentication. This
    * SSPIClient instance becomes unusable after disposal.
    */
-  public void dispose() {
-    if (sspiContext != null) {
+  public void dispose()
+  {
+    if (sspiContext != null)
+    {
       sspiContext.dispose();
       sspiContext = null;
     }
-    if (clientCredentials != null) {
+    if (clientCredentials != null)
+    {
       clientCredentials.dispose();
       clientCredentials = null;
     }

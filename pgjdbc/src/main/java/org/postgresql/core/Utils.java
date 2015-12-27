@@ -20,16 +20,19 @@ import java.sql.SQLException;
 /**
  * Collection of utilities used by the protocol-level code.
  */
-public class Utils {
+public class Utils
+{
   /**
    * Turn a bytearray into a printable form, representing each byte in hex.
    *
    * @param data the bytearray to stringize
    * @return a hex-encoded printable representation of <code>data</code>
    */
-  public static String toHexString(byte[] data) {
+  public static String toHexString(byte[] data)
+  {
     StringBuilder sb = new StringBuilder(data.length * 2);
-    for (byte element : data) {
+    for (byte element : data)
+    {
       sb.append(Integer.toHexString((element >> 4) & 15));
       sb.append(Integer.toHexString(element & 15));
     }
@@ -48,7 +51,8 @@ public class Utils {
    * @param str the string to encode
    * @return the UTF-8 representation of <code>str</code>
    */
-  public static byte[] encodeUTF8(String str) {
+  public static byte[] encodeUTF8(String str)
+  {
     // See org.postgresql.benchmark.encoding.UTF8Encoding#string_getBytes
     // for performance measurements.
     // In OracleJDK 6u65, 7u55, and 8u40 String.getBytes(Charset) is
@@ -71,8 +75,10 @@ public class Utils {
    */
   public static StringBuffer appendEscapedLiteral(StringBuffer sbuf, String value,
       boolean standardConformingStrings)
-      throws SQLException {
-    if (sbuf == null) {
+      throws SQLException
+  {
+    if (sbuf == null)
+    {
       sbuf = new StringBuffer(value.length() * 11 / 10); // Add 10% for escaping.
     }
     doAppendEscapedLiteral(sbuf, value, standardConformingStrings);
@@ -93,8 +99,10 @@ public class Utils {
    */
   public static StringBuilder escapeLiteral(StringBuilder sbuf, String value,
       boolean standardConformingStrings)
-      throws SQLException {
-    if (sbuf == null) {
+      throws SQLException
+  {
+    if (sbuf == null)
+    {
       sbuf = new StringBuilder(value.length() * 11 / 10); // Add 10% for escaping.
     }
     doAppendEscapedLiteral(sbuf, value, standardConformingStrings);
@@ -112,40 +120,51 @@ public class Utils {
    */
   private static void doAppendEscapedLiteral(Appendable sbuf, String value,
       boolean standardConformingStrings)
-      throws SQLException {
-    try {
-      if (standardConformingStrings) {
+      throws SQLException
+  {
+    try
+    {
+      if (standardConformingStrings)
+      {
         // With standard_conforming_strings on, escape only single-quotes.
-        for (int i = 0; i < value.length(); ++i) {
+        for (int i = 0; i < value.length(); ++i)
+        {
           char ch = value.charAt(i);
-          if (ch == '\0') {
+          if (ch == '\0')
+          {
             throw new PSQLException(GT.tr("Zero bytes may not occur in string parameters."),
                 PSQLState.INVALID_PARAMETER_VALUE);
           }
-          if (ch == '\'') {
+          if (ch == '\'')
+          {
             sbuf.append('\'');
           }
           sbuf.append(ch);
         }
-      } else {
+      } else
+      {
         // With standard_conforming_string off, escape backslashes and
         // single-quotes, but still escape single-quotes by doubling, to
         // avoid a security hazard if the reported value of
         // standard_conforming_strings is incorrect, or an error if
         // backslash_quote is off.
-        for (int i = 0; i < value.length(); ++i) {
+        for (int i = 0; i < value.length(); ++i)
+        {
           char ch = value.charAt(i);
-          if (ch == '\0') {
+          if (ch == '\0')
+          {
             throw new PSQLException(GT.tr("Zero bytes may not occur in string parameters."),
                 PSQLState.INVALID_PARAMETER_VALUE);
           }
-          if (ch == '\\' || ch == '\'') {
+          if (ch == '\\' || ch == '\'')
+          {
             sbuf.append(ch);
           }
           sbuf.append(ch);
         }
       }
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       throw new PSQLException(GT.tr("No IOException expected from StringBuffer or StringBuilder"),
           PSQLState.UNEXPECTED_ERROR, e);
     }
@@ -164,8 +183,10 @@ public class Utils {
    * @deprecated use {@link #escapeIdentifier(StringBuilder, String)} instead
    */
   public static StringBuffer appendEscapedIdentifier(StringBuffer sbuf, String value)
-      throws SQLException {
-    if (sbuf == null) {
+      throws SQLException
+  {
+    if (sbuf == null)
+    {
       sbuf = new StringBuffer(2 + value.length() * 11 / 10); // Add 10% for escaping.
     }
     doAppendEscapedIdentifier(sbuf, value);
@@ -184,8 +205,10 @@ public class Utils {
    * @throws SQLException if the string contains a <tt>\0</tt> character
    */
   public static StringBuilder escapeIdentifier(StringBuilder sbuf, String value)
-      throws SQLException {
-    if (sbuf == null) {
+      throws SQLException
+  {
+    if (sbuf == null)
+    {
       sbuf = new StringBuilder(2 + value.length() * 11 / 10); // Add 10% for escaping.
     }
     doAppendEscapedIdentifier(sbuf, value);
@@ -200,24 +223,30 @@ public class Utils {
    * @param value value to append
    */
   private static void doAppendEscapedIdentifier(Appendable sbuf, String value)
-      throws SQLException {
-    try {
+      throws SQLException
+  {
+    try
+    {
       sbuf.append('"');
 
-      for (int i = 0; i < value.length(); ++i) {
+      for (int i = 0; i < value.length(); ++i)
+      {
         char ch = value.charAt(i);
-        if (ch == '\0') {
+        if (ch == '\0')
+        {
           throw new PSQLException(GT.tr("Zero bytes may not occur in identifiers."),
               PSQLState.INVALID_PARAMETER_VALUE);
         }
-        if (ch == '"') {
+        if (ch == '"')
+        {
           sbuf.append(ch);
         }
         sbuf.append(ch);
       }
 
       sbuf.append('"');
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       throw new PSQLException(GT.tr("No IOException expected from StringBuffer or StringBuilder"),
           PSQLState.UNEXPECTED_ERROR, e);
     }
@@ -243,7 +272,8 @@ public class Utils {
    */
   @Deprecated
   public static int parseServerVersionStr(String serverVersion)
-      throws NumberFormatException {
+      throws NumberFormatException
+  {
     return ServerVersion.parseServerVersionStr(serverVersion);
   }
 }

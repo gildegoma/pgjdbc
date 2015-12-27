@@ -15,10 +15,12 @@ package org.postgresql.util;
  *
  * @author jdumas@zgs.com (John Dumas)
  */
-public class UnixCrypt extends Object {
+public class UnixCrypt extends Object
+{
   //
   // Null constructor - can't instantiate class
-  private UnixCrypt() {
+  private UnixCrypt()
+  {
   }
 
   private static final char[] saltChars =
@@ -339,13 +341,15 @@ public class UnixCrypt extends Object {
       0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7A
   };
 
-  private static final int byteToUnsigned(byte b) {
+  private static final int byteToUnsigned(byte b)
+  {
     int value = (int) b;
 
     return (value >= 0 ? value : value + 256);
   }
 
-  private static int fourBytesToInt(byte b[], int offset) {
+  private static int fourBytesToInt(byte b[], int offset)
+  {
     int value;
 
     value = byteToUnsigned(b[offset++]);
@@ -356,14 +360,16 @@ public class UnixCrypt extends Object {
     return (value);
   }
 
-  private static final void intToFourBytes(int iValue, byte b[], int offset) {
+  private static final void intToFourBytes(int iValue, byte b[], int offset)
+  {
     b[offset++] = (byte) ((iValue) & 0xff);
     b[offset++] = (byte) ((iValue >>> 8) & 0xff);
     b[offset++] = (byte) ((iValue >>> 16) & 0xff);
     b[offset++] = (byte) ((iValue >>> 24) & 0xff);
   }
 
-  private static final void PERM_OP(int a, int b, int n, int m, int results[]) {
+  private static final void PERM_OP(int a, int b, int n, int m, int results[])
+  {
     int t;
 
     t = ((a >>> n) ^ b) & m;
@@ -374,7 +380,8 @@ public class UnixCrypt extends Object {
     results[1] = b;
   }
 
-  private static final int HPERM_OP(int a, int n, int m) {
+  private static final int HPERM_OP(int a, int n, int m)
+  {
     int t;
 
     t = ((a << (16 - n)) ^ a) & m;
@@ -383,7 +390,8 @@ public class UnixCrypt extends Object {
     return (a);
   }
 
-  private static int[] des_set_key(byte key[]) {
+  private static int[] des_set_key(byte key[])
+  {
     int schedule[] = new int[ITERATIONS * 2];
 
     int c = fourBytesToInt(key, 0);
@@ -418,11 +426,14 @@ public class UnixCrypt extends Object {
     int t;
     int j = 0;
 
-    for (int i = 0; i < ITERATIONS; i++) {
-      if (shifts2[i]) {
+    for (int i = 0; i < ITERATIONS; i++)
+    {
+      if (shifts2[i])
+      {
         c = (c >>> 2) | (c << 26);
         d = (d >>> 2) | (d << 26);
-      } else {
+      } else
+      {
         c = (c >>> 1) | (c << 27);
         d = (d >>> 1) | (d << 27);
       }
@@ -449,7 +460,8 @@ public class UnixCrypt extends Object {
     return (schedule);
   }
 
-  private static final int D_ENCRYPT(int L, int R, int S, int E0, int E1, int s[]) {
+  private static final int D_ENCRYPT(int L, int R, int S, int E0, int E1, int s[])
+  {
     int t;
     int u;
     int v;
@@ -473,13 +485,16 @@ public class UnixCrypt extends Object {
     return (L);
   }
 
-  private static final int[] body(int schedule[], int Eswap0, int Eswap1) {
+  private static final int[] body(int schedule[], int Eswap0, int Eswap1)
+  {
     int left = 0;
     int right = 0;
     int t = 0;
 
-    for (int j = 0; j < 25; j++) {
-      for (int i = 0; i < ITERATIONS * 2; i += 4) {
+    for (int j = 0; j < 25; j++)
+    {
+      for (int i = 0; i < ITERATIONS * 2; i += 4)
+      {
         left = D_ENCRYPT(left, right, i, Eswap0, Eswap1, schedule);
         right = D_ENCRYPT(right, left, i + 2, Eswap0, Eswap1, schedule);
       }
@@ -535,7 +550,8 @@ public class UnixCrypt extends Object {
    * @param original The password to be encrypted.
    * @return A string consisting of the 2-character salt followed by the encrypted password.
    */
-  public static final byte[] crypt(byte salt[], byte original[]) {
+  public static final byte[] crypt(byte salt[], byte original[])
+  {
     byte result[] = new byte[13];
 
     byte byteZero = salt[0];
@@ -549,11 +565,13 @@ public class UnixCrypt extends Object {
 
     byte key[] = new byte[8];
 
-    for (int i = 0; i < key.length; i++) {
+    for (int i = 0; i < key.length; i++)
+    {
       key[i] = (byte) 0;
     }
 
-    for (int i = 0; i < key.length && i < original.length; i++) {
+    for (int i = 0; i < key.length && i < original.length; i++)
+    {
       int iChar = (int) original[i];
 
       key[i] = (byte) (iChar << 1);
@@ -568,17 +586,21 @@ public class UnixCrypt extends Object {
     intToFourBytes(out[1], b, 4);
     b[8] = 0;
 
-    for (int i = 2, y = 0, u = 0x80; i < 13; i++) {
-      for (int j = 0, c = 0; j < 6; j++) {
+    for (int i = 2, y = 0, u = 0x80; i < 13; i++)
+    {
+      for (int j = 0, c = 0; j < 6; j++)
+      {
         c <<= 1;
 
-        if (((int) b[y] & u) != 0) {
+        if (((int) b[y] & u) != 0)
+        {
           c |= 1;
         }
 
         u >>>= 1;
 
-        if (u == 0) {
+        if (u == 0)
+        {
           y++;
           u = 0x80;
         }

@@ -19,15 +19,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CompositeTest extends TestCase {
+public class CompositeTest extends TestCase
+{
 
   private Connection _conn;
 
-  public CompositeTest(String name) {
+  public CompositeTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     TestUtil.createSchema(_conn, "\"Composites\"");
     TestUtil.createCompositeType(_conn, "simplecompositetest", "i int, d decimal, u uuid");
@@ -38,7 +41,8 @@ public class CompositeTest extends TestCase {
         "s simplecompositetest, cc \"Composites\".\"ComplexCompositeTest\"[]");
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.dropTable(_conn, "compositetabletest");
     TestUtil.dropType(_conn, "\"Composites\".\"ComplexCompositeTest\"");
     TestUtil.dropType(_conn, "nestedcompositetest");
@@ -47,7 +51,8 @@ public class CompositeTest extends TestCase {
     TestUtil.closeDB(_conn);
   }
 
-  public void testSimpleSelect() throws SQLException {
+  public void testSimpleSelect() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT '(1,2.2,)'::simplecompositetest");
     ResultSet rs = pstmt.executeQuery();
     assertTrue(rs.next());
@@ -56,7 +61,8 @@ public class CompositeTest extends TestCase {
     assertEquals("(1,2.2,)", pgo.getValue());
   }
 
-  public void testComplexSelect() throws SQLException {
+  public void testComplexSelect() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement(
         "SELECT '(\"{1,2}\",{},\"(1,2.2,)\")'::\"Composites\".\"ComplexCompositeTest\"");
     ResultSet rs = pstmt.executeQuery();
@@ -66,7 +72,8 @@ public class CompositeTest extends TestCase {
     assertEquals("(\"{1,2}\",{},\"(1,2.2,)\")", pgo.getValue());
   }
 
-  public void testSimpleArgumentSelect() throws SQLException {
+  public void testSimpleArgumentSelect() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?");
     PGobject pgo = new PGobject();
     pgo.setType("simplecompositetest");
@@ -78,7 +85,8 @@ public class CompositeTest extends TestCase {
     assertEquals(pgo, pgo2);
   }
 
-  public void testComplexArgumentSelect() throws SQLException {
+  public void testComplexArgumentSelect() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?");
     PGobject pgo = new PGobject();
     pgo.setType("\"Composites\".\"ComplexCompositeTest\"");
@@ -90,7 +98,8 @@ public class CompositeTest extends TestCase {
     assertEquals(pgo, pgo2);
   }
 
-  public void testCompositeFromTable() throws SQLException {
+  public void testCompositeFromTable() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("INSERT INTO compositetabletest VALUES(?, ?)");
     PGobject pgo1 = new PGobject();
     pgo1.setType("public.simplecompositetest");
@@ -124,7 +133,8 @@ public class CompositeTest extends TestCase {
         pgo3.getValue());
   }
 
-  public void testNullArrayElement() throws SQLException {
+  public void testNullArrayElement() throws SQLException
+  {
     PreparedStatement pstmt =
         _conn.prepareStatement("SELECT array[NULL, NULL]::compositetabletest[]");
     ResultSet rs = pstmt.executeQuery();

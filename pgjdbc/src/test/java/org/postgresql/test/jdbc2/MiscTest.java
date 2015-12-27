@@ -25,9 +25,11 @@ import java.sql.Statement;
  * help prevent previous problems from re-occuring ;-)
  *
  */
-public class MiscTest extends TestCase {
+public class MiscTest extends TestCase
+{
 
-  public MiscTest(String name) {
+  public MiscTest(String name)
+  {
     super(name);
   }
 
@@ -38,14 +40,16 @@ public class MiscTest extends TestCase {
    *
    * Added Feb 13 2001
    */
-  public void testDatabaseSelectNullBug() throws Exception {
+  public void testDatabaseSelectNullBug() throws Exception
+  {
     Connection con = TestUtil.openDB();
 
     Statement st = con.createStatement();
     ResultSet rs = st.executeQuery("select datname from pg_database");
     assertNotNull(rs);
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       rs.getString(1);
     }
 
@@ -59,10 +63,12 @@ public class MiscTest extends TestCase {
    * Ensure the cancel call does not return before it has completed. Previously it did which
    * cancelled future queries.
    */
-  public void testSingleThreadCancel() throws Exception {
+  public void testSingleThreadCancel() throws Exception
+  {
     Connection con = TestUtil.openDB();
     Statement stmt = con.createStatement();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 100; i++)
+    {
       ResultSet rs = stmt.executeQuery("SELECT 1");
       rs.close();
       stmt.cancel();
@@ -70,9 +76,11 @@ public class MiscTest extends TestCase {
     TestUtil.closeDB(con);
   }
 
-  public void testError() throws Exception {
+  public void testError() throws Exception
+  {
     Connection con = TestUtil.openDB();
-    try {
+    try
+    {
 
       // transaction mode
       con.setAutoCommit(false);
@@ -80,7 +88,8 @@ public class MiscTest extends TestCase {
       stmt.execute("select 1/0");
       fail("Should not execute this, as a SQLException s/b thrown");
       con.commit();
-    } catch (SQLException ex) {
+    } catch (SQLException ex)
+    {
       // Verify that the SQLException is serializable.
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -92,7 +101,8 @@ public class MiscTest extends TestCase {
     con.close();
   }
 
-  public void testWarning() throws Exception {
+  public void testWarning() throws Exception
+  {
     Connection con = TestUtil.openDB();
     Statement stmt = con.createStatement();
     stmt.execute("CREATE TEMP TABLE t(a int primary key)");
@@ -100,7 +110,8 @@ public class MiscTest extends TestCase {
     // We should get a warning about primary key index creation
     // it's possible we won't depending on the server's
     // client_min_messages setting.
-    while (warning != null) {
+    while (warning != null)
+    {
       // Verify that the SQLWarning is serializable.
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -113,7 +124,8 @@ public class MiscTest extends TestCase {
     con.close();
   }
 
-  public void xtestLocking() throws Exception {
+  public void xtestLocking() throws Exception
+  {
     Connection con = TestUtil.openDB();
     Connection con2 = TestUtil.openDB();
 

@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-public class SslTest extends TestCase {
+public class SslTest extends TestCase
+{
 
   /**
    * Tries to connect to the database.
@@ -24,12 +25,15 @@ public class SslTest extends TestCase {
    *                 PSQLException or null, if no exception is expected, the second indicates
    *                 weather ssl is to be used (Boolean)
    */
-  protected void driver(String connstr, Object[] expected) throws SQLException {
+  protected void driver(String connstr, Object[] expected) throws SQLException
+  {
     Connection conn = null;
     String exmsg = (String) expected[0];
-    try {
+    try
+    {
       conn = DriverManager.getConnection(connstr, TestUtil.getUser(), TestUtil.getPassword());
-      if (exmsg != null) {
+      if (exmsg != null)
+      {
         fail("Exception did not occur: " + exmsg);
       }
       //
@@ -37,13 +41,17 @@ public class SslTest extends TestCase {
       assertTrue(rs.next());
       assertEquals("ssl_is_used: ", ((Boolean) expected[1]).booleanValue(), rs.getBoolean(1));
       conn.close();
-    } catch (SQLException ex) {
-      if (conn != null) {
+    } catch (SQLException ex)
+    {
+      if (conn != null)
+      {
         conn.close();
       }
-      if (exmsg == null) { //no exception is excepted
+      if (exmsg == null)
+      { //no exception is excepted
         fail("Exception thrown: " + ex.getMessage());
-      } else {
+      } else
+      {
         assertTrue("expected: " + exmsg + " actual: " + ex.getMessage(),
             ex.getMessage().matches(exmsg));
         return;
@@ -60,7 +68,8 @@ public class SslTest extends TestCase {
   protected String prefix;
   protected Object[] expected;
 
-  private String makeConnStr(String sslmode, boolean goodclient, boolean goodserver, int protocol) {
+  private String makeConnStr(String sslmode, boolean goodclient, boolean goodserver, int protocol)
+  {
     return connstr + "&protocolVersion=" + protocol + "&sslmode=" + sslmode +
         "&sslcert=" + certdir + "/" + prefix + (goodclient ? "goodclient.crt" : "badclient.crt") +
         "&sslkey=" + certdir + "/" + prefix + (goodclient ? "goodclient.pk8" : "badclient.pk8") +
@@ -69,7 +78,8 @@ public class SslTest extends TestCase {
   }
 
   public SslTest(String name, String certdir, String connstr, String sslmode, int protocol,
-      boolean goodclient, boolean goodserver, String prefix, Object[] expected) {
+      boolean goodclient, boolean goodserver, String prefix, Object[] expected)
+  {
     super(name);
     this.certdir = certdir;
     this.connstr = connstr;
@@ -81,7 +91,8 @@ public class SslTest extends TestCase {
     this.expected = expected;
   }
 
-  static TestSuite getSuite(Properties prop, String param) {
+  static TestSuite getSuite(Properties prop, String param)
+  {
     File certDirFile = TestUtil.getFile(prop.getProperty("certdir"));
     String certdir = certDirFile.getAbsolutePath();
     String sconnstr = prop.getProperty(param);
@@ -90,12 +101,14 @@ public class SslTest extends TestCase {
 
     TestSuite suite = new TestSuite();
     Map<String, Object[]> expected = expectedmap.get(param);
-    if (expected == null) {
+    if (expected == null)
+    {
       ;
       expected = defaultexpected;
     }
     int j = 0;
-    for (int i = 0; i < csslmode.length; i++) {
+    for (int i = 0; i < csslmode.length; i++)
+    {
       suite.addTest(
           new SslTest(param + "-" + csslmode[i] + "GG2", certdir, sconnstr, csslmode[i], 2, true,
               true, sprefix, expected.get(csslmode[i] + "GG")));
@@ -118,7 +131,8 @@ public class SslTest extends TestCase {
     return suite;
   }
 
-  protected void runTest() throws Throwable {
+  protected void runTest() throws Throwable
+  {
     driver(makeConnStr(sslmode, goodclient, goodserver, protocol), expected);
   }
 
@@ -142,7 +156,8 @@ public class SslTest extends TestCase {
       "SSL error: sun.security.validator.ValidatorException: PKIX path (building|validation) failed:.*";
   static String HOSTNAME = "The hostname .* could not be verified.";
 
-  static {
+  static
+  {
     defaultexpected = new TreeMap<String, Object[]>();
     defaultexpected.put("disableGG", new Object[]{null, Boolean.FALSE});
     defaultexpected.put("disableGB", new Object[]{null, Boolean.FALSE});

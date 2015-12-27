@@ -23,20 +23,24 @@ import java.sql.Statement;
  * help prevent previous problems from re-occuring ;-)
  *
  */
-public class DateTest extends TestCase {
+public class DateTest extends TestCase
+{
 
   private Connection con;
 
-  public DateTest(String name) {
+  public DateTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, "testdate", "dt date");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, "testdate");
     TestUtil.closeDB(con);
   }
@@ -44,7 +48,8 @@ public class DateTest extends TestCase {
   /*
    * Tests the time methods in ResultSet
    */
-  public void testGetDate() throws SQLException {
+  public void testGetDate() throws SQLException
+  {
     Statement stmt = con.createStatement();
 
     assertEquals(1, stmt.executeUpdate(TestUtil.insertSQL("testdate", "'1950-02-07'")));
@@ -76,7 +81,8 @@ public class DateTest extends TestCase {
   /*
    * Tests the time methods in PreparedStatement
    */
-  public void testSetDate() throws SQLException {
+  public void testSetDate() throws SQLException
+  {
     Statement stmt = con.createStatement();
     PreparedStatement ps = con.prepareStatement(TestUtil.insertSQL("testdate", "?"));
 
@@ -146,7 +152,8 @@ public class DateTest extends TestCase {
   /*
    * Helper for the date tests. It tests what should be in the db
    */
-  private void dateTest() throws SQLException {
+  private void dateTest() throws SQLException
+  {
     Statement st = con.createStatement();
     ResultSet rs;
     java.sql.Date d;
@@ -251,7 +258,8 @@ public class DateTest extends TestCase {
     st.close();
   }
 
-  private java.sql.Date makeDate(int y, int m, int d) {
+  private java.sql.Date makeDate(int y, int m, int d)
+  {
     return new java.sql.Date(y - 1900, m - 1, d);
   }
 }

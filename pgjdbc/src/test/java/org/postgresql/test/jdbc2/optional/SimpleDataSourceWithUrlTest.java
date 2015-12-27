@@ -16,19 +16,23 @@ import org.postgresql.test.TestUtil;
  *
  * @author Aaron Mulder (ammulder@chariotsolutions.com)
  */
-public class SimpleDataSourceWithUrlTest extends BaseDataSourceTest {
+public class SimpleDataSourceWithUrlTest extends BaseDataSourceTest
+{
   /**
    * Constructor required by JUnit
    */
-  public SimpleDataSourceWithUrlTest(String name) {
+  public SimpleDataSourceWithUrlTest(String name)
+  {
     super(name);
   }
 
   /**
    * Creates and configures a new SimpleDataSource.
    */
-  protected void initializeDataSource() {
-    if (bds == null) {
+  protected void initializeDataSource()
+  {
+    if (bds == null)
+    {
       bds = new SimpleDataSource();
       bds.setUrl("jdbc:postgresql://" + TestUtil.getServer() + ":" + TestUtil.getPort() + "/"
           + TestUtil.getDatabase() + "?prepareThreshold=" + TestUtil.getPrepareThreshold()

@@ -48,7 +48,8 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class FinalizeStatement {
+public class FinalizeStatement
+{
   @Param({"0", "1", "10", "100"})
   private int leakPct;
 
@@ -61,7 +62,8 @@ public class FinalizeStatement {
   //#endif
 
   @Setup(Level.Trial)
-  public void setUp() throws SQLException {
+  public void setUp() throws SQLException
+  {
     Properties props = ConnectionUtil.getProperties();
 
     connection = DriverManager.getConnection(ConnectionUtil.getURL(), props);
@@ -69,12 +71,14 @@ public class FinalizeStatement {
   }
 
   @TearDown(Level.Trial)
-  public void tearDown() throws SQLException {
+  public void tearDown() throws SQLException
+  {
     connection.close();
   }
 
   @Benchmark
-  public Statement createAndLeak() throws SQLException {
+  public Statement createAndLeak() throws SQLException
+  {
     Statement statement = connection.createStatement();
     Random rnd;
     //#if mvn.project.property.current.jdk < "1.7"
@@ -82,13 +86,15 @@ public class FinalizeStatement {
     //#else
     rnd = java.util.concurrent.ThreadLocalRandom.current();
     //#endif
-    if (rnd.nextFloat() >= leakPctFloat) {
+    if (rnd.nextFloat() >= leakPctFloat)
+    {
       statement.close();
     }
     return statement;
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(FinalizeStatement.class.getSimpleName())
         .addProfiler(GCProfiler.class)

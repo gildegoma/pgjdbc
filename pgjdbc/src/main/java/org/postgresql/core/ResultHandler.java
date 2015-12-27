@@ -24,7 +24,8 @@ import java.util.List;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-public interface ResultHandler {
+public interface ResultHandler
+{
   /**
    * Called when result rows are received from a query.
    *

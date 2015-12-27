@@ -28,7 +28,8 @@ import java.util.TimeZone;
  * Tests {@link PGTime} in various scenarios including setTime, setObject for both <code>time with
  * time zone</code> and <code>time without time zone</code> data types.
  */
-public class PGTimeTest extends TestCase {
+public class PGTimeTest extends TestCase
+{
   /**
    * The name of the test table.
    */
@@ -39,16 +40,19 @@ public class PGTimeTest extends TestCase {
    */
   private Connection con;
 
-  public PGTimeTest(String name) {
+  public PGTimeTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTempTable(con, TEST_TABLE, "tm time, tz time with time zone");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, TEST_TABLE);
     TestUtil.closeDB(con);
   }
@@ -59,7 +63,8 @@ public class PGTimeTest extends TestCase {
    *
    * @throws SQLException if a JDBC or database problem occurs.
    */
-  public void testTimeWithInterval() throws SQLException {
+  public void testTimeWithInterval() throws SQLException
+  {
     Calendar cal = Calendar.getInstance();
     cal.set(1970, 0, 1);
 
@@ -89,12 +94,15 @@ public class PGTimeTest extends TestCase {
    * @throws SQLException if a JDBC or database problem occurs.
    */
   private void verifyTimeWithInterval(PGTime time, PGInterval interval, boolean useSetObject)
-      throws SQLException {
+      throws SQLException
+  {
     // Construct the SQL query.
     String sql;
-    if (time.getCalendar() != null) {
+    if (time.getCalendar() != null)
+    {
       sql = "SELECT ?::time with time zone + ?";
-    } else {
+    } else
+    {
       sql = "SELECT ?::time + ?";
     }
 
@@ -114,9 +122,11 @@ public class PGTimeTest extends TestCase {
 
     // Execute a query using with PGTime + PGInterval.
     stmt = con.prepareStatement("SELECT ? + ?");
-    if (useSetObject) {
+    if (useSetObject)
+    {
       stmt.setObject(1, time);
-    } else {
+    } else
+    {
       stmt.setTime(1, time);
     }
     stmt.setObject(2, interval);
@@ -136,7 +146,8 @@ public class PGTimeTest extends TestCase {
    *
    * @throws SQLException if a JDBC or database problem occurs.
    */
-  public void testTimeInsertAndSelect() throws SQLException {
+  public void testTimeInsertAndSelect() throws SQLException
+  {
     Calendar cal = Calendar.getInstance();
     cal.set(1970, 0, 1);
 
@@ -163,13 +174,16 @@ public class PGTimeTest extends TestCase {
    *                     setTime.
    * @throws SQLException if a JDBC or database problem occurs.
    */
-  private void verifyInsertAndSelect(PGTime time, boolean useSetObject) throws SQLException {
+  private void verifyInsertAndSelect(PGTime time, boolean useSetObject) throws SQLException
+  {
     // Construct the INSERT statement of a casted time string.
     String sql;
-    if (time.getCalendar() != null) {
+    if (time.getCalendar() != null)
+    {
       sql =
           "INSERT INTO " + TEST_TABLE + " VALUES (?::time with time zone, ?::time with time zone)";
-    } else {
+    } else
+    {
       sql = "INSERT INTO " + TEST_TABLE + " VALUES (?::time, ?::time)";
     }
 
@@ -184,10 +198,12 @@ public class PGTimeTest extends TestCase {
     // Insert the times as PGTime objects.
     PreparedStatement pstmt2 = con.prepareStatement("INSERT INTO " + TEST_TABLE + " VALUES (?, ?)");
 
-    if (useSetObject) {
+    if (useSetObject)
+    {
       pstmt2.setObject(1, time);
       pstmt2.setObject(2, time);
-    } else {
+    } else
+    {
       pstmt2.setTime(1, time);
       pstmt2.setTime(2, time);
     }
@@ -233,14 +249,17 @@ public class PGTimeTest extends TestCase {
    * @param time the time object.
    * @return the new format instance.
    */
-  private SimpleDateFormat createSimpleDateFormat(PGTime time) {
+  private SimpleDateFormat createSimpleDateFormat(PGTime time)
+  {
     String pattern = "HH:mm:ss.SSS";
-    if (time.getCalendar() != null) {
+    if (time.getCalendar() != null)
+    {
       pattern += " Z";
     }
 
     SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-    if (time.getCalendar() != null) {
+    if (time.getCalendar() != null)
+    {
       sdf.setTimeZone(time.getCalendar().getTimeZone());
     }
     return sdf;

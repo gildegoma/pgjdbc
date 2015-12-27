@@ -13,7 +13,8 @@ import java.sql.SQLException;
 /**
  * Copy bulk data from client into a PostgreSQL table very fast.
  */
-public interface CopyIn extends CopyOperation {
+public interface CopyIn extends CopyOperation
+{
 
   /**
    * Writes specified part of given byte array to an open and writable copy operation.

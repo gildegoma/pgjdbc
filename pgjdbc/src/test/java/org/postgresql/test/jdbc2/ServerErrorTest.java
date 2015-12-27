@@ -22,15 +22,18 @@ import java.sql.Statement;
  * Test that enhanced error reports return the correct origin
  * for constraint violation errors.
  */
-public class ServerErrorTest extends TestCase {
+public class ServerErrorTest extends TestCase
+{
 
   private Connection con;
 
-  public ServerErrorTest(String name) {
+  public ServerErrorTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     Statement stmt = con.createStatement();
 
@@ -40,7 +43,8 @@ public class ServerErrorTest extends TestCase {
     stmt.close();
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, "testerr");
     Statement stmt = con.createStatement();
     stmt.execute("DROP DOMAIN testdom");
@@ -48,13 +52,16 @@ public class ServerErrorTest extends TestCase {
     TestUtil.closeDB(con);
   }
 
-  public void testPrimaryKey() throws Exception {
+  public void testPrimaryKey() throws Exception
+  {
     Statement stmt = con.createStatement();
     stmt.executeUpdate("INSERT INTO testerr (id, val) VALUES (1, 1)");
-    try {
+    try
+    {
       stmt.executeUpdate("INSERT INTO testerr (id, val) VALUES (1, 1)");
       fail("Should have thrown a duplicate key exception.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
       ServerErrorMessage err = ((PSQLException) sqle).getServerErrorMessage();
       assertEquals("public", err.getSchema());
       assertEquals("testerr", err.getTable());
@@ -65,12 +72,15 @@ public class ServerErrorTest extends TestCase {
     stmt.close();
   }
 
-  public void testColumn() throws Exception {
+  public void testColumn() throws Exception
+  {
     Statement stmt = con.createStatement();
-    try {
+    try
+    {
       stmt.executeUpdate("INSERT INTO testerr (id, val) VALUES (1, NULL)");
       fail("Should have thrown a not null constraint violation.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
       ServerErrorMessage err = ((PSQLException) sqle).getServerErrorMessage();
       assertEquals("public", err.getSchema());
       assertEquals("testerr", err.getTable());
@@ -81,12 +91,15 @@ public class ServerErrorTest extends TestCase {
     stmt.close();
   }
 
-  public void testDatatype() throws Exception {
+  public void testDatatype() throws Exception
+  {
     Statement stmt = con.createStatement();
-    try {
+    try
+    {
       stmt.executeUpdate("INSERT INTO testerr (id, val) VALUES (1, 20)");
       fail("Should have thrown a constraint violation.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
       ServerErrorMessage err = ((PSQLException) sqle).getServerErrorMessage();
       assertEquals("public", err.getSchema());
       assertEquals("testdom", err.getDatatype());

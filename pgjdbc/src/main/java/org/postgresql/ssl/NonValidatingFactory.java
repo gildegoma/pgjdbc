@@ -19,7 +19,8 @@ import javax.net.ssl.X509TrustManager;
  * certificate.  This is more convenient for some applications, but is less secure as it allows "man
  * in the middle" attacks.
  */
-public class NonValidatingFactory extends WrappedFactory {
+public class NonValidatingFactory extends WrappedFactory
+{
 
   /**
    * We provide a constructor that takes an unused argument solely because the ssl calling code will
@@ -29,7 +30,8 @@ public class NonValidatingFactory extends WrappedFactory {
    * @param arg input argument
    * @throws GeneralSecurityException if something goes wrong
    */
-  public NonValidatingFactory(String arg) throws GeneralSecurityException {
+  public NonValidatingFactory(String arg) throws GeneralSecurityException
+  {
     SSLContext ctx = SSLContext.getInstance("TLS"); // or "SSL" ?
 
     ctx.init(null,
@@ -39,16 +41,20 @@ public class NonValidatingFactory extends WrappedFactory {
     _factory = ctx.getSocketFactory();
   }
 
-  public static class NonValidatingTM implements X509TrustManager {
+  public static class NonValidatingTM implements X509TrustManager
+  {
 
-    public X509Certificate[] getAcceptedIssuers() {
+    public X509Certificate[] getAcceptedIssuers()
+    {
       return new X509Certificate[0];
     }
 
-    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+    public void checkClientTrusted(X509Certificate[] certs, String authType)
+    {
     }
 
-    public void checkServerTrusted(X509Certificate[] certs, String authType) {
+    public void checkServerTrusted(X509Certificate[] certs, String authType)
+    {
     }
   }
 }

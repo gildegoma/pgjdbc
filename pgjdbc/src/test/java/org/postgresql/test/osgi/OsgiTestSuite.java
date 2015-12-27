@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({PGDataSourceFactoryTest.class})
-public class OsgiTestSuite {
+public class OsgiTestSuite
+{
 
 }

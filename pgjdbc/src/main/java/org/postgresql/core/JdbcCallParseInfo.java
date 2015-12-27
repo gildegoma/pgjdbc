@@ -11,12 +11,14 @@ package org.postgresql.core;
 /**
  * Contains parse flags from {@link Parser#modifyJdbcCall(String, boolean, int, int)}.
  */
-public class JdbcCallParseInfo {
+public class JdbcCallParseInfo
+{
   private final String sql;
   private final boolean isFunction;
   private final boolean outParmBeforeFunc;
 
-  public JdbcCallParseInfo(String sql, boolean isFunction, boolean outParmBeforeFunc) {
+  public JdbcCallParseInfo(String sql, boolean isFunction, boolean outParmBeforeFunc)
+  {
     this.sql = sql;
     this.isFunction = isFunction;
     this.outParmBeforeFunc = outParmBeforeFunc;
@@ -27,7 +29,8 @@ public class JdbcCallParseInfo {
    *
    * @return SQL in a native for certain backend version
    */
-  public String getSql() {
+  public String getSql()
+  {
     return sql;
   }
 
@@ -36,7 +39,8 @@ public class JdbcCallParseInfo {
    *
    * @return {@code true} if given SQL is a function
    */
-  public boolean isFunction() {
+  public boolean isFunction()
+  {
     return isFunction;
   }
 
@@ -45,7 +49,8 @@ public class JdbcCallParseInfo {
    *
    * @return true if given SQL is a function with one out parameter
    */
-  public boolean isOutParmBeforeFunc() {
+  public boolean isOutParmBeforeFunc()
+  {
     return outParmBeforeFunc;
   }
 }

@@ -24,19 +24,23 @@ import java.sql.Statement;
  * DataSource test to ensure the BaseConnection is configured with column
  * sanitiser disabled.
  */
-public class CaseOptimiserDataSourceTest extends TestCase {
+public class CaseOptimiserDataSourceTest extends TestCase
+{
   private BaseDataSource bds;
   protected Connection conn;
 
-  protected void initializeDataSource() {
-    if (bds == null) {
+  protected void initializeDataSource()
+  {
+    if (bds == null)
+    {
       bds = new SimpleDataSource();
       setupDataSource(bds);
       bds.setDisableColumnSanitiser(true);
     }
   }
 
-  public void setUp() throws SQLException {
+  public void setUp() throws SQLException
+  {
     Connection conn = getDataSourceConnection();
     assertTrue(conn instanceof BaseConnection);
     BaseConnection bc = (BaseConnection) conn;
@@ -53,7 +57,8 @@ public class CaseOptimiserDataSourceTest extends TestCase {
   }
 
   @Override
-  public void tearDown() throws SQLException {
+  public void tearDown() throws SQLException
+  {
     Connection conn = getDataSourceConnection();
     Statement drop = conn.createStatement();
     drop.execute("drop table allmixedup");
@@ -68,11 +73,13 @@ public class CaseOptimiserDataSourceTest extends TestCase {
    * disabled. The column is not expected to be found.
    */
   public void testDataSourceDisabledSanitiserPropertySucceeds()
-      throws SQLException {
+      throws SQLException
+  {
     String label = "FOO";
     PreparedStatement query = getDataSourceConnection().prepareStatement(
         "select * from allmixedup");
-    if (0 < TestUtil.findColumn(query, label)) {
+    if (0 < TestUtil.findColumn(query, label))
+    {
       fail(String.format(
           "Did not expect to find the column with the label [%1$s].",
           label));
@@ -83,14 +90,17 @@ public class CaseOptimiserDataSourceTest extends TestCase {
   /**
    * Gets a connection from the current BaseDataSource
    */
-  protected Connection getDataSourceConnection() throws SQLException {
-    if (bds == null) {
+  protected Connection getDataSourceConnection() throws SQLException
+  {
+    if (bds == null)
+    {
       initializeDataSource();
     }
     return bds.getConnection();
   }
 
-  public static void setupDataSource(BaseDataSource bds) {
+  public static void setupDataSource(BaseDataSource bds)
+  {
     bds.setServerName(TestUtil.getServer());
     bds.setPortNumber(TestUtil.getPort());
     bds.setDatabaseName(TestUtil.getDatabase());
@@ -101,7 +111,8 @@ public class CaseOptimiserDataSourceTest extends TestCase {
     bds.setProtocolVersion(TestUtil.getProtocolVersion());
   }
 
-  public CaseOptimiserDataSourceTest(String name) {
+  public CaseOptimiserDataSourceTest(String name)
+  {
     super(name);
   }
 }

@@ -13,11 +13,13 @@ package org.postgresql.core.v3;
  *
  * @see QueryExecutorImpl#pendingExecuteQueue
  */
-class ExecuteRequest {
+class ExecuteRequest
+{
   public final SimpleQuery query;
   public final Portal portal;
 
-  public ExecuteRequest(SimpleQuery query, Portal portal) {
+  public ExecuteRequest(SimpleQuery query, Portal portal)
+  {
     this.query = query;
     this.portal = portal;
   }

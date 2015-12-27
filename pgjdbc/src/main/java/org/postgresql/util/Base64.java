@@ -38,7 +38,8 @@ package org.postgresql.util;
  * @author rob@iharder.net
  * @version 2.1
  */
-public class Base64 {
+public class Base64
+{
 
   /* ********  P U B L I C   F I E L D S  ******** */
 
@@ -111,12 +112,15 @@ public class Base64 {
   };
 
   /** Determine which ALPHABET to use. */
-  static {
+  static
+  {
     byte[] __bytes;
-    try {
+    try
+    {
       __bytes = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".getBytes(
           PREFERRED_ENCODING);
-    } catch (java.io.UnsupportedEncodingException use) {
+    } catch (java.io.UnsupportedEncodingException use)
+    {
       __bytes = _NATIVE_ALPHABET; // Fall back to native encoding
     }
     ALPHABET = __bytes;
@@ -170,7 +174,8 @@ public class Base64 {
   /**
    * Defeats instantiation.
    */
-  private Base64() {
+  private Base64()
+  {
   }
 
 
@@ -191,7 +196,8 @@ public class Base64 {
    * @return four byte array in Base64 notation.
    * @since 1.5.1
    */
-  private static byte[] encode3to4(byte[] b4, byte[] threeBytes, int numSigBytes) {
+  private static byte[] encode3to4(byte[] b4, byte[] threeBytes, int numSigBytes)
+  {
     encode3to4(threeBytes, 0, numSigBytes, b4, 0);
     return b4;
   }   // end encode3to4
@@ -216,7 +222,8 @@ public class Base64 {
    */
   private static byte[] encode3to4(
       byte[] source, int srcOffset, int numSigBytes,
-      byte[] destination, int destOffset) {
+      byte[] destination, int destOffset)
+  {
     //           1         2         3
     // 01234567890123456789012345678901 Bit position
     // --------000000001111111122222222 Array position from threeBytes
@@ -232,7 +239,8 @@ public class Base64 {
         | (numSigBytes > 1 ? ((source[srcOffset + 1] << 24) >>> 16) : 0)
         | (numSigBytes > 2 ? ((source[srcOffset + 2] << 24) >>> 24) : 0);
 
-    switch (numSigBytes) {
+    switch (numSigBytes)
+    {
       case 3:
         destination[destOffset] = ALPHABET[(inBuff >>> 18)];
         destination[destOffset + 1] = ALPHABET[(inBuff >>> 12) & 0x3f];
@@ -266,7 +274,8 @@ public class Base64 {
    * @return Base64 notation of input data
    * @since 1.4
    */
-  public static String encodeBytes(byte[] source) {
+  public static String encodeBytes(byte[] source)
+  {
     return encodeBytes(source, 0, source.length, NO_OPTIONS);
   }   // end encodeBytes
 
@@ -287,7 +296,8 @@ public class Base64 {
    * @see Base64#DONT_BREAK_LINES
    * @since 2.0
    */
-  public static String encodeBytes(byte[] source, int options) {
+  public static String encodeBytes(byte[] source, int options)
+  {
     return encodeBytes(source, 0, source.length, options);
   }   // end encodeBytes
 
@@ -301,7 +311,8 @@ public class Base64 {
    * @return Base64 notation
    * @since 1.4
    */
-  public static String encodeBytes(byte[] source, int off, int len) {
+  public static String encodeBytes(byte[] source, int off, int len)
+  {
     return encodeBytes(source, off, len, NO_OPTIONS);
   }   // end encodeBytes
 
@@ -324,7 +335,8 @@ public class Base64 {
    * @see Base64#DONT_BREAK_LINES
    * @since 2.0
    */
-  public static String encodeBytes(byte[] source, int off, int len, int options) {
+  public static String encodeBytes(byte[] source, int off, int len, int options)
+  {
     // Isolate options
     int dontBreakLines = (options & DONT_BREAK_LINES);
 
@@ -341,27 +353,32 @@ public class Base64 {
       int e = 0;
       int len2 = len - 2;
       int lineLength = 0;
-      for (; d < len2; d += 3, e += 4) {
+      for (; d < len2; d += 3, e += 4)
+      {
         encode3to4(source, d + off, 3, outBuff, e);
 
         lineLength += 4;
-        if (breakLines && lineLength == MAX_LINE_LENGTH) {
+        if (breakLines && lineLength == MAX_LINE_LENGTH)
+        {
           outBuff[e + 4] = NEW_LINE;
           e++;
           lineLength = 0;
         }   // end if: end of line
       }   // en dfor: each piece of array
 
-      if (d < len) {
+      if (d < len)
+      {
         encode3to4(source, d + off, len - d, outBuff, e);
         e += 4;
       }   // end if: some padding needed
 
 
       // Return value according to relevant encoding.
-      try {
+      try
+      {
         return new String(outBuff, 0, e, PREFERRED_ENCODING);
-      } catch (java.io.UnsupportedEncodingException uue) {
+      } catch (java.io.UnsupportedEncodingException uue)
+      {
         return new String(outBuff, 0, e);
       }
 
@@ -392,9 +409,11 @@ public class Base64 {
    * @return the number of decoded bytes converted
    * @since 1.3
    */
-  private static int decode4to3(byte[] source, int srcOffset, byte[] destination, int destOffset) {
+  private static int decode4to3(byte[] source, int srcOffset, byte[] destination, int destOffset)
+  {
     // Example: Dk==
-    if (source[srcOffset + 2] == EQUALS_SIGN) {
+    if (source[srcOffset + 2] == EQUALS_SIGN)
+    {
       // Two ways to do the same thing. Don't know which way I like best.
       //int outBuff =   ( ( DECODABET[ source[ srcOffset    ] ] << 24 ) >>>  6 )
       //              | ( ( DECODABET[ source[ srcOffset + 1] ] << 24 ) >>> 12 );
@@ -403,7 +422,8 @@ public class Base64 {
 
       destination[destOffset] = (byte) (outBuff >>> 16);
       return 1;
-    } else if (source[srcOffset + 3] == EQUALS_SIGN) {
+    } else if (source[srcOffset + 3] == EQUALS_SIGN)
+    {
       // Example: DkL=
       // Two ways to do the same thing. Don't know which way I like best.
       //int outBuff =   ( ( DECODABET[ source[ srcOffset     ] ] << 24 ) >>>  6 )
@@ -416,9 +436,11 @@ public class Base64 {
       destination[destOffset] = (byte) (outBuff >>> 16);
       destination[destOffset + 1] = (byte) (outBuff >>> 8);
       return 2;
-    } else {
+    } else
+    {
       // Example: DkLE
-      try {
+      try
+      {
         // Two ways to do the same thing. Don't know which way I like best.
         //int outBuff =   ( ( DECODABET[ source[ srcOffset     ] ] << 24 ) >>>  6 )
         //              | ( ( DECODABET[ source[ srcOffset + 1 ] ] << 24 ) >>> 12 )
@@ -435,7 +457,8 @@ public class Base64 {
         destination[destOffset + 2] = (byte) (outBuff);
 
         return 3;
-      } catch (Exception e) {
+      } catch (Exception e)
+      {
         System.out.println("" + source[srcOffset] + ": " + (DECODABET[source[srcOffset]]));
         System.out.println("" + source[srcOffset + 1] + ": " + (DECODABET[source[srcOffset + 1]]));
         System.out.println("" + source[srcOffset + 2] + ": " + (DECODABET[source[srcOffset + 2]]));
@@ -456,7 +479,8 @@ public class Base64 {
    * @return decoded data
    * @since 1.3
    */
-  public static byte[] decode(byte[] source, int off, int len) {
+  public static byte[] decode(byte[] source, int off, int len)
+  {
     int len34 = len * 3 / 4;
     byte[] outBuff = new byte[len34]; // Upper limit on size of output
     int outBuffPosn = 0;
@@ -466,26 +490,32 @@ public class Base64 {
     int i = 0;
     byte sbiCrop = 0;
     byte sbiDecode = 0;
-    for (i = off; i < off + len; i++) {
+    for (i = off; i < off + len; i++)
+    {
       sbiCrop = (byte) (source[i] & 0x7f); // Only the low seven bits
       sbiDecode = DECODABET[sbiCrop];
 
-      if (sbiDecode >= WHITE_SPACE_ENC) { // White space, Equals sign or better
-        if (sbiDecode >= EQUALS_SIGN_ENC) {
+      if (sbiDecode >= WHITE_SPACE_ENC)
+      { // White space, Equals sign or better
+        if (sbiDecode >= EQUALS_SIGN_ENC)
+        {
           b4[b4Posn++] = sbiCrop;
-          if (b4Posn > 3) {
+          if (b4Posn > 3)
+          {
             outBuffPosn += decode4to3(b4, 0, outBuff, outBuffPosn);
             b4Posn = 0;
 
             // If that was the equals sign, break out of 'for' loop
-            if (sbiCrop == EQUALS_SIGN) {
+            if (sbiCrop == EQUALS_SIGN)
+            {
               break;
             }
           }   // end if: quartet built
 
         }   // end if: equals sign or better
 
-      } else {
+      } else
+      {
         // end if: white space, equals sign or better
         System.err.println("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
         return null;
@@ -506,11 +536,14 @@ public class Base64 {
    * @return the decoded data
    * @since 1.4
    */
-  public static byte[] decode(String s) {
+  public static byte[] decode(String s)
+  {
     byte[] bytes;
-    try {
+    try
+    {
       bytes = s.getBytes(PREFERRED_ENCODING);
-    } catch (java.io.UnsupportedEncodingException uee) {
+    } catch (java.io.UnsupportedEncodingException uee)
+    {
       bytes = s.getBytes();
     }
     //</change>

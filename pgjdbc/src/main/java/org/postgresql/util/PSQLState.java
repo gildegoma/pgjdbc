@@ -11,23 +11,29 @@ package org.postgresql.util;
 /**
  * This class is used for holding SQLState codes.
  */
-public class PSQLState implements java.io.Serializable {
+public class PSQLState implements java.io.Serializable
+{
   private String state;
 
-  public String getState() {
+  public String getState()
+  {
     return this.state;
   }
 
-  public PSQLState(String state) {
+  public PSQLState(String state)
+  {
     this.state = state;
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object o)
+  {
+    if (this == o)
+    {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass())
+    {
       return false;
     }
     PSQLState psqlState = (PSQLState) o;
@@ -35,7 +41,8 @@ public class PSQLState implements java.io.Serializable {
   }
 
   @Override
-  public int hashCode() {
+  public int hashCode()
+  {
     return state != null ? state.hashCode() : 0;
   }
 

@@ -20,29 +20,34 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.UUID;
 
-public class UUIDTest extends TestCase {
+public class UUIDTest extends TestCase
+{
 
   private Connection _conn;
 
-  public UUIDTest(String name) {
+  public UUIDTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     Statement stmt = _conn.createStatement();
     stmt.execute("CREATE TEMP TABLE uuidtest(id uuid)");
     stmt.close();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("DROP TABLE uuidtest");
     stmt.close();
     TestUtil.closeDB(_conn);
   }
 
-  public void testUUID() throws SQLException {
+  public void testUUID() throws SQLException
+  {
     UUID uuid = UUID.randomUUID();
     PreparedStatement ps = _conn.prepareStatement("INSERT INTO uuidtest VALUES (?)");
     ps.setObject(1, uuid, Types.OTHER);

@@ -8,7 +8,8 @@ import java.util.Properties;
  * Helper class to instantiate objects. Note: the class is <b>NOT</b> public API, so it is subject
  * to change.
  */
-public class ObjectFactory {
+public class ObjectFactory
+{
 
   /**
    * Instantiates a class using the appropriate constructor. If a constructor with a single
@@ -33,23 +34,30 @@ public class ObjectFactory {
       String stringarg)
       throws ClassNotFoundException, SecurityException, NoSuchMethodException,
       IllegalArgumentException,
-      InstantiationException, IllegalAccessException, InvocationTargetException {
+      InstantiationException, IllegalAccessException, InvocationTargetException
+  {
     Object[] args = {info};
     Constructor ctor = null;
     Class cls;
     cls = Class.forName(classname);
-    try {
+    try
+    {
       ctor = cls.getConstructor(new Class[]{Properties.class});
-    } catch (NoSuchMethodException nsme) {
-      if (tryString) {
-        try {
+    } catch (NoSuchMethodException nsme)
+    {
+      if (tryString)
+      {
+        try
+        {
           ctor = cls.getConstructor(new Class[]{String.class});
           args = new String[]{stringarg};
-        } catch (NoSuchMethodException nsme2) {
+        } catch (NoSuchMethodException nsme2)
+        {
           tryString = false;
         }
       }
-      if (!tryString) {
+      if (!tryString)
+      {
         ctor = cls.getConstructor((Class[]) null);
         args = null;
       }

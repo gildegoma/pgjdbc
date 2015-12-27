@@ -19,29 +19,35 @@ import java.sql.ResultSet;
 /*
  *  Tests for using non-zero setFetchSize().
  */
-public class ServerCursorTest extends TestCase {
+public class ServerCursorTest extends TestCase
+{
   private Connection con;
 
-  public ServerCursorTest(String name) {
+  public ServerCursorTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, "test_fetch", "value integer,data bytea");
     con.setAutoCommit(false);
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     con.rollback();
     con.setAutoCommit(true);
     TestUtil.dropTable(con, "test_fetch");
     TestUtil.closeDB(con);
   }
 
-  protected void createRows(int count) throws Exception {
+  protected void createRows(int count) throws Exception
+  {
     PreparedStatement stmt = con.prepareStatement("insert into test_fetch(value,data) values(?,?)");
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < count; ++i)
+    {
       stmt.setInt(1, i + 1);
       stmt.setBytes(2, DATA_STRING.getBytes("UTF8"));
       stmt.executeUpdate();
@@ -50,7 +56,8 @@ public class ServerCursorTest extends TestCase {
   }
 
   //Test regular cursor fetching
-  public void testBasicFetch() throws Exception {
+  public void testBasicFetch() throws Exception
+  {
     createRows(1);
 
     PreparedStatement stmt =
@@ -59,7 +66,8 @@ public class ServerCursorTest extends TestCase {
 
     stmt = con.prepareStatement("fetch forward from test_cursor");
     ResultSet rs = stmt.executeQuery();
-    while (rs.next()) {
+    while (rs.next())
+    {
       //there should only be one row returned
       assertEquals("query value error", 1, rs.getInt(1));
       byte[] dataBytes = rs.getBytes(2);
@@ -69,7 +77,8 @@ public class ServerCursorTest extends TestCase {
   }
 
   //Test binary cursor fetching
-  public void testBinaryFetch() throws Exception {
+  public void testBinaryFetch() throws Exception
+  {
     createRows(1);
 
     PreparedStatement stmt =
@@ -78,7 +87,8 @@ public class ServerCursorTest extends TestCase {
 
     stmt = con.prepareStatement("fetch forward from test_cursor");
     ResultSet rs = stmt.executeQuery();
-    while (rs.next()) {
+    while (rs.next())
+    {
       //there should only be one row returned
       byte[] dataBytes = rs.getBytes(2);
       assertEquals("binary data got munged", DATA_STRING, new String(dataBytes, "UTF8"));

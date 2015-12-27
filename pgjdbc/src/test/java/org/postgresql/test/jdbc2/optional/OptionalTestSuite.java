@@ -16,11 +16,13 @@ import junit.framework.TestSuite;
  *
  * @author Aaron Mulder (ammulder@chariotsolutions.com)
  */
-public class OptionalTestSuite extends TestSuite {
+public class OptionalTestSuite extends TestSuite
+{
   /**
    * Gets the test suite for the entire JDBC 2.0 Optional Package implementation.
    */
-  public static TestSuite suite() throws Exception {
+  public static TestSuite suite() throws Exception
+  {
     Class.forName("org.postgresql.Driver");
     TestSuite suite = new TestSuite();
     suite.addTestSuite(SimpleDataSourceTest.class);

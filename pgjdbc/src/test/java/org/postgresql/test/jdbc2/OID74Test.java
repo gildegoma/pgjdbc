@@ -24,14 +24,17 @@ import java.util.Properties;
 /**
  * User: alexei
  */
-public class OID74Test extends TestCase {
+public class OID74Test extends TestCase
+{
   private Connection conn;
 
-  public OID74Test(String name) {
+  public OID74Test(String name)
+  {
     super(name);
   }
 
-  public void setUp() throws Exception {
+  public void setUp() throws Exception
+  {
     //set up conection here
     Properties props = new Properties();
     props.setProperty("compatible", "7.1");
@@ -41,13 +44,15 @@ public class OID74Test extends TestCase {
     conn.setAutoCommit(false);
   }
 
-  public void tearDown() throws Exception {
+  public void tearDown() throws Exception
+  {
     conn.setAutoCommit(true);
     TestUtil.dropTable(conn, "temp");
     TestUtil.closeDB(conn);
   }
 
-  public void testSetNull() throws SQLException {
+  public void testSetNull() throws SQLException
+  {
     PreparedStatement pstmt = conn.prepareStatement("INSERT INTO temp VALUES (?)");
     pstmt.setNull(1, Types.VARBINARY);
     pstmt.executeUpdate();
@@ -58,7 +63,8 @@ public class OID74Test extends TestCase {
     pstmt.close();
   }
 
-  public void testBinaryStream() throws Exception {
+  public void testBinaryStream() throws Exception
+  {
 
     PreparedStatement pstmt = null;
 
@@ -75,7 +81,8 @@ public class OID74Test extends TestCase {
     InputStream in = rs.getBinaryStream(1);
     int data;
     int i = 1;
-    while ((data = in.read()) != -1) {
+    while ((data = in.read()) != -1)
+    {
       assertEquals(i++, data);
     }
     rs.close();

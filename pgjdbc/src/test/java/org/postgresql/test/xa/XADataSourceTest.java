@@ -25,7 +25,8 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-public class XADataSourceTest extends TestCase {
+public class XADataSourceTest extends TestCase
+{
 
   private XADataSource _ds;
 
@@ -37,14 +38,16 @@ public class XADataSourceTest extends TestCase {
   private Connection conn;
 
 
-  public XADataSourceTest(String name) {
+  public XADataSourceTest(String name)
+  {
     super(name);
 
     _ds = new PGXADataSource();
     BaseDataSourceTest.setupDataSource((PGXADataSource) _ds);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
 
     // Check if we're operating as a superuser; some tests require it.
@@ -64,7 +67,8 @@ public class XADataSourceTest extends TestCase {
     conn = xaconn.getConnection();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     xaconn.close();
     clearAllPrepared();
 
@@ -73,33 +77,39 @@ public class XADataSourceTest extends TestCase {
 
   }
 
-  private void clearAllPrepared() throws SQLException {
+  private void clearAllPrepared() throws SQLException
+  {
     Statement st = _conn.createStatement();
-    try {
+    try
+    {
       ResultSet rs = st.executeQuery(
           "SELECT x.gid, x.owner = current_user "
               + "FROM pg_prepared_xacts x "
               + "WHERE x.database = current_database()");
 
       Statement st2 = _conn.createStatement();
-      while (rs.next()) {
+      while (rs.next())
+      {
         // TODO: This should really use org.junit.Assume once we move to JUnit 4
         assertTrue("Only prepared xacts owned by current user may be present in db",
             rs.getBoolean(2));
         st2.executeUpdate("ROLLBACK PREPARED '" + rs.getString(1) + "'");
       }
       st2.close();
-    } finally {
+    } finally
+    {
       st.close();
     }
   }
 
-  static class CustomXid implements Xid {
+  static class CustomXid implements Xid
+  {
     private static Random rand = new Random(System.currentTimeMillis());
     byte[] gtrid = new byte[Xid.MAXGTRIDSIZE];
     byte[] bqual = new byte[Xid.MAXBQUALSIZE];
 
-    CustomXid(int i) {
+    CustomXid(int i)
+    {
       rand.nextBytes(gtrid);
       gtrid[0] = (byte) i;
       gtrid[1] = (byte) i;
@@ -111,28 +121,35 @@ public class XADataSourceTest extends TestCase {
       bqual[2] = 6;
     }
 
-    public int getFormatId() {
+    public int getFormatId()
+    {
       return 0;
     }
 
 
-    public byte[] getGlobalTransactionId() {
+    public byte[] getGlobalTransactionId()
+    {
       return gtrid;
     }
 
-    public byte[] getBranchQualifier() {
+    public byte[] getBranchQualifier()
+    {
       return bqual;
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
       Xid other = (Xid) o;
-      if (other.getFormatId() != this.getFormatId()) {
+      if (other.getFormatId() != this.getFormatId())
+      {
         return false;
       }
-      if (!Arrays.equals(other.getBranchQualifier(), this.getBranchQualifier())) {
+      if (!Arrays.equals(other.getBranchQualifier(), this.getBranchQualifier()))
+      {
         return false;
       }
-      if (!Arrays.equals(other.getGlobalTransactionId(), this.getGlobalTransactionId())) {
+      if (!Arrays.equals(other.getGlobalTransactionId(), this.getGlobalTransactionId()))
+      {
         return false;
       }
 
@@ -144,11 +161,13 @@ public class XADataSourceTest extends TestCase {
    * Check that the equals method works for the connection wrapper returned
    * by PGXAConnection.getConnection().
    */
-  public void testWrapperEquals() throws Exception {
+  public void testWrapperEquals() throws Exception
+  {
     assertTrue("Wrappers should be equal", conn.equals(conn));
   }
 
-  public void testOnePhase() throws Exception {
+  public void testOnePhase() throws Exception
+  {
     Xid xid = new CustomXid(1);
     xaRes.start(xid, XAResource.TMNOFLAGS);
     conn.createStatement().executeQuery("SELECT * FROM testxa1");
@@ -156,7 +175,8 @@ public class XADataSourceTest extends TestCase {
     xaRes.commit(xid, true);
   }
 
-  public void testTwoPhaseCommit() throws Exception {
+  public void testTwoPhaseCommit() throws Exception
+  {
     Xid xid = new CustomXid(1);
     xaRes.start(xid, XAResource.TMNOFLAGS);
     conn.createStatement().executeQuery("SELECT * FROM testxa1");
@@ -165,7 +185,8 @@ public class XADataSourceTest extends TestCase {
     xaRes.commit(xid, false);
   }
 
-  public void testCloseBeforeCommit() throws Exception {
+  public void testCloseBeforeCommit() throws Exception
+  {
     Xid xid = new CustomXid(5);
     xaRes.start(xid, XAResource.TMNOFLAGS);
     assertEquals(1, conn.createStatement().executeUpdate("INSERT INTO testxa1 VALUES (1)"));
@@ -178,7 +199,8 @@ public class XADataSourceTest extends TestCase {
     assertEquals(1, rs.getInt(1));
   }
 
-  public void testRecover() throws Exception {
+  public void testRecover() throws Exception
+  {
     Xid xid = new CustomXid(12345);
     xaRes.start(xid, XAResource.TMNOFLAGS);
     conn.createStatement().executeQuery("SELECT * FROM testxa1");
@@ -190,8 +212,10 @@ public class XADataSourceTest extends TestCase {
 
       boolean recoveredXid = false;
 
-      for (int i = 0; i < recoveredXidArray.length; i++) {
-        if (xid.equals(recoveredXidArray[i])) {
+      for (int i = 0; i < recoveredXidArray.length; i++)
+      {
+        if (xid.equals(recoveredXidArray[i]))
+        {
           recoveredXid = true;
           break;
         }
@@ -208,8 +232,10 @@ public class XADataSourceTest extends TestCase {
 
       boolean recoveredXid = false;
 
-      for (int c = 0; c < recoveredXidArray.length; c++) {
-        if (xaRes.equals(recoveredXidArray[c])) {
+      for (int c = 0; c < recoveredXidArray.length; c++)
+      {
+        if (xaRes.equals(recoveredXidArray[c]))
+        {
           recoveredXid = true;
           break;
         }
@@ -219,7 +245,8 @@ public class XADataSourceTest extends TestCase {
     }
   }
 
-  public void testRollback() throws XAException {
+  public void testRollback() throws XAException
+  {
     Xid xid = new CustomXid(3);
 
     xaRes.start(xid, XAResource.TMNOFLAGS);
@@ -228,7 +255,8 @@ public class XADataSourceTest extends TestCase {
     xaRes.rollback(xid);
   }
 
-  public void testRollbackWithoutPrepare() throws XAException {
+  public void testRollbackWithoutPrepare() throws XAException
+  {
     Xid xid = new CustomXid(4);
 
     xaRes.start(xid, XAResource.TMNOFLAGS);
@@ -236,7 +264,8 @@ public class XADataSourceTest extends TestCase {
     xaRes.rollback(xid);
   }
 
-  public void testAutoCommit() throws Exception {
+  public void testAutoCommit() throws Exception
+  {
     Xid xid = new CustomXid(6);
 
     // When not in an XA transaction, autocommit should be true
@@ -308,13 +337,15 @@ public class XADataSourceTest extends TestCase {
    * runs fast enough, and/or the server clock is very coarse grained. But it'll do for testing
    * purposes.
    */
-  private static java.sql.Timestamp getTransactionTimestamp(Connection conn) throws SQLException {
+  private static java.sql.Timestamp getTransactionTimestamp(Connection conn) throws SQLException
+  {
     ResultSet rs = conn.createStatement().executeQuery("SELECT now()");
     rs.next();
     return rs.getTimestamp(1);
   }
 
-  public void testEndThenJoin() throws XAException {
+  public void testEndThenJoin() throws XAException
+  {
     Xid xid = new CustomXid(5);
 
     xaRes.start(xid, XAResource.TMNOFLAGS);
@@ -324,7 +355,8 @@ public class XADataSourceTest extends TestCase {
     xaRes.commit(xid, true);
   }
 
-  public void testRestoreOfAutoCommit() throws Exception {
+  public void testRestoreOfAutoCommit() throws Exception
+  {
     conn.setAutoCommit(false);
 
     Xid xid = new CustomXid(14);
@@ -350,7 +382,8 @@ public class XADataSourceTest extends TestCase {
 
   }
 
-  public void testRestoreOfAutoCommitEndThenJoin() throws Exception {
+  public void testRestoreOfAutoCommitEndThenJoin() throws Exception
+  {
     // Test with TMJOIN
     conn.setAutoCommit(true);
 
@@ -372,7 +405,8 @@ public class XADataSourceTest extends TestCase {
    * Check the driver reports the xid does not exist. The db knows the fact. ERROR:  prepared
    * transaction with identifier "blah" does not exist
    */
-  public void testRepeatedRolledBack() throws Exception {
+  public void testRepeatedRolledBack() throws Exception
+  {
     Xid xid = new CustomXid(654321);
     xaRes.start(xid, XAResource.TMNOFLAGS);
     xaRes.end(xid, XAResource.TMSUCCESS);
@@ -380,10 +414,12 @@ public class XADataSourceTest extends TestCase {
     //tm crash
     xaRes.recover(XAResource.TMSTARTRSCAN);
     xaRes.rollback(xid);
-    try {
+    try
+    {
       xaRes.rollback(xid);
       fail("Rollback was successful");
-    } catch (XAException xae) {
+    } catch (XAException xae)
+    {
       assertEquals("Checking the errorCode is XAER_NOTA indicating the "
           + "xid does not exist.", XAException.XAER_NOTA, xae.errorCode);
     }

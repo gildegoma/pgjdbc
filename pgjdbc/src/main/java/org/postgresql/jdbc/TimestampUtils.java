@@ -28,7 +28,8 @@ import java.util.TimeZone;
 /**
  * Misc utils for handling time and date values.
  */
-public class TimestampUtils {
+public class TimestampUtils
+{
   /**
    * Number of milliseconds in one day.
    */
@@ -36,10 +37,12 @@ public class TimestampUtils {
   private static final char[] ZEROS = {'0', '0', '0', '0', '0', '0', '0', '0', '0'};
   private static final char[][] NUMBERS;
 
-  static {
+  static
+  {
     // The expected maximum value is 60 (seconds), so 64 is used "just in case"
     NUMBERS = new char[64][];
-    for (int i = 0; i < NUMBERS.length; i++) {
+    for (int i = 0; i < NUMBERS.length; i++)
+    {
       NUMBERS[i] = Integer.toString(i).toCharArray();
     }
   }
@@ -62,29 +65,35 @@ public class TimestampUtils {
    */
   private final boolean usesDouble;
 
-  TimestampUtils(boolean min74, boolean min82, boolean usesDouble) {
+  TimestampUtils(boolean min74, boolean min82, boolean usesDouble)
+  {
     this.min74 = min74;
     this.min82 = min82;
     this.usesDouble = usesDouble;
   }
 
-  private Calendar getCalendar(int sign, int hr, int min, int sec) {
+  private Calendar getCalendar(int sign, int hr, int min, int sec)
+  {
     int rawOffset = sign * (((hr * 60 + min) * 60 + sec) * 1000);
-    if (calCache != null && calCacheZone == rawOffset) {
+    if (calCache != null && calCacheZone == rawOffset)
+    {
       return calCache;
     }
 
     StringBuilder zoneID = new StringBuilder("GMT");
     zoneID.append(sign < 0 ? '-' : '+');
-    if (hr < 10) {
+    if (hr < 10)
+    {
       zoneID.append('0');
     }
     zoneID.append(hr);
-    if (min < 10) {
+    if (min < 10)
+    {
       zoneID.append('0');
     }
     zoneID.append(min);
-    if (sec < 10) {
+    if (sec < 10)
+    {
       zoneID.append('0');
     }
     zoneID.append(sec);
@@ -95,7 +104,8 @@ public class TimestampUtils {
     return calCache;
   }
 
-  private static class ParsedTimestamp {
+  private static class ParsedTimestamp
+  {
     boolean hasDate = false;
     int era = GregorianCalendar.AD;
     int year = 1970;
@@ -114,7 +124,8 @@ public class TimestampUtils {
   /**
    * Load date/time information into the provided calendar returning the fractional seconds.
    */
-  private ParsedTimestamp parseBackendTimestamp(String str) throws SQLException {
+  private ParsedTimestamp parseBackendTimestamp(String str) throws SQLException
+  {
     char[] s = str.toCharArray();
     int slen = s.length;
 
@@ -136,14 +147,16 @@ public class TimestampUtils {
     //   if date is present, an era specifier: AD or BC
     //   trailing whitespace
 
-    try {
+    try
+    {
       int start = skipWhitespace(s, 0);   // Skip leading whitespace
       int end = firstNonDigit(s, start);
       int num;
       char sep;
 
       // Possibly read date.
-      if (charAt(s, end) == '-') {
+      if (charAt(s, end) == '-')
+      {
         //
         // Date
         //
@@ -158,7 +171,8 @@ public class TimestampUtils {
         result.month = number(s, start, end);
 
         sep = charAt(s, end);
-        if (sep != '-') {
+        if (sep != '-')
+        {
           throw new NumberFormatException("Expected date to be dash-separated, got '" + sep + "'");
         }
 
@@ -172,7 +186,8 @@ public class TimestampUtils {
       }
 
       // Possibly read time.
-      if (Character.isDigit(charAt(s, start))) {
+      if (Character.isDigit(charAt(s, start)))
+      {
         //
         // Time.
         //
@@ -185,7 +200,8 @@ public class TimestampUtils {
         result.hour = number(s, start, end);
 
         sep = charAt(s, end);
-        if (sep != ':') {
+        if (sep != ':')
+        {
           throw new NumberFormatException("Expected time to be colon-separated, got '" + sep + "'");
         }
 
@@ -197,7 +213,8 @@ public class TimestampUtils {
         result.minute = number(s, start, end);
 
         sep = charAt(s, end);
-        if (sep != ':') {
+        if (sep != ':')
+        {
           throw new NumberFormatException("Expected time to be colon-separated, got '" + sep + "'");
         }
 
@@ -210,11 +227,13 @@ public class TimestampUtils {
         start = end;
 
         // Fractional seconds.
-        if (charAt(s, start) == '.') {
+        if (charAt(s, start) == '.')
+        {
           end = firstNonDigit(s, start + 1); // Skip '.'
           num = number(s, start + 1, end);
 
-          for (int numlength = (end - (start + 1)); numlength < 9; ++numlength) {
+          for (int numlength = (end - (start + 1)); numlength < 9; ++numlength)
+          {
             num *= 10;
           }
 
@@ -227,7 +246,8 @@ public class TimestampUtils {
 
       // Possibly read timezone.
       sep = charAt(s, start);
-      if (sep == '-' || sep == '+') {
+      if (sep == '-' || sep == '+')
+      {
         int tzsign = (sep == '-') ? -1 : 1;
         int tzhr;
         int tzmin;
@@ -238,18 +258,22 @@ public class TimestampUtils {
         start = end;
 
         sep = charAt(s, start);
-        if (sep == ':') {
+        if (sep == ':')
+        {
           end = firstNonDigit(s, start + 1);  // Skip ':'
           tzmin = number(s, start + 1, end);
           start = end;
-        } else {
+        } else
+        {
           tzmin = 0;
         }
 
         tzsec = 0;
-        if (min82) {
+        if (min82)
+        {
           sep = charAt(s, start);
-          if (sep == ':') {
+          if (sep == ':')
+          {
             end = firstNonDigit(s, start + 1);  // Skip ':'
             tzsec = number(s, start + 1, end);
             start = end;
@@ -264,27 +288,33 @@ public class TimestampUtils {
         start = skipWhitespace(s, start);  // Skip trailing whitespace
       }
 
-      if (result.hasDate && start < slen) {
+      if (result.hasDate && start < slen)
+      {
         String eraString = new String(s, start, slen - start);
-        if (eraString.startsWith("AD")) {
+        if (eraString.startsWith("AD"))
+        {
           result.era = GregorianCalendar.AD;
           start += 2;
-        } else if (eraString.startsWith("BC")) {
+        } else if (eraString.startsWith("BC"))
+        {
           result.era = GregorianCalendar.BC;
           start += 2;
         }
       }
 
-      if (start < slen) {
+      if (start < slen)
+      {
         throw new NumberFormatException(
             "Trailing junk on timestamp: '" + new String(s, start, slen - start) + "'");
       }
 
-      if (!result.hasTime && !result.hasDate) {
+      if (!result.hasTime && !result.hasDate)
+      {
         throw new NumberFormatException("Timestamp has neither date nor time");
       }
 
-    } catch (NumberFormatException nfe) {
+    } catch (NumberFormatException nfe)
+    {
       throw new PSQLException(
           GT.tr("Bad value for type timestamp/date/time: {1}", new Object[]{str}),
           PSQLState.BAD_DATETIME_FORMAT, nfe);
@@ -301,19 +331,23 @@ public class TimestampUtils {
    * @return null if s is null or a timestamp of the parsed string s.
    * @throws SQLException if there is a problem parsing s.
    */
-  public synchronized Timestamp toTimestamp(Calendar cal, String s) throws SQLException {
-    if (s == null) {
+  public synchronized Timestamp toTimestamp(Calendar cal, String s) throws SQLException
+  {
+    if (s == null)
+    {
       return null;
     }
 
     int slen = s.length();
 
     // convert postgres's infinity values to internal infinity magic value
-    if (slen == 8 && s.equals("infinity")) {
+    if (slen == 8 && s.equals("infinity"))
+    {
       return new Timestamp(PGStatement.DATE_POSITIVE_INFINITY);
     }
 
-    if (slen == 9 && s.equals("-infinity")) {
+    if (slen == 9 && s.equals("-infinity"))
+    {
       return new Timestamp(PGStatement.DATE_NEGATIVE_INFINITY);
     }
 
@@ -333,11 +367,13 @@ public class TimestampUtils {
     return result;
   }
 
-  public synchronized Time toTime(Calendar cal, String s) throws SQLException {
+  public synchronized Time toTime(Calendar cal, String s) throws SQLException
+  {
     // 1) Parse backend string
     Timestamp timestamp = toTimestamp(cal, s);
 
-    if (timestamp == null) {
+    if (timestamp == null)
+    {
       return null;
     }
 
@@ -345,7 +381,8 @@ public class TimestampUtils {
     // infinity cannot be represented as Time
     // so there's not much we can do here.
     if (millis <= PGStatement.DATE_NEGATIVE_INFINITY
-        || millis >= PGStatement.DATE_POSITIVE_INFINITY) {
+        || millis >= PGStatement.DATE_POSITIVE_INFINITY)
+    {
       throw new PSQLException(
           GT.tr("Infinite value found for timestamp/date. This cannot be represented as time."),
           PSQLState.DATETIME_OVERFLOW);
@@ -356,11 +393,13 @@ public class TimestampUtils {
     return convertToTime(timestamp.getTime(), cal == null ? null : cal.getTimeZone());
   }
 
-  public synchronized Date toDate(Calendar cal, String s) throws SQLException {
+  public synchronized Date toDate(Calendar cal, String s) throws SQLException
+  {
     // 1) Parse backend string
     Timestamp timestamp = toTimestamp(cal, s);
 
-    if (timestamp == null) {
+    if (timestamp == null)
+    {
       return null;
     }
 
@@ -369,16 +408,20 @@ public class TimestampUtils {
     return convertToDate(timestamp.getTime(), cal == null ? null : cal.getTimeZone());
   }
 
-  private Calendar setupCalendar(Calendar cal) {
+  private Calendar setupCalendar(Calendar cal)
+  {
     Calendar tmp = calendarWithUserTz;
     tmp.setTimeZone(cal == null ? getDefaultTz() : cal.getTimeZone());
     return tmp;
   }
 
-  public synchronized String toString(Calendar cal, Timestamp x) {
-    if (x.getTime() == PGStatement.DATE_POSITIVE_INFINITY) {
+  public synchronized String toString(Calendar cal, Timestamp x)
+  {
+    if (x.getTime() == PGStatement.DATE_POSITIVE_INFINITY)
+    {
       return "infinity";
-    } else if (x.getTime() == PGStatement.DATE_NEGATIVE_INFINITY) {
+    } else if (x.getTime() == PGStatement.DATE_NEGATIVE_INFINITY)
+    {
       return "-infinity";
     }
 
@@ -396,10 +439,13 @@ public class TimestampUtils {
     return sbuf.toString();
   }
 
-  public synchronized String toString(Calendar cal, Date x) {
-    if (x.getTime() == PGStatement.DATE_POSITIVE_INFINITY) {
+  public synchronized String toString(Calendar cal, Date x)
+  {
+    if (x.getTime() == PGStatement.DATE_POSITIVE_INFINITY)
+    {
       sbuf.append("infinity");
-    } else if (x.getTime() == PGStatement.DATE_NEGATIVE_INFINITY) {
+    } else if (x.getTime() == PGStatement.DATE_NEGATIVE_INFINITY)
+    {
       sbuf.append("-infinity");
     }
 
@@ -415,7 +461,8 @@ public class TimestampUtils {
     return sbuf.toString();
   }
 
-  public synchronized String toString(Calendar cal, Time x) {
+  public synchronized String toString(Calendar cal, Time x)
+  {
     cal = setupCalendar(cal);
     cal.setTime(x);
 
@@ -424,14 +471,16 @@ public class TimestampUtils {
     appendTime(sbuf, cal, cal.get(Calendar.MILLISECOND) * 1000000);
 
     // The 'time' parser for <= 7.3 doesn't like timezones.
-    if (min74) {
+    if (min74)
+    {
       appendTimeZone(sbuf, cal);
     }
 
     return sbuf.toString();
   }
 
-  private static void appendDate(StringBuilder sb, Calendar cal) {
+  private static void appendDate(StringBuilder sb, Calendar cal)
+  {
     int l_year = cal.get(Calendar.YEAR);
     // always use at least four digits for the year so very
     // early years, like 2, don't get misinterpreted
@@ -439,7 +488,8 @@ public class TimestampUtils {
     int prevLength = sb.length();
     sb.append(l_year);
     int leadingZerosForYear = 4 - (sb.length() - prevLength);
-    if (leadingZerosForYear > 0) {
+    if (leadingZerosForYear > 0)
+    {
       sb.insert(prevLength, ZEROS, 0, leadingZerosForYear);
     }
 
@@ -451,7 +501,8 @@ public class TimestampUtils {
     sb.append(NUMBERS[l_day]);
   }
 
-  private static void appendTime(StringBuilder sb, Calendar cal, int nanos) {
+  private static void appendTime(StringBuilder sb, Calendar cal, int nanos)
+  {
     int hours = cal.get(Calendar.HOUR_OF_DAY);
     sb.append(NUMBERS[hours]);
 
@@ -472,12 +523,14 @@ public class TimestampUtils {
     int len = sb.length();
     sb.append(nanos / 1000); // append microseconds
     int needZeros = 6 - (sb.length() - len);
-    if (needZeros > 0) {
+    if (needZeros > 0)
+    {
       sb.insert(len, ZEROS, 0, needZeros);
     }
   }
 
-  private void appendTimeZone(StringBuilder sb, java.util.Calendar cal) {
+  private void appendTimeZone(StringBuilder sb, java.util.Calendar cal)
+  {
     int offset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 1000;
 
     int absoff = Math.abs(offset);
@@ -493,51 +546,65 @@ public class TimestampUtils {
 
     sb.append(NUMBERS[mins]);
 
-    if (min82) {
+    if (min82)
+    {
       sb.append(':');
       sb.append(NUMBERS[secs]);
     }
   }
 
-  private static void appendEra(StringBuilder sb, Calendar cal) {
-    if (cal.get(Calendar.ERA) == GregorianCalendar.BC) {
+  private static void appendEra(StringBuilder sb, Calendar cal)
+  {
+    if (cal.get(Calendar.ERA) == GregorianCalendar.BC)
+    {
       sb.append(" BC");
     }
   }
 
-  private static int skipWhitespace(char[] s, int start) {
+  private static int skipWhitespace(char[] s, int start)
+  {
     int slen = s.length;
-    for (int i = start; i < slen; i++) {
-      if (!Character.isSpace(s[i])) {
+    for (int i = start; i < slen; i++)
+    {
+      if (!Character.isSpace(s[i]))
+      {
         return i;
       }
     }
     return slen;
   }
 
-  private static int firstNonDigit(char[] s, int start) {
+  private static int firstNonDigit(char[] s, int start)
+  {
     int slen = s.length;
-    for (int i = start; i < slen; i++) {
-      if (!Character.isDigit(s[i])) {
+    for (int i = start; i < slen; i++)
+    {
+      if (!Character.isDigit(s[i]))
+      {
         return i;
       }
     }
     return slen;
   }
 
-  private static int number(char[] s, int start, int end) {
-    if (start >= end) {
+  private static int number(char[] s, int start, int end)
+  {
+    if (start >= end)
+    {
       throw new NumberFormatException();
     }
     int n = 0;
-    for (int i = start; i < end; i++) {
+    for (int i = start; i < end; i++)
+    {
       n = 10 * n + (s[i] - '0');
     }
     return n;
   }
 
-  private static char charAt(char[] s, int pos) {
-    if (pos >= 0 && pos < s.length) {
+  private static char charAt(char[] s, int pos)
+  {
+    if (pos >= 0 && pos < s.length)
+    {
       return s[pos];
     }
     return '\0';
@@ -551,29 +618,35 @@ public class TimestampUtils {
    * @return The parsed date object.
    * @throws PSQLException If binary format could not be parsed.
    */
-  public Date toDateBin(TimeZone tz, byte[] bytes) throws PSQLException {
-    if (bytes.length != 4) {
+  public Date toDateBin(TimeZone tz, byte[] bytes) throws PSQLException
+  {
+    if (bytes.length != 4)
+    {
       throw new PSQLException(GT.tr("Unsupported binary encoding of {0}.",
           "date"), PSQLState.BAD_DATETIME_FORMAT);
     }
     int days = ByteConverter.int4(bytes, 0);
-    if (tz == null) {
+    if (tz == null)
+    {
       tz = getDefaultTz();
     }
     long secs = toJavaSecs(days * 86400L);
     long millis = secs * 1000L;
     int offset = tz.getOffset(millis);
-    if (millis <= PGStatement.DATE_NEGATIVE_SMALLER_INFINITY) {
+    if (millis <= PGStatement.DATE_NEGATIVE_SMALLER_INFINITY)
+    {
       millis = PGStatement.DATE_NEGATIVE_INFINITY;
       offset = 0;
-    } else if (millis >= PGStatement.DATE_POSITIVE_SMALLER_INFINITY) {
+    } else if (millis >= PGStatement.DATE_POSITIVE_SMALLER_INFINITY)
+    {
       millis = PGStatement.DATE_POSITIVE_INFINITY;
       offset = 0;
     }
     return new Date(millis - offset);
   }
 
-  private static TimeZone getDefaultTz() {
+  private static TimeZone getDefaultTz()
+  {
     return TimeZone.getDefault();
   }
 
@@ -587,8 +660,10 @@ public class TimestampUtils {
    * @return The parsed time object.
    * @throws PSQLException If binary format could not be parsed.
    */
-  public Time toTimeBin(TimeZone tz, byte[] bytes) throws PSQLException {
-    if ((bytes.length != 8 && bytes.length != 12)) {
+  public Time toTimeBin(TimeZone tz, byte[] bytes) throws PSQLException
+  {
+    if ((bytes.length != 8 && bytes.length != 12))
+    {
       throw new PSQLException(GT.tr("Unsupported binary encoding of {0}.",
           "time"), PSQLState.BAD_DATETIME_FORMAT);
     }
@@ -596,21 +671,26 @@ public class TimestampUtils {
     long millis;
     int timeOffset;
 
-    if (usesDouble) {
+    if (usesDouble)
+    {
       double time = ByteConverter.float8(bytes, 0);
 
       millis = (long) (time * 1000);
-    } else {
+    } else
+    {
       long time = ByteConverter.int8(bytes, 0);
 
       millis = time / 1000;
     }
 
-    if (bytes.length == 12) {
+    if (bytes.length == 12)
+    {
       timeOffset = ByteConverter.int4(bytes, 8);
       timeOffset *= -1000;
-    } else {
-      if (tz == null) {
+    } else
+    {
+      if (tz == null)
+      {
         tz = getDefaultTz();
       }
 
@@ -633,9 +713,11 @@ public class TimestampUtils {
    * @throws PSQLException If binary format could not be parsed.
    */
   public Timestamp toTimestampBin(TimeZone tz, byte[] bytes, boolean timestamptz)
-      throws PSQLException {
+      throws PSQLException
+  {
 
-    if (bytes.length != 8) {
+    if (bytes.length != 8)
+    {
       throw new PSQLException(GT.tr("Unsupported binary encoding of {0}.",
           "timestamp"), PSQLState.BAD_DATETIME_FORMAT);
     }
@@ -643,32 +725,39 @@ public class TimestampUtils {
     long secs;
     int nanos;
 
-    if (usesDouble) {
+    if (usesDouble)
+    {
       double time = ByteConverter.float8(bytes, 0);
-      if (time == Double.POSITIVE_INFINITY) {
+      if (time == Double.POSITIVE_INFINITY)
+      {
         return new Timestamp(PGStatement.DATE_POSITIVE_INFINITY);
-      } else if (time == Double.NEGATIVE_INFINITY) {
+      } else if (time == Double.NEGATIVE_INFINITY)
+      {
         return new Timestamp(PGStatement.DATE_NEGATIVE_INFINITY);
       }
 
       secs = (long) time;
       nanos = (int) ((time - secs) * 1000000);
-    } else {
+    } else
+    {
       long time = ByteConverter.int8(bytes, 0);
 
       // compatibility with text based receiving, not strictly necessary
       // and can actually be confusing because there are timestamps
       // that are larger than infinite
-      if (time == Long.MAX_VALUE) {
+      if (time == Long.MAX_VALUE)
+      {
         return new Timestamp(PGStatement.DATE_POSITIVE_INFINITY);
-      } else if (time == Long.MIN_VALUE) {
+      } else if (time == Long.MIN_VALUE)
+      {
         return new Timestamp(PGStatement.DATE_NEGATIVE_INFINITY);
       }
 
       secs = time / 1000000;
       nanos = (int) (time - secs * 1000000);
     }
-    if (nanos < 0) {
+    if (nanos < 0)
+    {
       secs--;
       nanos += 1000000;
     }
@@ -676,7 +765,8 @@ public class TimestampUtils {
 
     secs = toJavaSecs(secs);
     long millis = secs * 1000L;
-    if (!timestamptz) {
+    if (!timestamptz)
+    {
       // Here be dragons: backend did not provide us the timezone, so we guess the actual point in time
       millis = guessTimestamp(millis, tz);
     }
@@ -698,8 +788,10 @@ public class TimestampUtils {
    * @param tz     desired time zone
    * @return timestamp that would be rendered in {@code tz} like {@code millis} in UTC
    */
-  private long guessTimestamp(long millis, TimeZone tz) {
-    if (tz == null) {
+  private long guessTimestamp(long millis, TimeZone tz)
+  {
+    if (tz == null)
+    {
       // If client did not provide us with time zone, we use system default time zone
       tz = getDefaultTz();
     }
@@ -719,7 +811,8 @@ public class TimestampUtils {
     // To make a long story short: we have UTC timestamp that looks like "2000-03-26 02:00:01" when rendered in UTC tz.
     // We want to know another timestamp that will look like "2000-03-26 02:00:01" in Europe/Moscow time zone.
 
-    if (isSimpleTimeZone(tz.getID())) {
+    if (isSimpleTimeZone(tz.getID()))
+    {
       // For well-known non-DST time zones, just subtract offset
       return millis - tz.getRawOffset();
     }
@@ -749,7 +842,8 @@ public class TimestampUtils {
     return cal.getTimeInMillis();
   }
 
-  private static boolean isSimpleTimeZone(String id) {
+  private static boolean isSimpleTimeZone(String id)
+  {
     return id.startsWith("GMT") || id.startsWith("UTC");
   }
 
@@ -760,17 +854,21 @@ public class TimestampUtils {
    * @param tz     The time zone of the date.
    * @return The extracted date.
    */
-  public Date convertToDate(long millis, TimeZone tz) {
+  public Date convertToDate(long millis, TimeZone tz)
+  {
 
     // no adjustments for the inifity hack values
     if (millis <= PGStatement.DATE_NEGATIVE_INFINITY
-        || millis >= PGStatement.DATE_POSITIVE_INFINITY) {
+        || millis >= PGStatement.DATE_POSITIVE_INFINITY)
+    {
       return new Date(millis);
     }
-    if (tz == null) {
+    if (tz == null)
+    {
       tz = getDefaultTz();
     }
-    if (isSimpleTimeZone(tz.getID())) {
+    if (isSimpleTimeZone(tz.getID()))
+    {
       // Truncate to 00:00 of the day.
       // Suppose the input date is 7 Jan 15:40 GMT+02:00 (that is 13:40 UTC)
       // We want it to become 7 Jan 00:00 GMT+02:00
@@ -802,11 +900,14 @@ public class TimestampUtils {
    * @param tz     timezone to use.
    * @return The extracted time.
    */
-  public Time convertToTime(long millis, TimeZone tz) {
-    if (tz == null) {
+  public Time convertToTime(long millis, TimeZone tz)
+  {
+    if (tz == null)
+    {
       tz = getDefaultTz();
     }
-    if (isSimpleTimeZone(tz.getID())) {
+    if (isSimpleTimeZone(tz.getID()))
+    {
       // Leave just time part of the day.
       // Suppose the input date is 2015 7 Jan 15:40 GMT+02:00 (that is 13:40 UTC)
       // We want it to become 1970 1 Jan 15:40 GMT+02:00
@@ -838,12 +939,15 @@ public class TimestampUtils {
    * @param time time value
    * @return given time value as String
    */
-  public String timeToString(java.util.Date time) {
+  public String timeToString(java.util.Date time)
+  {
     long millis = time.getTime();
-    if (millis <= PGStatement.DATE_NEGATIVE_INFINITY) {
+    if (millis <= PGStatement.DATE_NEGATIVE_INFINITY)
+    {
       return "-infinity";
     }
-    if (millis >= PGStatement.DATE_POSITIVE_INFINITY) {
+    if (millis >= PGStatement.DATE_POSITIVE_INFINITY)
+    {
       return "infinity";
     }
     return time.toString();
@@ -857,14 +961,17 @@ public class TimestampUtils {
    * @param secs Postgresql seconds.
    * @return Java seconds.
    */
-  private static long toJavaSecs(long secs) {
+  private static long toJavaSecs(long secs)
+  {
     // postgres epoc to java epoc
     secs += 946684800L;
 
     // Julian/Gregorian calendar cutoff point
-    if (secs < -12219292800L) { // October 4, 1582 -> October 15, 1582
+    if (secs < -12219292800L)
+    { // October 4, 1582 -> October 15, 1582
       secs += 86400 * 10;
-      if (secs < -14825808000L) { // 1500-02-28 -> 1500-03-01
+      if (secs < -14825808000L)
+      { // 1500-02-28 -> 1500-03-01
         int extraLeaps = (int) ((secs + 14825808000L) / 3155760000L);
         extraLeaps--;
         extraLeaps -= extraLeaps / 4;
@@ -881,14 +988,17 @@ public class TimestampUtils {
    * @param secs Postgresql seconds.
    * @return Java seconds.
    */
-  private static long toPgSecs(long secs) {
+  private static long toPgSecs(long secs)
+  {
     // java epoc to postgres epoc
     secs -= 946684800L;
 
     // Julian/Greagorian calendar cutoff point
-    if (secs < -13165977600L) { // October 15, 1582 -> October 4, 1582
+    if (secs < -13165977600L)
+    { // October 15, 1582 -> October 4, 1582
       secs -= 86400 * 10;
-      if (secs < -15773356800L) { // 1500-03-01 -> 1500-02-28
+      if (secs < -15773356800L)
+      { // 1500-03-01 -> 1500-02-28
         int years = (int) ((secs + 15773356800L) / -3155823050L);
         years++;
         years -= years / 4;
@@ -907,10 +1017,12 @@ public class TimestampUtils {
    * @param value value
    * @throws PSQLException If binary format could not be parsed.
    */
-  public void toBinDate(TimeZone tz, byte[] bytes, Date value) throws PSQLException {
+  public void toBinDate(TimeZone tz, byte[] bytes, Date value) throws PSQLException
+  {
     long millis = value.getTime();
 
-    if (tz == null) {
+    if (tz == null)
+    {
       tz = getDefaultTz();
     }
     // It "getOffset" is UNTESTED

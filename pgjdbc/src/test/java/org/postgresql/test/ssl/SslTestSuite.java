@@ -6,12 +6,16 @@ import junit.framework.TestSuite;
 
 import java.util.Properties;
 
-public class SslTestSuite extends TestSuite {
+public class SslTestSuite extends TestSuite
+{
 
-  private static void add(TestSuite suite, String param) {
-    if (prop.getProperty(param, "").equals("")) {
+  private static void add(TestSuite suite, String param)
+  {
+    if (prop.getProperty(param, "").equals(""))
+    {
       System.out.println("Skipping " + param + ".");
-    } else {
+    } else
+    {
       suite.addTest(SslTest.getSuite(prop, param));
     }
   }
@@ -21,7 +25,8 @@ public class SslTestSuite extends TestSuite {
   /*
    * The main entry point for JUnit
    */
-  public static TestSuite suite() throws Exception {
+  public static TestSuite suite() throws Exception
+  {
     TestSuite suite = new TestSuite();
     prop = TestUtil.loadPropertyFiles("ssltest.properties");
     add(suite, "ssloff8");
@@ -32,8 +37,10 @@ public class SslTestSuite extends TestSuite {
     String[] hostmode = {"sslhost", "sslhostssl", "sslhostsslcert", "sslcert"};
     String[] certmode = {"gh", "bh"};
 
-    for (int i = 0; i < hostmode.length; i++) {
-      for (int j = 0; j < certmode.length; j++) {
+    for (int i = 0; i < hostmode.length; i++)
+    {
+      for (int j = 0; j < certmode.length; j++)
+      {
         add(suite, hostmode[i] + certmode[j] + "8");
         add(suite, hostmode[i] + certmode[j] + "9");
       }

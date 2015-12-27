@@ -20,38 +20,47 @@ import java.lang.ref.PhantomReference;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-class Portal implements ResultCursor {
-  Portal(SimpleQuery query, String portalName) {
+class Portal implements ResultCursor
+{
+  Portal(SimpleQuery query, String portalName)
+  {
     this.query = query;
     this.portalName = portalName;
     this.encodedName = Utils.encodeUTF8(portalName);
   }
 
-  public void close() {
-    if (cleanupRef != null) {
+  public void close()
+  {
+    if (cleanupRef != null)
+    {
       cleanupRef.clear();
       cleanupRef.enqueue();
       cleanupRef = null;
     }
   }
 
-  String getPortalName() {
+  String getPortalName()
+  {
     return portalName;
   }
 
-  byte[] getEncodedPortalName() {
+  byte[] getEncodedPortalName()
+  {
     return encodedName;
   }
 
-  SimpleQuery getQuery() {
+  SimpleQuery getQuery()
+  {
     return query;
   }
 
-  void setCleanupRef(PhantomReference<?> cleanupRef) {
+  void setCleanupRef(PhantomReference<?> cleanupRef)
+  {
     this.cleanupRef = cleanupRef;
   }
 
-  public String toString() {
+  public String toString()
+  {
     return portalName;
   }
 

@@ -39,7 +39,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 
-public class XmlTest extends TestCase {
+public class XmlTest extends TestCase
+{
 
   private Connection _conn;
   private final Transformer _xslTransformer;
@@ -50,7 +51,8 @@ public class XmlTest extends TestCase {
   private final static String _xmlFragment = "<a>f</a><b>g</b>";
 
 
-  public XmlTest(String name) throws Exception {
+  public XmlTest(String name) throws Exception
+  {
     super(name);
     TransformerFactory factory = TransformerFactory.newInstance();
     _xslTransformer = factory.newTransformer(new StreamSource(new StringReader(_xsl)));
@@ -58,7 +60,8 @@ public class XmlTest extends TestCase {
     _identityTransformer = factory.newTransformer();
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     Statement stmt = _conn.createStatement();
     stmt.execute("CREATE TEMP TABLE xmltest(id int primary key, val xml)");
@@ -67,19 +70,22 @@ public class XmlTest extends TestCase {
     stmt.close();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("DROP TABLE xmltest");
     stmt.close();
     TestUtil.closeDB(_conn);
   }
 
-  private ResultSet getRS() throws SQLException {
+  private ResultSet getRS() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     return stmt.executeQuery("SELECT val FROM xmltest");
   }
 
-  public void testUpdateRS() throws SQLException {
+  public void testUpdateRS() throws SQLException
+  {
     Statement stmt = _conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
     ResultSet rs = stmt.executeQuery("SELECT id, val FROM xmltest");
     assertTrue(rs.next());
@@ -88,7 +94,8 @@ public class XmlTest extends TestCase {
     rs.updateRow();
   }
 
-  public void testDOMParse() throws SQLException {
+  public void testDOMParse() throws SQLException
+  {
     ResultSet rs = getRS();
 
     assertTrue(rs.next());
@@ -105,22 +112,26 @@ public class XmlTest extends TestCase {
     assertEquals("2", last.getTextContent());
 
     assertTrue(rs.next());
-    try {
+    try
+    {
       xml = rs.getSQLXML(1);
       source = xml.getSource(DOMSource.class);
       fail("Can't retrieve a fragment.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  private void transform(Source source) throws Exception {
+  private void transform(Source source) throws Exception
+  {
     StringWriter writer = new StringWriter();
     StreamResult result = new StreamResult(writer);
     _xslTransformer.transform(source, result);
     assertEquals("B1B2", writer.toString());
   }
 
-  private <T extends Source> void testRead(Class<T> sourceClass) throws Exception {
+  private <T extends Source> void testRead(Class<T> sourceClass) throws Exception
+  {
     ResultSet rs = getRS();
 
     assertTrue(rs.next());
@@ -130,31 +141,38 @@ public class XmlTest extends TestCase {
 
     assertTrue(rs.next());
     xml = rs.getSQLXML(1);
-    try {
+    try
+    {
       source = xml.getSource(sourceClass);
       transform(source);
       fail("Can't transform a fragment.");
-    } catch (Exception sqle) {
+    } catch (Exception sqle)
+    {
     }
   }
 
-  public void testDOMRead() throws Exception {
+  public void testDOMRead() throws Exception
+  {
     testRead(DOMSource.class);
   }
 
-  public void testSAXRead() throws Exception {
+  public void testSAXRead() throws Exception
+  {
     testRead(SAXSource.class);
   }
 
-  public void testStAXRead() throws Exception {
+  public void testStAXRead() throws Exception
+  {
     testRead(StAXSource.class);
   }
 
-  public void testStreamRead() throws Exception {
+  public void testStreamRead() throws Exception
+  {
     testRead(StreamSource.class);
   }
 
-  private <T extends Result> void testWrite(Class<T> resultClass) throws Exception {
+  private <T extends Result> void testWrite(Class<T> resultClass) throws Exception
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("DELETE FROM xmltest");
     stmt.close();
@@ -177,7 +195,8 @@ public class XmlTest extends TestCase {
     // DOMResults tack on the additional <?xml ...?> header.
     //
     String header = "";
-    if (DOMResult.class.equals(resultClass)) {
+    if (DOMResult.class.equals(resultClass))
+    {
       header = "<?xml version=\"1.0\" standalone=\"no\"?>";
     }
 
@@ -188,42 +207,51 @@ public class XmlTest extends TestCase {
     assertTrue(!rs.next());
   }
 
-  public void testDomWrite() throws Exception {
+  public void testDomWrite() throws Exception
+  {
     testWrite(DOMResult.class);
   }
 
-  public void testStAXWrite() throws Exception {
+  public void testStAXWrite() throws Exception
+  {
     testWrite(StAXResult.class);
   }
 
-  public void testStreamWrite() throws Exception {
+  public void testStreamWrite() throws Exception
+  {
     testWrite(StreamResult.class);
   }
 
-  public void testSAXWrite() throws Exception {
+  public void testSAXWrite() throws Exception
+  {
     testWrite(SAXResult.class);
   }
 
-  public void testFree() throws SQLException {
+  public void testFree() throws SQLException
+  {
     ResultSet rs = getRS();
     assertTrue(rs.next());
     SQLXML xml = rs.getSQLXML(1);
     xml.free();
     xml.free();
-    try {
+    try
+    {
       xml.getString();
       fail("Not freed.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  public void testGetObject() throws SQLException {
+  public void testGetObject() throws SQLException
+  {
     ResultSet rs = getRS();
     assertTrue(rs.next());
     SQLXML xml = (SQLXML) rs.getObject(1);
   }
 
-  public void testSetNull() throws SQLException {
+  public void testSetNull() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("DELETE FROM xmltest");
     stmt.close();
@@ -252,53 +280,67 @@ public class XmlTest extends TestCase {
     assertTrue(!rs.next());
   }
 
-  public void testEmpty() throws SQLException, IOException {
+  public void testEmpty() throws SQLException, IOException
+  {
     SQLXML xml = _conn.createSQLXML();
 
-    try {
+    try
+    {
       xml.getString();
       fail("Cannot retrieve data from an uninitialized object.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
-    try {
+    try
+    {
       xml.getSource(null);
       fail("Cannot retrieve data from an uninitialized object.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
-  public void testDoubleSet() throws SQLException {
+  public void testDoubleSet() throws SQLException
+  {
     SQLXML xml = _conn.createSQLXML();
 
     xml.setString("");
 
-    try {
+    try
+    {
       xml.setString("");
       fail("Can't set a value after its been initialized.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
     ResultSet rs = getRS();
     assertTrue(rs.next());
     xml = rs.getSQLXML(1);
-    try {
+    try
+    {
       xml.setString("");
       fail("Can't set a value after its been initialized.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
   // Don't print warning and errors to System.err, it just
   // clutters the display.
-  static class Ignorer implements ErrorListener {
-    public void error(TransformerException t) {
+  static class Ignorer implements ErrorListener
+  {
+    public void error(TransformerException t)
+    {
     }
 
-    public void fatalError(TransformerException t) {
+    public void fatalError(TransformerException t)
+    {
     }
 
-    public void warning(TransformerException t) {
+    public void warning(TransformerException t)
+    {
     }
   }
 

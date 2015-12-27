@@ -1,6 +1,7 @@
 package org.postgresql.core;
 
-public interface Version {
+public interface Version
+{
 
   /**
    * Get a machine-readable version number.

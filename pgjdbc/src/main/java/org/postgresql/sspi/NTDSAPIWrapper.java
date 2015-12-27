@@ -4,7 +4,8 @@ import com.sun.jna.LastErrorException;
 import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
 
-public class NTDSAPIWrapper {
+public class NTDSAPIWrapper
+{
 
   static final NTDSAPIWrapper instance = new NTDSAPIWrapper();
 
@@ -26,7 +27,8 @@ public class NTDSAPIWrapper {
       String instanceName,
       short instancePort,
       String referrer)
-      throws LastErrorException {
+      throws LastErrorException
+  {
     IntByReference spnLength = new IntByReference(2048);
     char[] spn = new char[spnLength.getValue()];
 
@@ -39,7 +41,8 @@ public class NTDSAPIWrapper {
             referrer == null ? null : new WString(referrer),
             spnLength, spn);
 
-    if (ret != NTDSAPI.ERROR_SUCCESS) {
+    if (ret != NTDSAPI.ERROR_SUCCESS)
+    {
       /* Should've thrown LastErrorException, but just in case */
       throw new RuntimeException("NTDSAPI DsMakeSpn call failed with " + ret);
     }

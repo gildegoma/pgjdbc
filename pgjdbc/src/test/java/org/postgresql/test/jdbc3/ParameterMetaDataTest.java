@@ -20,27 +20,33 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
-public class ParameterMetaDataTest extends TestCase {
+public class ParameterMetaDataTest extends TestCase
+{
 
   private Connection _conn;
 
-  public ParameterMetaDataTest(String name) {
+  public ParameterMetaDataTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     TestUtil.createTable(_conn, "parametertest",
         "a int4, b float8, c text, d point, e timestamp with time zone");
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.dropTable(_conn, "parametertest");
     TestUtil.closeDB(_conn);
   }
 
-  public void testParameterMD() throws SQLException {
-    if (!TestUtil.isProtocolVersion(_conn, 3)) {
+  public void testParameterMD() throws SQLException
+  {
+    if (!TestUtil.isProtocolVersion(_conn, 3))
+    {
       return;
     }
 
@@ -62,29 +68,37 @@ public class ParameterMetaDataTest extends TestCase {
     pstmt.close();
   }
 
-  public void testFailsOnBadIndex() throws SQLException {
-    if (!TestUtil.isProtocolVersion(_conn, 3)) {
+  public void testFailsOnBadIndex() throws SQLException
+  {
+    if (!TestUtil.isProtocolVersion(_conn, 3))
+    {
       return;
     }
 
     PreparedStatement pstmt =
         _conn.prepareStatement("SELECT a FROM parametertest WHERE b = ? AND c = ?");
     ParameterMetaData pmd = pstmt.getParameterMetaData();
-    try {
+    try
+    {
       pmd.getParameterType(0);
       fail("Can't get parameter for index < 1.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
-    try {
+    try
+    {
       pmd.getParameterType(3);
       fail("Can't get parameter for index 3 with only two parameters.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
   }
 
   // Make sure we work when mashing two queries into a single statement.
-  public void testMultiStatement() throws SQLException {
-    if (!TestUtil.isProtocolVersion(_conn, 3)) {
+  public void testMultiStatement() throws SQLException
+  {
+    if (!TestUtil.isProtocolVersion(_conn, 3))
+    {
       return;
     }
 
@@ -108,8 +122,10 @@ public class ParameterMetaDataTest extends TestCase {
   // from text to varchar with the complicating factor that there
   // is also an unknown parameter.
   //
-  public void testTypeChangeWithUnknown() throws SQLException {
-    if (!TestUtil.isProtocolVersion(_conn, 3)) {
+  public void testTypeChangeWithUnknown() throws SQLException
+  {
+    if (!TestUtil.isProtocolVersion(_conn, 3))
+    {
       return;
     }
 

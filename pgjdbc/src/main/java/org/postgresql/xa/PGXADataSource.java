@@ -23,7 +23,8 @@ import javax.sql.XADataSource;
  *
  * @author Heikki Linnakangas (heikki.linnakangas@iki.fi)
  */
-public class PGXADataSource extends BaseDataSource implements XADataSource, Referenceable {
+public class PGXADataSource extends BaseDataSource implements XADataSource, Referenceable
+{
   /**
    * Gets a connection to the PostgreSQL database.  The database is identified by the DataSource
    * properties serverName, databaseName, and portNumber. The user to connect as is identified by
@@ -32,7 +33,8 @@ public class PGXADataSource extends BaseDataSource implements XADataSource, Refe
    * @return A valid database connection.
    * @throws SQLException Occurs when the database connection cannot be established.
    */
-  public XAConnection getXAConnection() throws SQLException {
+  public XAConnection getXAConnection() throws SQLException
+  {
     return getXAConnection(getUser(), getPassword());
   }
 
@@ -45,26 +47,30 @@ public class PGXADataSource extends BaseDataSource implements XADataSource, Refe
    * @return A valid database connection.
    * @throws SQLException Occurs when the database connection cannot be established.
    */
-  public XAConnection getXAConnection(String user, String password) throws SQLException {
+  public XAConnection getXAConnection(String user, String password) throws SQLException
+  {
     Connection con = super.getConnection(user, password);
     return new PGXAConnection((BaseConnection) con);
   }
 
-  public String getDescription() {
+  public String getDescription()
+  {
     return "JDBC3 XA-enabled DataSource from " + org.postgresql.Driver.getVersion();
   }
 
   /**
    * Generates a reference using the appropriate object factory.
    */
-  protected Reference createReference() {
+  protected Reference createReference()
+  {
     return new Reference(
         getClass().getName(),
         PGXADataSourceFactory.class.getName(),
         null);
   }
 
-  public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+  public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException
+  {
     throw org.postgresql.Driver.notImplemented(this.getClass(), "getParentLogger()");
   }
 }

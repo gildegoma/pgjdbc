@@ -32,16 +32,19 @@ import java.util.List;
 /*
  * Test case for geometric type I/O
  */
-public class GeometricTest extends TestCase {
+public class GeometricTest extends TestCase
+{
   private Connection con;
 
-  public GeometricTest(String name) {
+  public GeometricTest(String name)
+  {
     super(name);
   }
 
   // Set up the fixture for this testcase: a connection to a database with
   // a table for this test.
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con,
         "testgeometric",
@@ -49,12 +52,14 @@ public class GeometricTest extends TestCase {
   }
 
   // Tear down the fixture for this test case.
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, "testgeometric");
     TestUtil.closeDB(con);
   }
 
-  private void checkReadWrite(PGobject obj, String column) throws Exception {
+  private void checkReadWrite(PGobject obj, String column) throws Exception
+  {
     PreparedStatement insert =
         con.prepareStatement("INSERT INTO testgeometric(" + column + ") VALUES (?)");
     insert.setObject(1, obj);
@@ -71,7 +76,8 @@ public class GeometricTest extends TestCase {
     stmt.close();
   }
 
-  public void testPGbox() throws Exception {
+  public void testPGbox() throws Exception
+  {
     checkReadWrite(new PGbox(1.0, 2.0, 3.0, 4.0), "boxval");
     checkReadWrite(new PGbox(-1.0, 2.0, 3.0, 4.0), "boxval");
     checkReadWrite(new PGbox(1.0, -2.0, 3.0, 4.0), "boxval");
@@ -79,13 +85,15 @@ public class GeometricTest extends TestCase {
     checkReadWrite(new PGbox(1.0, 2.0, 3.0, -4.0), "boxval");
   }
 
-  public void testPGcircle() throws Exception {
+  public void testPGcircle() throws Exception
+  {
     checkReadWrite(new PGcircle(1.0, 2.0, 3.0), "circleval");
     checkReadWrite(new PGcircle(-1.0, 2.0, 3.0), "circleval");
     checkReadWrite(new PGcircle(1.0, -2.0, 3.0), "circleval");
   }
 
-  public void testPGlseg() throws Exception {
+  public void testPGlseg() throws Exception
+  {
     checkReadWrite(new PGlseg(1.0, 2.0, 3.0, 4.0), "lsegval");
     checkReadWrite(new PGlseg(-1.0, 2.0, 3.0, 4.0), "lsegval");
     checkReadWrite(new PGlseg(1.0, -2.0, 3.0, 4.0), "lsegval");
@@ -93,7 +101,8 @@ public class GeometricTest extends TestCase {
     checkReadWrite(new PGlseg(1.0, 2.0, 3.0, -4.0), "lsegval");
   }
 
-  public void testPGpath() throws Exception {
+  public void testPGpath() throws Exception
+  {
     PGpoint[] points = new PGpoint[]{
         new PGpoint(0.0, 0.0),
         new PGpoint(0.0, 5.0),
@@ -107,7 +116,8 @@ public class GeometricTest extends TestCase {
     checkReadWrite(new PGpath(points, false), "pathval");
   }
 
-  public void testPGpolygon() throws Exception {
+  public void testPGpolygon() throws Exception
+  {
     PGpoint[] points = new PGpoint[]{
         new PGpoint(0.0, 0.0),
         new PGpoint(0.0, 5.0),
@@ -120,29 +130,35 @@ public class GeometricTest extends TestCase {
     checkReadWrite(new PGpolygon(points), "polygonval");
   }
 
-  public void testPGline() throws Exception {
+  public void testPGline() throws Exception
+  {
     final String columnName = "lineval";
 
     // PostgreSQL versions older than 9.4 support creating columns with the LINE datatype, but
     // not actually writing to those columns.  Only try to write if the version if at least 9.4
     final boolean roundTripToDatabase = TestUtil.haveMinimumServerVersion(con, "9.4");
 
-    if (TestUtil.haveMinimumServerVersion(con, "9.4")) {
+    if (TestUtil.haveMinimumServerVersion(con, "9.4"))
+    {
 
       // Apparently the driver requires public no-args constructor, and postgresql doesn't accept lines with A and B
       // coefficients both being zero... so assert a no-arg instantiated instance throws an exception.
-      if (roundTripToDatabase) {
-        try {
+      if (roundTripToDatabase)
+      {
+        try
+        {
           checkReadWrite(new PGline(), columnName);
           fail("Expected a PGSQLException to be thrown");
-        } catch (PSQLException e) {
+        } catch (PSQLException e)
+        {
           assertTrue(e.getMessage().contains("A and B cannot both be zero"));
         }
       }
 
       // Generate a dataset for testing.
       List<PGline> linesToTest = new ArrayList<PGline>();
-      for (double i = 1; i <= 3; i += 0.25) {
+      for (double i = 1; i <= 3; i += 0.25)
+      {
         // Test the 3-arg constructor (coefficients+constant)
         linesToTest.add(new PGline(i, (0 - i), (1 / i)));
         linesToTest.add(new PGline("{" + i + "," + (0 - i) + "," + (1 / i) + "}"));
@@ -163,8 +179,10 @@ public class GeometricTest extends TestCase {
       }
 
       // Include persistence an querying if the postgresql version supports it.
-      if (roundTripToDatabase) {
-        for (PGline testLine : linesToTest) {
+      if (roundTripToDatabase)
+      {
+        for (PGline testLine : linesToTest)
+        {
           checkReadWrite(testLine, columnName);
         }
       }
@@ -172,7 +190,8 @@ public class GeometricTest extends TestCase {
     }
   }
 
-  public void testPGpoint() throws Exception {
+  public void testPGpoint() throws Exception
+  {
     checkReadWrite(new PGpoint(1.0, 2.0), "pointval");
   }
 

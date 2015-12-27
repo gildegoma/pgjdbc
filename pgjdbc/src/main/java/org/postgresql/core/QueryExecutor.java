@@ -36,7 +36,8 @@ import java.sql.SQLException;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-public interface QueryExecutor {
+public interface QueryExecutor
+{
   /**
    * Flag for query execution that indicates the given Query object is unlikely to be reused.
    */

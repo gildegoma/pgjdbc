@@ -20,7 +20,8 @@ import java.util.Map;
 /**
  * Keeps track of HostSpec targets in a global map.
  */
-public class GlobalHostStatusTracker {
+public class GlobalHostStatusTracker
+{
   private static final Map<HostSpec, HostSpecStatus> hostStatusMap =
       new HashMap<HostSpec, HostSpecStatus>();
 
@@ -30,21 +31,27 @@ public class GlobalHostStatusTracker {
    * @param hostSpec   The host whose status is known.
    * @param hostStatus Latest known status for the host.
    */
-  public static void reportHostStatus(HostSpec hostSpec, HostStatus hostStatus) {
+  public static void reportHostStatus(HostSpec hostSpec, HostStatus hostStatus)
+  {
     long now = currentTimeMillis();
-    synchronized (hostStatusMap) {
+    synchronized (hostStatusMap)
+    {
       HostSpecStatus oldStatus = hostStatusMap.get(hostSpec);
-      if (oldStatus == null || updateStatusFromTo(oldStatus.status, hostStatus)) {
+      if (oldStatus == null || updateStatusFromTo(oldStatus.status, hostStatus))
+      {
         hostStatusMap.put(hostSpec, new HostSpecStatus(hostSpec, hostStatus, now));
       }
     }
   }
 
-  private static boolean updateStatusFromTo(HostStatus oldStatus, HostStatus newStatus) {
-    if (oldStatus == null) {
+  private static boolean updateStatusFromTo(HostStatus oldStatus, HostStatus newStatus)
+  {
+    if (oldStatus == null)
+    {
       return true;
     }
-    if (newStatus == HostStatus.ConnectOK) {
+    if (newStatus == HostStatus.ConnectOK)
+    {
       return oldStatus != HostStatus.Master && oldStatus != HostStatus.Slave;
     }
     return true;
@@ -59,18 +66,23 @@ public class GlobalHostStatusTracker {
    * @return candidate hosts to connect to.
    */
   static List<HostSpecStatus> getCandidateHosts(HostSpec[] hostSpecs,
-      HostRequirement targetServerType, long hostRecheckMillis) {
+      HostRequirement targetServerType, long hostRecheckMillis)
+  {
     List<HostSpecStatus> candidates = new ArrayList<HostSpecStatus>(hostSpecs.length);
     long latestAllowedUpdate = currentTimeMillis() - hostRecheckMillis;
-    synchronized (hostStatusMap) {
-      for (HostSpec hostSpec : hostSpecs) {
+    synchronized (hostStatusMap)
+    {
+      for (HostSpec hostSpec : hostSpecs)
+      {
         HostSpecStatus hostInfo = hostStatusMap.get(hostSpec);
         // return null status wrapper if if the current value is not known or is too old
-        if (hostInfo == null || hostInfo.lastUpdated < latestAllowedUpdate) {
+        if (hostInfo == null || hostInfo.lastUpdated < latestAllowedUpdate)
+        {
           hostInfo = new HostSpecStatus(hostSpec, null, Long.MAX_VALUE);
         }
         // candidates are nodes we do not know about and the nodes with correct type
-        if (hostInfo.status == null || targetServerType.allowConnectingTo(hostInfo.status)) {
+        if (hostInfo.status == null || targetServerType.allowConnectingTo(hostInfo.status))
+        {
           candidates.add(hostInfo);
         }
       }
@@ -81,19 +93,22 @@ public class GlobalHostStatusTracker {
   /**
    * Immutable structure of known status of one HostSpec.
    */
-  static class HostSpecStatus {
+  static class HostSpecStatus
+  {
     final HostSpec host;
     final HostStatus status;
     final long lastUpdated;
 
-    HostSpecStatus(HostSpec host, HostStatus hostStatus, long lastUpdated) {
+    HostSpecStatus(HostSpec host, HostStatus hostStatus, long lastUpdated)
+    {
       this.host = host;
       this.status = hostStatus;
       this.lastUpdated = lastUpdated;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
       return host.toString() + '=' + status;
     }
   }

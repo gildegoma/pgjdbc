@@ -6,15 +6,18 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import javax.net.SocketFactory;
 
-public class CustomSocketFactory extends SocketFactory {
+public class CustomSocketFactory extends SocketFactory
+{
 
   private static CustomSocketFactory instance;
 
   private final String argument;
   private int socketCreated;
 
-  public CustomSocketFactory(String argument) {
-    if (instance != null) {
+  public CustomSocketFactory(String argument)
+  {
+    if (instance != null)
+    {
       throw new IllegalStateException("Test failed, multiple custom socket factory instanciation");
     }
     instance = this;
@@ -22,42 +25,50 @@ public class CustomSocketFactory extends SocketFactory {
   }
 
   @Override
-  public Socket createSocket(String arg0, int arg1) throws IOException, UnknownHostException {
+  public Socket createSocket(String arg0, int arg1) throws IOException, UnknownHostException
+  {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Socket createSocket(InetAddress arg0, int arg1) throws IOException {
+  public Socket createSocket(InetAddress arg0, int arg1) throws IOException
+  {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public Socket createSocket(String arg0, int arg1, InetAddress arg2, int arg3)
-      throws IOException, UnknownHostException {
+      throws IOException, UnknownHostException
+  {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public Socket createSocket(InetAddress arg0, int arg1, InetAddress arg2, int arg3)
-      throws IOException {
+      throws IOException
+  {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Socket createSocket() throws IOException {
+  public Socket createSocket() throws IOException
+  {
     socketCreated++;
     return new Socket();
   }
 
-  public String getArgument() {
+  public String getArgument()
+  {
     return argument;
   }
 
-  public int getSocketCreated() {
+  public int getSocketCreated()
+  {
     return socketCreated;
   }
 
-  public static CustomSocketFactory getInstance() {
+  public static CustomSocketFactory getInstance()
+  {
     return instance;
   }
 

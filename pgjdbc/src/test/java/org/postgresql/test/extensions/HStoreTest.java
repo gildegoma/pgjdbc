@@ -23,29 +23,35 @@ import java.util.Map;
 // SELECT 'hstore'::regtype::oid
 // SELECT 'hstore[]'::regtype::oid
 
-public class HStoreTest extends TestCase {
+public class HStoreTest extends TestCase
+{
 
   private Connection _conn;
 
-  public HStoreTest(String name) {
+  public HStoreTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.closeDB(_conn);
   }
 
-  public void testHStoreSelect() throws SQLException {
+  public void testHStoreSelect() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT 'a=>1,b=>2'::hstore");
     ResultSet rs = pstmt.executeQuery();
     assertEquals(Map.class.getName(), rs.getMetaData().getColumnClassName(1));
     assertTrue(rs.next());
     String str = rs.getString(1);
-    if (!("\"a\"=>\"1\", \"b\"=>\"2\"".equals(str) || "\"b\"=>\"2\", \"a\"=>\"1\"".equals(str))) {
+    if (!("\"a\"=>\"1\", \"b\"=>\"2\"".equals(str) || "\"b\"=>\"2\", \"a\"=>\"1\"".equals(str)))
+    {
       fail("Expected " + "\"a\"=>\"1\", \"b\"=>\"2\"" + " but got " + str);
     }
     Map<String, String> correct = new HashMap<String, String>();
@@ -54,7 +60,8 @@ public class HStoreTest extends TestCase {
     assertEquals(correct, rs.getObject(1));
   }
 
-  public void testHStoreSelectNullValue() throws SQLException {
+  public void testHStoreSelectNullValue() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("SELECT 'a=>NULL'::hstore");
     ResultSet rs = pstmt.executeQuery();
     assertEquals(Map.class.getName(), rs.getMetaData().getColumnClassName(1));
@@ -64,7 +71,8 @@ public class HStoreTest extends TestCase {
     assertEquals(correct, rs.getObject(1));
   }
 
-  public void testHStoreSend() throws SQLException {
+  public void testHStoreSend() throws SQLException
+  {
     Map<String, Integer> correct = Collections.singletonMap("a", new Integer(1));
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?::text");
     pstmt.setObject(1, correct);
@@ -74,7 +82,8 @@ public class HStoreTest extends TestCase {
     assertEquals("\"a\"=>\"1\"", rs.getString(1));
   }
 
-  public void testHStoreSendEscaped() throws SQLException {
+  public void testHStoreSendEscaped() throws SQLException
+  {
     Map<String, String> correct = Collections.singletonMap("a", "t'e\ns\"t");
     PreparedStatement pstmt = _conn.prepareStatement("SELECT ?");
     pstmt.setObject(1, correct);

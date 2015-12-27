@@ -10,5 +10,6 @@ package org.postgresql.jdbc3;
 
 import org.postgresql.ds.PGConnectionPoolDataSource;
 
-public class Jdbc3ConnectionPool extends PGConnectionPoolDataSource {
+public class Jdbc3ConnectionPool extends PGConnectionPoolDataSource
+{
 }

@@ -41,7 +41,8 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-public class ParseStatement {
+public class ParseStatement
+{
   @Param({"0", "1", "10", "20"})
   private int bindCount;
 
@@ -55,14 +56,17 @@ public class ParseStatement {
   private int cntr;
 
   @Setup(Level.Trial)
-  public void setUp() throws SQLException {
+  public void setUp() throws SQLException
+  {
     Properties props = ConnectionUtil.getProperties();
 
     connection = DriverManager.getConnection(ConnectionUtil.getURL(), props);
     StringBuilder sb = new StringBuilder();
     sb.append("SELECT ");
-    for (int i = 0; i < bindCount; i++) {
-      if (i > 0) {
+    for (int i = 0; i < bindCount; i++)
+    {
+      if (i > 0)
+      {
         sb.append(',');
       }
       sb.append('?');
@@ -71,23 +75,29 @@ public class ParseStatement {
   }
 
   @TearDown(Level.Trial)
-  public void tearDown() throws SQLException {
+  public void tearDown() throws SQLException
+  {
     connection.close();
   }
 
   @Benchmark
-  public Statement bindExecuteFetch(Blackhole b) throws SQLException {
+  public Statement bindExecuteFetch(Blackhole b) throws SQLException
+  {
     String sql = this.sql;
-    if (unique) {
+    if (unique)
+    {
       sql += " -- " + cntr++;
     }
     PreparedStatement ps = connection.prepareStatement(sql);
-    for (int i = 1; i <= bindCount; i++) {
+    for (int i = 1; i <= bindCount; i++)
+    {
       ps.setInt(i, i);
     }
     ResultSet rs = ps.executeQuery();
-    while (rs.next()) {
-      for (int i = 1; i <= bindCount; i++) {
+    while (rs.next())
+    {
+      for (int i = 1; i <= bindCount; i++)
+      {
         b.consume(rs.getInt(i));
       }
     }
@@ -96,7 +106,8 @@ public class ParseStatement {
     return ps;
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(ParseStatement.class.getSimpleName())
         .addProfiler(GCProfiler.class)

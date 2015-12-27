@@ -21,22 +21,27 @@ import java.util.Deque;
 /**
  * Tests {@link org.postgresql.util.LruCache}
  */
-public class LruCacheTest extends TestCase {
-  static class Entry implements CanEstimateSize {
+public class LruCacheTest extends TestCase
+{
+  static class Entry implements CanEstimateSize
+  {
     private final int id;
 
-    Entry(int id) {
+    Entry(int id)
+    {
       this.id = id;
     }
 
 
     @Override
-    public long getSize() {
+    public long getSize()
+    {
       return id;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
       return "Entry{"
           + "id=" + id
           + '}';
@@ -49,23 +54,29 @@ public class LruCacheTest extends TestCase {
   private LruCache<Integer, Entry> cache;
 
   @Override
-  protected void setUp() throws Exception {
-    cache = new LruCache<Integer, Entry>(3, 1000, new LruCache.CreateAction<Integer, Entry>() {
+  protected void setUp() throws Exception
+  {
+    cache = new LruCache<Integer, Entry>(3, 1000, new LruCache.CreateAction<Integer, Entry>()
+    {
       @Override
-      public Entry create(Integer key) throws SQLException {
+      public Entry create(Integer key) throws SQLException
+      {
         assertEquals("Unexpected create", expectCreate[0], key);
         return new Entry(key);
       }
-    }, new LruCache.EvictAction<Entry>() {
+    }, new LruCache.EvictAction<Entry>()
+    {
       @Override
-      public void evict(Entry entry) throws SQLException {
+      public void evict(Entry entry) throws SQLException
+      {
         Entry expected = expectEvict.removeFirst();
         assertEquals("Unexpected evict", expected, entry);
       }
     });
   }
 
-  public void testEvictsByNumberOfEntries() throws SQLException {
+  public void testEvictsByNumberOfEntries() throws SQLException
+  {
     Entry a, b, c, d;
 
     a = use(1, dummy);
@@ -74,7 +85,8 @@ public class LruCacheTest extends TestCase {
     d = use(4, a);
   }
 
-  public void testEvictsBySize() throws SQLException {
+  public void testEvictsBySize() throws SQLException
+  {
     Entry a, b, c, d;
 
     a = use(3, dummy);
@@ -85,7 +97,8 @@ public class LruCacheTest extends TestCase {
     d = use(4, a, b);
   }
 
-  public void testEvictsLeastRecentlyUsed() throws SQLException {
+  public void testEvictsLeastRecentlyUsed() throws SQLException
+  {
     Entry a, b, c, d;
 
     a = use(1, dummy);
@@ -95,7 +108,8 @@ public class LruCacheTest extends TestCase {
     d = use(4, b); // expect b to be evicted
   }
 
-  public void testCyclicReplacement() throws SQLException {
+  public void testCyclicReplacement() throws SQLException
+  {
     Entry a, b, c, d;
 
     a = use(1, dummy);
@@ -103,7 +117,8 @@ public class LruCacheTest extends TestCase {
     c = use(3, dummy);
     d = use(4, a);
 
-    for (int i = 0; i < 100000; i++) {
+    for (int i = 0; i < 100000; i++)
+    {
       a = use(1, b);
       b = use(2, c);
       c = use(3, d);
@@ -111,14 +126,16 @@ public class LruCacheTest extends TestCase {
     }
   }
 
-  public void testCaching() throws SQLException {
+  public void testCaching() throws SQLException
+  {
     Entry a, b, c, d;
 
     a = use(1, dummy);
     b = use(2, dummy);
     c = use(3, dummy);
 
-    for (int i = 0; i < 100000; i++) {
+    for (int i = 0; i < 100000; i++)
+    {
       b = use(-2, dummy);
       a = use(-1, dummy);
       d = use(4, c);
@@ -128,7 +145,8 @@ public class LruCacheTest extends TestCase {
     }
   }
 
-  private Entry use(int expectCreate, Entry... expectEvict) throws SQLException {
+  private Entry use(int expectCreate, Entry... expectEvict) throws SQLException
+  {
     Entry a;
     this.expectCreate[0] = expectCreate <= 0 ? -1 : expectCreate;
     this.expectEvict.clear();

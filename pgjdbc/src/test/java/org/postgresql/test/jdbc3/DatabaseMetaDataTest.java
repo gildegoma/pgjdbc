@@ -18,25 +18,31 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
 
-public class DatabaseMetaDataTest extends TestCase {
+public class DatabaseMetaDataTest extends TestCase
+{
 
   private Connection _conn;
 
-  public DatabaseMetaDataTest(String name) {
+  public DatabaseMetaDataTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
-    if (TestUtil.haveMinimumServerVersion(_conn, "7.3")) {
+    if (TestUtil.haveMinimumServerVersion(_conn, "7.3"))
+    {
       Statement stmt = _conn.createStatement();
       stmt.execute("CREATE DOMAIN mydom AS int");
       stmt.execute("CREATE TABLE domtab (a mydom)");
     }
   }
 
-  protected void tearDown() throws Exception {
-    if (TestUtil.haveMinimumServerVersion(_conn, "7.3")) {
+  protected void tearDown() throws Exception
+  {
+    if (TestUtil.haveMinimumServerVersion(_conn, "7.3"))
+    {
       Statement stmt = _conn.createStatement();
       stmt.execute("DROP TABLE domtab");
       stmt.execute("DROP DOMAIN mydom");
@@ -44,8 +50,10 @@ public class DatabaseMetaDataTest extends TestCase {
     TestUtil.closeDB(_conn);
   }
 
-  public void testGetColumnsForDomain() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(_conn, "7.3")) {
+  public void testGetColumnsForDomain() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(_conn, "7.3"))
+    {
       return;
     }
 

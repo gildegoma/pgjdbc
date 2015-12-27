@@ -2,14 +2,16 @@ package org.postgresql.jdbc;
 
 import org.postgresql.core.Field;
 
-class CacheMetadataField {
+class CacheMetadataField
+{
   private String colName;
   private String tabName;
   private String schemaName;
   private int nullable;
   private boolean auto;
 
-  protected CacheMetadataField(Field f) {
+  protected CacheMetadataField(Field f)
+  {
     colName = f.getColumnName();
     tabName = f.getTableName();
     schemaName = f.getSchemaName();
@@ -17,7 +19,8 @@ class CacheMetadataField {
     auto = f.getAutoIncrement();
   }
 
-  protected void get(Field f) {
+  protected void get(Field f)
+  {
     f.setColumnName(colName);
     f.setTableName(tabName);
     f.setSchemaName(schemaName);

@@ -17,7 +17,8 @@ import java.sql.SQLException;
 /**
  * This implements the polygon datatype within PostgreSQL.
  */
-public class PGpolygon extends PGobject implements Serializable, Cloneable {
+public class PGpolygon extends PGobject implements Serializable, Cloneable
+{
   /**
    * The points defining the polygon
    */
@@ -28,7 +29,8 @@ public class PGpolygon extends PGobject implements Serializable, Cloneable {
    *
    * @param points the points defining the polygon
    */
-  public PGpolygon(PGpoint[] points) {
+  public PGpolygon(PGpoint[] points)
+  {
     this();
     this.points = points;
   }
@@ -37,7 +39,8 @@ public class PGpolygon extends PGobject implements Serializable, Cloneable {
    * @param s definition of the polygon in PostgreSQL's syntax.
    * @throws SQLException on conversion failure
    */
-  public PGpolygon(String s) throws SQLException {
+  public PGpolygon(String s) throws SQLException
+  {
     this();
     setValue(s);
   }
@@ -45,7 +48,8 @@ public class PGpolygon extends PGobject implements Serializable, Cloneable {
   /**
    * Required by the driver
    */
-  public PGpolygon() {
+  public PGpolygon()
+  {
     setType("polygon");
   }
 
@@ -53,11 +57,13 @@ public class PGpolygon extends PGobject implements Serializable, Cloneable {
    * @param s Definition of the polygon in PostgreSQL's syntax
    * @throws SQLException on conversion failure
    */
-  public void setValue(String s) throws SQLException {
+  public void setValue(String s) throws SQLException
+  {
     PGtokenizer t = new PGtokenizer(PGtokenizer.removePara(s), ',');
     int npoints = t.getSize();
     points = new PGpoint[npoints];
-    for (int p = 0; p < npoints; p++) {
+    for (int p = 0; p < npoints; p++)
+    {
       points[p] = new PGpoint(t.getToken(p));
     }
   }
@@ -66,16 +72,21 @@ public class PGpolygon extends PGobject implements Serializable, Cloneable {
    * @param obj Object to compare with
    * @return true if the two polygons are identical
    */
-  public boolean equals(Object obj) {
-    if (obj instanceof PGpolygon) {
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof PGpolygon)
+    {
       PGpolygon p = (PGpolygon) obj;
 
-      if (p.points.length != points.length) {
+      if (p.points.length != points.length)
+      {
         return false;
       }
 
-      for (int i = 0; i < points.length; i++) {
-        if (!points[i].equals(p.points[i])) {
+      for (int i = 0; i < points.length; i++)
+      {
+        if (!points[i].equals(p.points[i]))
+        {
           return false;
         }
       }
@@ -85,21 +96,27 @@ public class PGpolygon extends PGobject implements Serializable, Cloneable {
     return false;
   }
 
-  public int hashCode() {
+  public int hashCode()
+  {
     // XXX not very good..
     int hash = 0;
-    for (int i = 0; i < points.length && i < 5; ++i) {
+    for (int i = 0; i < points.length && i < 5; ++i)
+    {
       hash = hash ^ points[i].hashCode();
     }
     return hash;
   }
 
-  public Object clone() throws CloneNotSupportedException {
+  public Object clone() throws CloneNotSupportedException
+  {
     PGpolygon newPGpolygon = (PGpolygon) super.clone();
-    if (newPGpolygon.points != null) {
+    if (newPGpolygon.points != null)
+    {
       newPGpolygon.points = (PGpoint[]) newPGpolygon.points.clone();
-      for (int i = 0; i < newPGpolygon.points.length; ++i) {
-        if (newPGpolygon.points[i] != null) {
+      for (int i = 0; i < newPGpolygon.points.length; ++i)
+      {
+        if (newPGpolygon.points[i] != null)
+        {
           newPGpolygon.points[i] = (PGpoint) newPGpolygon.points[i].clone();
         }
       }
@@ -110,11 +127,14 @@ public class PGpolygon extends PGobject implements Serializable, Cloneable {
   /**
    * @return the PGpolygon in the syntax expected by org.postgresql
    */
-  public String getValue() {
+  public String getValue()
+  {
     StringBuilder b = new StringBuilder();
     b.append("(");
-    for (int p = 0; p < points.length; p++) {
-      if (p > 0) {
+    for (int p = 0; p < points.length; p++)
+    {
+      if (p > 0)
+      {
         b.append(",");
       }
       b.append(points[p].toString());

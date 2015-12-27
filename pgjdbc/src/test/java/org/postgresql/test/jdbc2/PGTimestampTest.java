@@ -28,7 +28,8 @@ import java.util.TimeZone;
  * Tests {@link PGTimestamp} in various scenarios including setTimestamp, setObject for both
  * <code>timestamp with time zone</code> and <code>timestamp without time zone</code> data types.
  */
-public class PGTimestampTest extends TestCase {
+public class PGTimestampTest extends TestCase
+{
   /**
    * The name of the test table.
    */
@@ -39,16 +40,19 @@ public class PGTimestampTest extends TestCase {
    */
   private Connection con;
 
-  public PGTimestampTest(final String name) {
+  public PGTimestampTest(final String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, TEST_TABLE, "ts timestamp, tz timestamp with time zone");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(con, TEST_TABLE);
     TestUtil.closeDB(con);
   }
@@ -58,7 +62,8 @@ public class PGTimestampTest extends TestCase {
    *
    * @throws SQLException if a JDBC or database problem occurs.
    */
-  public void testTimestampWithInterval() throws SQLException {
+  public void testTimestampWithInterval() throws SQLException
+  {
     PGTimestamp timestamp = new PGTimestamp(System.currentTimeMillis());
     PGInterval interval = new PGInterval(0, 0, 0, 1, 2, 3.14);
     verifyTimestampWithInterval(timestamp, interval, true);
@@ -86,12 +91,15 @@ public class PGTimestampTest extends TestCase {
    * @throws SQLException if a JDBC or database problem occurs.
    */
   private void verifyTimestampWithInterval(PGTimestamp timestamp, PGInterval interval,
-      boolean useSetObject) throws SQLException {
+      boolean useSetObject) throws SQLException
+  {
     // Construct the SQL query.
     String sql;
-    if (timestamp.getCalendar() != null) {
+    if (timestamp.getCalendar() != null)
+    {
       sql = "SELECT ?::timestamp with time zone + ?";
-    } else {
+    } else
+    {
       sql = "SELECT ?::timestamp + ?";
     }
 
@@ -111,9 +119,11 @@ public class PGTimestampTest extends TestCase {
 
     // Execute a query as PGTimestamp + PGInterval.
     ps = con.prepareStatement("SELECT ? + ?");
-    if (useSetObject) {
+    if (useSetObject)
+    {
       ps.setObject(1, timestamp);
-    } else {
+    } else
+    {
       ps.setTimestamp(1, timestamp);
     }
     ps.setObject(2, interval);
@@ -132,7 +142,8 @@ public class PGTimestampTest extends TestCase {
    *
    * @throws SQLException if a JDBC or database problem occurs.
    */
-  public void testTimeInsertAndSelect() throws SQLException {
+  public void testTimeInsertAndSelect() throws SQLException
+  {
     final long now = System.currentTimeMillis();
     verifyInsertAndSelect(new PGTimestamp(now), true);
     verifyInsertAndSelect(new PGTimestamp(now), false);
@@ -158,13 +169,16 @@ public class PGTimestampTest extends TestCase {
    * @throws SQLException if a JDBC or database problem occurs.
    */
   private void verifyInsertAndSelect(PGTimestamp timestamp, boolean useSetObject)
-      throws SQLException {
+      throws SQLException
+  {
     // Construct the INSERT statement of a casted timestamp string.
     String sql;
-    if (timestamp.getCalendar() != null) {
+    if (timestamp.getCalendar() != null)
+    {
       sql = "INSERT INTO " + TEST_TABLE
           + " VALUES (?::timestamp with time zone, ?::timestamp with time zone)";
-    } else {
+    } else
+    {
       sql = "INSERT INTO " + TEST_TABLE + " VALUES (?::timestamp, ?::timestamp)";
     }
 
@@ -179,10 +193,12 @@ public class PGTimestampTest extends TestCase {
     // Insert the timestamps as PGTimestamp objects.
     PreparedStatement pstmt2 = con.prepareStatement("INSERT INTO " + TEST_TABLE + " VALUES (?, ?)");
 
-    if (useSetObject) {
+    if (useSetObject)
+    {
       pstmt2.setObject(1, timestamp);
       pstmt2.setObject(2, timestamp);
-    } else {
+    } else
+    {
       pstmt2.setTimestamp(1, timestamp);
       pstmt2.setTimestamp(2, timestamp);
     }
@@ -228,14 +244,17 @@ public class PGTimestampTest extends TestCase {
    * @param timestamp the timestamp object.
    * @return the new format instance.
    */
-  private SimpleDateFormat createSimpleDateFormat(PGTimestamp timestamp) {
+  private SimpleDateFormat createSimpleDateFormat(PGTimestamp timestamp)
+  {
     String pattern = "yyyy-MM-dd HH:mm:ss.SSS";
-    if (timestamp.getCalendar() != null) {
+    if (timestamp.getCalendar() != null)
+    {
       pattern += " Z";
     }
 
     SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-    if (timestamp.getCalendar() != null) {
+    if (timestamp.getCalendar() != null)
+    {
       sdf.setTimeZone(timestamp.getCalendar().getTimeZone());
     }
     return sdf;

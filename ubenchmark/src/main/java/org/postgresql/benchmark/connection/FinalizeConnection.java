@@ -49,13 +49,15 @@ import java.util.concurrent.TimeUnit;
 @Threads(1)
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class FinalizeConnection {
+public class FinalizeConnection
+{
   private Properties connectionProperties;
   private String connectionUrl;
   private Driver driver;
 
   @Setup(Level.Trial)
-  public void setUp() throws SQLException {
+  public void setUp() throws SQLException
+  {
     Properties props = ConnectionUtil.getProperties();
 
     connectionProperties = props;
@@ -64,17 +66,20 @@ public class FinalizeConnection {
   }
 
   @Benchmark
-  public void baseline() throws SQLException {
+  public void baseline() throws SQLException
+  {
   }
 
   @Benchmark
-  public Connection createAndClose() throws SQLException {
+  public Connection createAndClose() throws SQLException
+  {
     Connection connection = driver.connect(connectionUrl, connectionProperties);
     connection.close();
     return connection;
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(FinalizeConnection.class.getSimpleName())
         .addProfiler(GCProfiler.class)

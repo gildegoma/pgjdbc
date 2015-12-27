@@ -16,7 +16,8 @@ package org.postgresql.core;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-public interface ResultCursor {
+public interface ResultCursor
+{
   /**
    * Close this cursor. This may not immediately free underlying resources but may make it happen
    * more promptly. Closed cursors should not be passed to QueryExecutor methods.

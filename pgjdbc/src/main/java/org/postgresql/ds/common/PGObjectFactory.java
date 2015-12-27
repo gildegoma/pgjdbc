@@ -28,37 +28,45 @@ import javax.naming.spi.ObjectFactory;
  *
  * @author Aaron Mulder (ammulder@chariotsolutions.com)
  */
-public class PGObjectFactory implements ObjectFactory {
+public class PGObjectFactory implements ObjectFactory
+{
   /**
    * Dereferences a PostgreSQL DataSource.  Other types of references are ignored.
    */
   public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-      Hashtable<?, ?> environment) throws Exception {
+      Hashtable<?, ?> environment) throws Exception
+  {
     Reference ref = (Reference) obj;
     String className = ref.getClassName();
     // Old names are here for those who still use them
     if (className.equals("org.postgresql.ds.PGSimpleDataSource")
         || className.equals("org.postgresql.jdbc2.optional.SimpleDataSource")
-        || className.equals("org.postgresql.jdbc3.Jdbc3SimpleDataSource")) {
+        || className.equals("org.postgresql.jdbc3.Jdbc3SimpleDataSource"))
+    {
       return loadSimpleDataSource(ref);
     } else if (className.equals("org.postgresql.ds.PGConnectionPoolDataSource")
         || className.equals("org.postgresql.jdbc2.optional.ConnectionPool")
-        || className.equals("org.postgresql.jdbc3.Jdbc3ConnectionPool")) {
+        || className.equals("org.postgresql.jdbc3.Jdbc3ConnectionPool"))
+    {
       return loadConnectionPool(ref);
     } else if (className.equals("org.postgresql.ds.PGPoolingDataSource")
         || className.equals("org.postgresql.jdbc2.optional.PoolingDataSource")
-        || className.equals("org.postgresql.jdbc3.Jdbc3PoolingDataSource")) {
+        || className.equals("org.postgresql.jdbc3.Jdbc3PoolingDataSource"))
+    {
       return loadPoolingDataSource(ref);
-    } else {
+    } else
+    {
       return null;
     }
   }
 
-  private Object loadPoolingDataSource(Reference ref) {
+  private Object loadPoolingDataSource(Reference ref)
+  {
     // If DataSource exists, return it
     String name = getProperty(ref, "dataSourceName");
     PGPoolingDataSource pds = PGPoolingDataSource.getDataSource(name);
-    if (pds != null) {
+    if (pds != null)
+    {
       return pds;
     }
     // Otherwise, create a new one
@@ -66,35 +74,42 @@ public class PGObjectFactory implements ObjectFactory {
     pds.setDataSourceName(name);
     loadBaseDataSource(pds, ref);
     String min = getProperty(ref, "initialConnections");
-    if (min != null) {
+    if (min != null)
+    {
       pds.setInitialConnections(Integer.parseInt(min));
     }
     String max = getProperty(ref, "maxConnections");
-    if (max != null) {
+    if (max != null)
+    {
       pds.setMaxConnections(Integer.parseInt(max));
     }
     return pds;
   }
 
-  private Object loadSimpleDataSource(Reference ref) {
+  private Object loadSimpleDataSource(Reference ref)
+  {
     PGSimpleDataSource ds = new PGSimpleDataSource();
     return loadBaseDataSource(ds, ref);
   }
 
-  private Object loadConnectionPool(Reference ref) {
+  private Object loadConnectionPool(Reference ref)
+  {
     PGConnectionPoolDataSource cp = new PGConnectionPoolDataSource();
     return loadBaseDataSource(cp, ref);
   }
 
-  protected Object loadBaseDataSource(BaseDataSource ds, Reference ref) {
+  protected Object loadBaseDataSource(BaseDataSource ds, Reference ref)
+  {
     ds.setFromReference(ref);
 
     return ds;
   }
 
-  protected String getProperty(Reference ref, String s) {
+  protected String getProperty(Reference ref, String s)
+  {
     RefAddr addr = ref.get(s);
-    if (addr == null) {
+    if (addr == null)
+    {
       return null;
     }
     return (String) addr.getContent();

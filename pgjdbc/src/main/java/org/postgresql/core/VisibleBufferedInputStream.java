@@ -18,7 +18,8 @@ import java.io.InputStream;
  *
  * @author Mikko Tiihonen
  */
-public class VisibleBufferedInputStream extends InputStream {
+public class VisibleBufferedInputStream extends InputStream
+{
 
   /**
    * If a direct read to byte array is called that would require a smaller read from the wrapped
@@ -58,7 +59,8 @@ public class VisibleBufferedInputStream extends InputStream {
    * @param in         The stream to buffer.
    * @param bufferSize The initial size of the buffer.
    */
-  public VisibleBufferedInputStream(InputStream in, int bufferSize) {
+  public VisibleBufferedInputStream(InputStream in, int bufferSize)
+  {
     wrapped = in;
     buffer = new byte[bufferSize < MINIMUM_READ ? MINIMUM_READ : bufferSize];
   }
@@ -66,8 +68,10 @@ public class VisibleBufferedInputStream extends InputStream {
   /**
    * {@inheritDoc}
    */
-  public int read() throws IOException {
-    if (ensureBytes(1)) {
+  public int read() throws IOException
+  {
+    if (ensureBytes(1))
+    {
       return buffer[index++] & 0xFF;
     }
     return -1;
@@ -79,8 +83,10 @@ public class VisibleBufferedInputStream extends InputStream {
    * @return byte from the buffer without advancing the index pointer
    * @throws IOException if something wrong happens
    */
-  public int peek() throws IOException {
-    if (ensureBytes(1)) {
+  public int peek() throws IOException
+  {
+    if (ensureBytes(1))
+    {
       return buffer[index] & 0xFF;
     }
     return -1;
@@ -94,7 +100,8 @@ public class VisibleBufferedInputStream extends InputStream {
    * @throws ArrayIndexOutOfBoundsException If ensureBytes was not called to make sure the buffer
    *                                        contains the byte.
    */
-  public byte readRaw() {
+  public byte readRaw()
+  {
     return buffer[index++];
   }
 
@@ -106,10 +113,13 @@ public class VisibleBufferedInputStream extends InputStream {
    * @return true if required bytes are available and false if EOF
    * @throws IOException If reading of the wrapped stream failed.
    */
-  public boolean ensureBytes(int n) throws IOException {
+  public boolean ensureBytes(int n) throws IOException
+  {
     int required = n - endIndex + index;
-    while (required > 0) {
-      if (!readMore(required)) {
+    while (required > 0)
+    {
+      if (!readMore(required))
+      {
         return false;
       }
       required = n - endIndex + index;
@@ -124,24 +134,30 @@ public class VisibleBufferedInputStream extends InputStream {
    * @return True if at least some bytes were read.
    * @throws IOException If reading of the wrapped stream failed.
    */
-  private boolean readMore(int wanted) throws IOException {
-    if (endIndex == index) {
+  private boolean readMore(int wanted) throws IOException
+  {
+    if (endIndex == index)
+    {
       index = 0;
       endIndex = 0;
     }
     int canFit = buffer.length - endIndex;
-    if (canFit < wanted) {
+    if (canFit < wanted)
+    {
       // would the wanted bytes fit if we compacted the buffer
       // and still leave some slack
-      if (index + canFit > wanted + MINIMUM_READ) {
+      if (index + canFit > wanted + MINIMUM_READ)
+      {
         compact();
-      } else {
+      } else
+      {
         doubleBuffer();
       }
       canFit = buffer.length - endIndex;
     }
     int read = wrapped.read(buffer, endIndex, canFit);
-    if (read < 0) {
+    if (read < 0)
+    {
       return false;
     }
     endIndex += read;
@@ -151,7 +167,8 @@ public class VisibleBufferedInputStream extends InputStream {
   /**
    * Doubles the size of the buffer.
    */
-  private void doubleBuffer() {
+  private void doubleBuffer()
+  {
     byte[] buf = new byte[buffer.length * 2];
     moveBufferTo(buf);
     buffer = buf;
@@ -160,7 +177,8 @@ public class VisibleBufferedInputStream extends InputStream {
   /**
    * Compacts the unread bytes of the buffer to the beginning of the buffer.
    */
-  private void compact() {
+  private void compact()
+  {
     moveBufferTo(buffer);
   }
 
@@ -170,7 +188,8 @@ public class VisibleBufferedInputStream extends InputStream {
    *
    * @param dest The destination buffer.
    */
-  private void moveBufferTo(byte[] dest) {
+  private void moveBufferTo(byte[] dest)
+  {
     int size = endIndex - index;
     System.arraycopy(buffer, index, dest, 0, size);
     index = 0;
@@ -180,24 +199,30 @@ public class VisibleBufferedInputStream extends InputStream {
   /**
    * {@inheritDoc}
    */
-  public int read(byte to[], int off, int len) throws IOException {
-    if ((off | len | (off + len) | (to.length - (off + len))) < 0) {
+  public int read(byte to[], int off, int len) throws IOException
+  {
+    if ((off | len | (off + len) | (to.length - (off + len))) < 0)
+    {
       throw new IndexOutOfBoundsException();
-    } else if (len == 0) {
+    } else if (len == 0)
+    {
       return 0;
     }
 
     // if the read would go to wrapped stream, but would result
     // in a small read then try read to the buffer instead
     int avail = endIndex - index;
-    if (len - avail < MINIMUM_READ) {
+    if (len - avail < MINIMUM_READ)
+    {
       ensureBytes(len);
       avail = endIndex - index;
     }
 
     // first copy from buffer
-    if (avail > 0) {
-      if (len <= avail) {
+    if (avail > 0)
+    {
+      if (len <= avail)
+      {
         System.arraycopy(buffer, index, to, off, len);
         index += len;
         return len;
@@ -213,9 +238,11 @@ public class VisibleBufferedInputStream extends InputStream {
     endIndex = 0;
 
     // then directly from wrapped stream
-    do {
+    do
+    {
       int r = wrapped.read(to, off, len);
-      if (r <= 0) {
+      if (r <= 0)
+      {
         return (read == 0) ? r : read;
       }
       read += r;
@@ -229,9 +256,11 @@ public class VisibleBufferedInputStream extends InputStream {
   /**
    * {@inheritDoc}
    */
-  public long skip(long n) throws IOException {
+  public long skip(long n) throws IOException
+  {
     int avail = endIndex - index;
-    if (avail >= n) {
+    if (avail >= n)
+    {
       index += n;
       return n;
     }
@@ -244,7 +273,8 @@ public class VisibleBufferedInputStream extends InputStream {
   /**
    * {@inheritDoc}
    */
-  public int available() throws IOException {
+  public int available() throws IOException
+  {
     int avail = endIndex - index;
     return avail > 0 ? avail : wrapped.available();
   }
@@ -252,7 +282,8 @@ public class VisibleBufferedInputStream extends InputStream {
   /**
    * {@inheritDoc}
    */
-  public void close() throws IOException {
+  public void close() throws IOException
+  {
     wrapped.close();
   }
 
@@ -262,7 +293,8 @@ public class VisibleBufferedInputStream extends InputStream {
    *
    * @return The underlaying buffer.
    */
-  public byte[] getBuffer() {
+  public byte[] getBuffer()
+  {
     return buffer;
   }
 
@@ -271,7 +303,8 @@ public class VisibleBufferedInputStream extends InputStream {
    *
    * @return the current read position in the buffer.
    */
-  public int getIndex() {
+  public int getIndex()
+  {
     return index;
   }
 
@@ -282,15 +315,20 @@ public class VisibleBufferedInputStream extends InputStream {
    * @throws IOException  If reading of stream fails.
    * @throws EOFException If the stream did not contain any null terminators.
    */
-  public int scanCStringLength() throws IOException {
+  public int scanCStringLength() throws IOException
+  {
     int pos = index;
-    for (; ; ) {
-      while (pos < endIndex) {
-        if (buffer[pos++] == '\0') {
+    for (; ; )
+    {
+      while (pos < endIndex)
+      {
+        if (buffer[pos++] == '\0')
+        {
           return pos - index;
         }
       }
-      if (!readMore(STRING_SCAN_SPAN)) {
+      if (!readMore(STRING_SCAN_SPAN))
+      {
         throw new EOFException();
       }
       pos = index;

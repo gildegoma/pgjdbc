@@ -15,7 +15,8 @@ import java.sql.SQLException;
 /**
  * This implements a class that handles the PostgreSQL money and cash types
  */
-public class PGmoney extends PGobject implements Serializable, Cloneable {
+public class PGmoney extends PGobject implements Serializable, Cloneable
+{
   /*
    * The value of the field
    */
@@ -24,12 +25,14 @@ public class PGmoney extends PGobject implements Serializable, Cloneable {
   /**
    * @param value of field
    */
-  public PGmoney(double value) {
+  public PGmoney(double value)
+  {
     this();
     val = value;
   }
 
-  public PGmoney(String value) throws SQLException {
+  public PGmoney(String value) throws SQLException
+  {
     this();
     setValue(value);
   }
@@ -37,12 +40,15 @@ public class PGmoney extends PGobject implements Serializable, Cloneable {
   /*
    * Required by the driver
    */
-  public PGmoney() {
+  public PGmoney()
+  {
     setType("money");
   }
 
-  public void setValue(String s) throws SQLException {
-    try {
+  public void setValue(String s) throws SQLException
+  {
+    try
+    {
       String s1;
       boolean negative;
 
@@ -53,7 +59,8 @@ public class PGmoney extends PGobject implements Serializable, Cloneable {
 
       // Strip out any , in currency
       int pos = s1.indexOf(',');
-      while (pos != -1) {
+      while (pos != -1)
+      {
         s1 = s1.substring(0, pos) + s1.substring(pos + 1);
         pos = s1.indexOf(',');
       }
@@ -61,24 +68,30 @@ public class PGmoney extends PGobject implements Serializable, Cloneable {
       val = Double.parseDouble(s1);
       val = negative ? -val : val;
 
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException e)
+    {
       throw new PSQLException(GT.tr("Conversion of money failed."),
           PSQLState.NUMERIC_CONSTANT_OUT_OF_RANGE, e);
     }
   }
 
-  public boolean equals(Object obj) {
-    if (obj instanceof PGmoney) {
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof PGmoney)
+    {
       PGmoney p = (PGmoney) obj;
       return val == p.val;
     }
     return false;
   }
 
-  public String getValue() {
-    if (val < 0) {
+  public String getValue()
+  {
+    if (val < 0)
+    {
       return "-$" + (-val);
-    } else {
+    } else
+    {
       return "$" + val;
     }
   }

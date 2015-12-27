@@ -63,46 +63,58 @@ import javax.net.ssl.X509TrustManager;
  * <td>Loaded from string value of the argument.</td> </tr> </table>
  */
 
-public class SingleCertValidatingFactory extends WrappedFactory {
+public class SingleCertValidatingFactory extends WrappedFactory
+{
   private static final String FILE_PREFIX = "file:";
   private static final String CLASSPATH_PREFIX = "classpath:";
   private static final String ENV_PREFIX = "env:";
   private static final String SYS_PROP_PREFIX = "sys:";
 
-  public SingleCertValidatingFactory(String sslFactoryArg) throws GeneralSecurityException {
-    if (sslFactoryArg == null || sslFactoryArg.equals("")) {
+  public SingleCertValidatingFactory(String sslFactoryArg) throws GeneralSecurityException
+  {
+    if (sslFactoryArg == null || sslFactoryArg.equals(""))
+    {
       throw new GeneralSecurityException(GT.tr("The sslfactoryarg property may not be empty."));
     }
     InputStream in = null;
-    try {
-      if (sslFactoryArg.startsWith(FILE_PREFIX)) {
+    try
+    {
+      if (sslFactoryArg.startsWith(FILE_PREFIX))
+      {
         String path = sslFactoryArg.substring(FILE_PREFIX.length());
         in = new BufferedInputStream(new FileInputStream(path));
-      } else if (sslFactoryArg.startsWith(CLASSPATH_PREFIX)) {
+      } else if (sslFactoryArg.startsWith(CLASSPATH_PREFIX))
+      {
         String path = sslFactoryArg.substring(CLASSPATH_PREFIX.length());
         in = new BufferedInputStream(
             Thread.currentThread().getContextClassLoader().getResourceAsStream(path));
-      } else if (sslFactoryArg.startsWith(ENV_PREFIX)) {
+      } else if (sslFactoryArg.startsWith(ENV_PREFIX))
+      {
         String name = sslFactoryArg.substring(ENV_PREFIX.length());
         String cert = System.getenv(name);
-        if (cert == null || "".equals(cert)) {
+        if (cert == null || "".equals(cert))
+        {
           throw new GeneralSecurityException(
               GT.tr(
                   "The environment variable containing the server's SSL certificate must not be empty."));
         }
         in = new ByteArrayInputStream(cert.getBytes("UTF-8"));
-      } else if (sslFactoryArg.startsWith(SYS_PROP_PREFIX)) {
+      } else if (sslFactoryArg.startsWith(SYS_PROP_PREFIX))
+      {
         String name = sslFactoryArg.substring(SYS_PROP_PREFIX.length());
         String cert = System.getProperty(name);
-        if (cert == null || "".equals(cert)) {
+        if (cert == null || "".equals(cert))
+        {
           throw new GeneralSecurityException(
               GT.tr(
                   "The system property containing the server's SSL certificate must not be empty."));
         }
         in = new ByteArrayInputStream(cert.getBytes("UTF-8"));
-      } else if (sslFactoryArg.startsWith("-----BEGIN CERTIFICATE-----")) {
+      } else if (sslFactoryArg.startsWith("-----BEGIN CERTIFICATE-----"))
+      {
         in = new ByteArrayInputStream(sslFactoryArg.getBytes("UTF-8"));
-      } else {
+      } else
+      {
         throw new GeneralSecurityException(
             GT.tr(
                 "The sslfactoryarg property must start with the prefix file:, classpath:, env:, sys:, or -----BEGIN CERTIFICATE-----."));
@@ -111,34 +123,45 @@ public class SingleCertValidatingFactory extends WrappedFactory {
       SSLContext ctx = SSLContext.getInstance("TLS");
       ctx.init(null, new TrustManager[]{new SingleCertTrustManager(in)}, null);
       _factory = ctx.getSocketFactory();
-    } catch (RuntimeException e) {
+    } catch (RuntimeException e)
+    {
       throw (RuntimeException) e;
-    } catch (Exception e) {
-      if (e instanceof GeneralSecurityException) {
+    } catch (Exception e)
+    {
+      if (e instanceof GeneralSecurityException)
+      {
         throw (GeneralSecurityException) e;
       }
       throw new GeneralSecurityException(GT.tr("An error occurred reading the certificate"), e);
-    } finally {
-      if (in != null) {
-        try {
+    } finally
+    {
+      if (in != null)
+      {
+        try
+        {
           in.close();
-        } catch (Exception e2) {
+        } catch (Exception e2)
+        {
           // ignore
         }
       }
     }
   }
 
-  public class SingleCertTrustManager implements X509TrustManager {
+  public class SingleCertTrustManager implements X509TrustManager
+  {
     X509Certificate cert;
     X509TrustManager trustManager;
 
-    public SingleCertTrustManager(InputStream in) throws IOException, GeneralSecurityException {
+    public SingleCertTrustManager(InputStream in) throws IOException, GeneralSecurityException
+    {
       KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-      try {
+      try
+      {
         // Note: KeyStore requires it be loaded even if you don't load anything into it:
         ks.load(null);
-      } catch (Exception e) {
+      } catch (Exception e)
+      {
       }
       CertificateFactory cf = CertificateFactory.getInstance("X509");
       cert = (X509Certificate) cf.generateCertificate(in);
@@ -146,27 +169,33 @@ public class SingleCertValidatingFactory extends WrappedFactory {
       TrustManagerFactory tmf =
           TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
       tmf.init(ks);
-      for (TrustManager tm : tmf.getTrustManagers()) {
-        if (tm instanceof X509TrustManager) {
+      for (TrustManager tm : tmf.getTrustManagers())
+      {
+        if (tm instanceof X509TrustManager)
+        {
           trustManager = (X509TrustManager) tm;
           break;
         }
       }
-      if (trustManager == null) {
+      if (trustManager == null)
+      {
         throw new GeneralSecurityException(GT.tr("No X509TrustManager found"));
       }
     }
 
     public void checkClientTrusted(X509Certificate[] chain, String authType)
-        throws CertificateException {
+        throws CertificateException
+    {
     }
 
     public void checkServerTrusted(X509Certificate[] chain, String authType)
-        throws CertificateException {
+        throws CertificateException
+    {
       trustManager.checkServerTrusted(chain, authType);
     }
 
-    public X509Certificate[] getAcceptedIssuers() {
+    public X509Certificate[] getAcceptedIssuers()
+    {
       return new X509Certificate[]{cert};
     }
   }

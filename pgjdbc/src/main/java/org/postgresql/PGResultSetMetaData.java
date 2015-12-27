@@ -12,7 +12,8 @@ import org.postgresql.core.Field;
 
 import java.sql.SQLException;
 
-public interface PGResultSetMetaData {
+public interface PGResultSetMetaData
+{
 
   /**
    * Returns the underlying column name of a query result, or "" if it is unable to be determined.

@@ -10,27 +10,33 @@ package org.postgresql.util;
 
 import java.sql.SQLWarning;
 
-public class PSQLWarning extends SQLWarning {
+public class PSQLWarning extends SQLWarning
+{
 
   private ServerErrorMessage serverError;
 
-  public PSQLWarning(ServerErrorMessage err) {
+  public PSQLWarning(ServerErrorMessage err)
+  {
     this.serverError = err;
   }
 
-  public String toString() {
+  public String toString()
+  {
     return serverError.toString();
   }
 
-  public String getSQLState() {
+  public String getSQLState()
+  {
     return serverError.getSQLState();
   }
 
-  public String getMessage() {
+  public String getMessage()
+  {
     return serverError.getMessage();
   }
 
-  public ServerErrorMessage getServerErrorMessage() {
+  public ServerErrorMessage getServerErrorMessage()
+  {
     return serverError;
   }
 }

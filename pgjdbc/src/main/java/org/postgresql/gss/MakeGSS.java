@@ -25,36 +25,45 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 
 
-public class MakeGSS {
+public class MakeGSS
+{
 
   public static void authenticate(PGStream pgStream, String host, String user, String password,
       String jaasApplicationName, String kerberosServerName, Logger logger, boolean useSpnego)
-      throws IOException, SQLException {
-    if (logger.logDebug()) {
+      throws IOException, SQLException
+  {
+    if (logger.logDebug())
+    {
       logger.debug(" <=BE AuthenticationReqGSS");
     }
 
     Exception result = null;
 
-    if (jaasApplicationName == null) {
+    if (jaasApplicationName == null)
+    {
       jaasApplicationName = "pgjdbc";
     }
-    if (kerberosServerName == null) {
+    if (kerberosServerName == null)
+    {
       kerberosServerName = "postgres";
     }
 
-    try {
+    try
+    {
       boolean performAuthentication = true;
       GSSCredential gssCredential = null;
       Subject sub = Subject.getSubject(AccessController.getContext());
-      if (sub != null) {
+      if (sub != null)
+      {
         Set<GSSCredential> gssCreds = sub.getPrivateCredentials(GSSCredential.class);
-        if (gssCreds != null && gssCreds.size() > 0) {
+        if (gssCreds != null && gssCreds.size() > 0)
+        {
           gssCredential = gssCreds.iterator().next();
           performAuthentication = false;
         }
       }
-      if (performAuthentication) {
+      if (performAuthentication)
+      {
         LoginContext lc =
             new LoginContext(jaasApplicationName, new GSSCallbackHandler(user, password));
         lc.login();
@@ -65,15 +74,19 @@ public class MakeGSS {
               useSpnego);
 
       result = Subject.doAs(sub, action);
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       throw new PSQLException(GT.tr("GSS Authentication failed"), PSQLState.CONNECTION_FAILURE, e);
     }
 
-    if (result instanceof IOException) {
+    if (result instanceof IOException)
+    {
       throw (IOException) result;
-    } else if (result instanceof SQLException) {
+    } else if (result instanceof SQLException)
+    {
       throw (SQLException) result;
-    } else if (result != null) {
+    } else if (result != null)
+    {
       throw new PSQLException(GT.tr("GSS Authentication failed"), PSQLState.CONNECTION_FAILURE,
           result);
     }

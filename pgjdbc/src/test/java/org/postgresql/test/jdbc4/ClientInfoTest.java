@@ -19,23 +19,28 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class ClientInfoTest extends TestCase {
+public class ClientInfoTest extends TestCase
+{
 
   private Connection _conn;
 
-  public ClientInfoTest(String name) {
+  public ClientInfoTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.closeDB(_conn);
   }
 
-  private String getAppName() throws SQLException {
+  private String getAppName() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     ResultSet rs = stmt.executeQuery("SHOW application_name");
     rs.next();
@@ -45,8 +50,10 @@ public class ClientInfoTest extends TestCase {
     return appName;
   }
 
-  public void testSetAppName() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0")) {
+  public void testSetAppName() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0"))
+    {
       return;
     }
 
@@ -56,8 +63,10 @@ public class ClientInfoTest extends TestCase {
     assertEquals("my app", _conn.getClientInfo().getProperty("ApplicationName"));
   }
 
-  public void testSetAppNameProps() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0")) {
+  public void testSetAppNameProps() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0"))
+    {
       return;
     }
 
@@ -72,10 +81,13 @@ public class ClientInfoTest extends TestCase {
   /**
    * Test that no exception is thrown when an unknown property is set
    */
-  public void testWarningOnUnknownName() throws SQLException {
-    try {
+  public void testWarningOnUnknownName() throws SQLException
+  {
+    try
+    {
       _conn.setClientInfo("UnexisingClientInfoName", "NoValue");
-    } catch (SQLClientInfoException e) {
+    } catch (SQLClientInfoException e)
+    {
       fail("Trying to set an unexisting name must not throw an exception (spec)");
     }
     assertTrue(_conn.getWarnings() != null);
@@ -84,8 +96,10 @@ public class ClientInfoTest extends TestCase {
   /**
    * Test that a name missing in the properties given to setClientInfo should be unset (spec)
    */
-  public void testMissingName() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0")) {
+  public void testMissingName() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(_conn, "9.0"))
+    {
       return;
     }
 

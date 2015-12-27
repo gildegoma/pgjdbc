@@ -18,55 +18,71 @@ import org.postgresql.core.ParameterList;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-class CompositeQuery implements V3Query {
-  CompositeQuery(SimpleQuery[] subqueries, int[] offsets) {
+class CompositeQuery implements V3Query
+{
+  CompositeQuery(SimpleQuery[] subqueries, int[] offsets)
+  {
     this.subqueries = subqueries;
     this.offsets = offsets;
   }
 
-  public ParameterList createParameterList() {
+  public ParameterList createParameterList()
+  {
     SimpleParameterList[] subparams = new SimpleParameterList[subqueries.length];
-    for (int i = 0; i < subqueries.length; ++i) {
+    for (int i = 0; i < subqueries.length; ++i)
+    {
       subparams[i] = (SimpleParameterList) subqueries[i].createParameterList();
     }
     return new CompositeParameterList(subparams, offsets);
   }
 
-  public String toString(ParameterList parameters) {
+  public String toString(ParameterList parameters)
+  {
     StringBuilder sbuf = new StringBuilder(subqueries[0].toString());
-    for (int i = 1; i < subqueries.length; ++i) {
+    for (int i = 1; i < subqueries.length; ++i)
+    {
       sbuf.append(';');
       sbuf.append(subqueries[i]);
     }
     return sbuf.toString();
   }
 
-  public String toString() {
+  public String toString()
+  {
     return toString(null);
   }
 
-  public void close() {
-    for (SimpleQuery subquery : subqueries) {
+  public void close()
+  {
+    for (SimpleQuery subquery : subqueries)
+    {
       subquery.close();
     }
   }
 
-  public SimpleQuery[] getSubqueries() {
+  public SimpleQuery[] getSubqueries()
+  {
     return subqueries;
   }
 
-  public boolean isStatementDescribed() {
-    for (SimpleQuery subquery : subqueries) {
-      if (!subquery.isStatementDescribed()) {
+  public boolean isStatementDescribed()
+  {
+    for (SimpleQuery subquery : subqueries)
+    {
+      if (!subquery.isStatementDescribed())
+      {
         return false;
       }
     }
     return true;
   }
 
-  public boolean isEmpty() {
-    for (SimpleQuery subquery : subqueries) {
-      if (!subquery.isEmpty()) {
+  public boolean isEmpty()
+  {
+    for (SimpleQuery subquery : subqueries)
+    {
+      if (!subquery.isEmpty())
+      {
         return false;
       }
     }

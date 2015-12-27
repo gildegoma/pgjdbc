@@ -25,9 +25,11 @@ import java.util.Properties;
  * Tests the dynamically created class org.postgresql.Driver
  *
  */
-public class DriverTest extends TestCase {
+public class DriverTest extends TestCase
+{
 
-  public DriverTest(String name) {
+  public DriverTest(String name)
+  {
     super(name);
   }
 
@@ -35,7 +37,8 @@ public class DriverTest extends TestCase {
    * This tests the acceptsURL() method with a couple of well and poorly
    * formed jdbc urls.
    */
-  public void testAcceptsURL() throws Exception {
+  public void testAcceptsURL() throws Exception
+  {
     TestUtil.initDriver(); // Set up log levels, etc.
 
     // Load the driver (note clients should never do it this way!)
@@ -67,7 +70,8 @@ public class DriverTest extends TestCase {
   }
 
   private void verifyUrl(Driver drv, String url, String hosts, String ports, String dbName)
-      throws Exception {
+      throws Exception
+  {
     assertTrue(url, drv.acceptsURL(url));
     Method parseMethod =
         drv.getClass().getDeclaredMethod("parseURL", new Class[]{String.class, Properties.class});
@@ -81,7 +85,8 @@ public class DriverTest extends TestCase {
   /**
    * Tests the connect method by connecting to the test database
    */
-  public void testConnect() throws Exception {
+  public void testConnect() throws Exception
+  {
     TestUtil.initDriver(); // Set up log levels, etc.
 
     // Test with the url, username & password
@@ -105,7 +110,8 @@ public class DriverTest extends TestCase {
    *
    * @throws Exception if something wrong happens
    */
-  public void testConnectFailover() throws Exception {
+  public void testConnectFailover() throws Exception
+  {
     String url =
         "jdbc:postgresql://invalidhost.not.here," + TestUtil.getServer() + ":" + TestUtil.getPort()
             + "/" + TestUtil.getDatabase() + "?connectTimeout=5";
@@ -117,7 +123,8 @@ public class DriverTest extends TestCase {
   /*
    * Test that the readOnly property works.
    */
-  public void testReadOnly() throws Exception {
+  public void testReadOnly() throws Exception
+  {
     TestUtil.initDriver(); // Set up log levels, etc.
 
     Connection con =
@@ -140,7 +147,8 @@ public class DriverTest extends TestCase {
     con.close();
   }
 
-  public void testRegistration() throws Exception {
+  public void testRegistration() throws Exception
+  {
     TestUtil.initDriver();
     ArrayList<java.sql.Driver> drivers;
 
@@ -151,8 +159,10 @@ public class DriverTest extends TestCase {
     searchInstanceOf:
     {
 
-      for (java.sql.Driver driver : drivers) {
-        if (driver instanceof org.postgresql.Driver) {
+      for (java.sql.Driver driver : drivers)
+      {
+        if (driver instanceof org.postgresql.Driver)
+        {
           break searchInstanceOf;
         }
       }
@@ -164,8 +174,10 @@ public class DriverTest extends TestCase {
     Assert.assertFalse(Driver.isRegistered());
 
     drivers = Collections.list(DriverManager.getDrivers());
-    for (java.sql.Driver driver : drivers) {
-      if (driver instanceof org.postgresql.Driver) {
+    for (java.sql.Driver driver : drivers)
+    {
+      if (driver instanceof org.postgresql.Driver)
+      {
         Assert.fail(
             "Driver should be deregistered but it is still present in DriverManager's list");
       }
@@ -176,8 +188,10 @@ public class DriverTest extends TestCase {
     Assert.assertTrue(Driver.isRegistered());
 
     drivers = Collections.list(DriverManager.getDrivers());
-    for (java.sql.Driver driver : drivers) {
-      if (driver instanceof org.postgresql.Driver) {
+    for (java.sql.Driver driver : drivers)
+    {
+      if (driver instanceof org.postgresql.Driver)
+      {
         return;
       }
     }

@@ -13,7 +13,8 @@ import org.postgresql.util.PGobject;
 import java.sql.SQLException;
 import java.util.Iterator;
 
-public interface TypeInfo {
+public interface TypeInfo
+{
   public void addCoreType(String pgTypeName, Integer oid, Integer sqlType, String javaClass,
       Integer arrayOid);
 

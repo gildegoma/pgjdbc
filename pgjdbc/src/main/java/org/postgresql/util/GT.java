@@ -19,39 +19,50 @@ import java.util.ResourceBundle;
  * localized version if available or the original if not.
  */
 
-public class GT {
+public class GT
+{
 
   private final static GT _gt = new GT();
   private final static Object noargs[] = new Object[0];
 
-  public static String tr(String message) {
+  public static String tr(String message)
+  {
     return _gt.translate(message, null);
   }
 
-  public static String tr(String message, Object arg) {
+  public static String tr(String message, Object arg)
+  {
     return _gt.translate(message, new Object[]{arg});
   }
 
-  public static String tr(String message, Object args[]) {
+  public static String tr(String message, Object args[])
+  {
     return _gt.translate(message, args);
   }
 
   private ResourceBundle _bundle;
 
-  private GT() {
-    try {
+  private GT()
+  {
+    try
+    {
       _bundle = ResourceBundle.getBundle("org.postgresql.translation.messages");
-    } catch (MissingResourceException mre) {
+    } catch (MissingResourceException mre)
+    {
       // translation files have not been installed
       _bundle = null;
     }
   }
 
-  private String translate(String message, Object args[]) {
-    if (_bundle != null && message != null) {
-      try {
+  private String translate(String message, Object args[])
+  {
+    if (_bundle != null && message != null)
+    {
+      try
+      {
         message = _bundle.getString(message);
-      } catch (MissingResourceException mre) {
+      } catch (MissingResourceException mre)
+      {
         // If we can't find a translation, just
         // use the untranslated message.
       }
@@ -61,13 +72,15 @@ public class GT {
     // this through the MessageFormat(ter) to allow the same
     // quoting and escaping rules to be used for all messages.
     //
-    if (args == null) {
+    if (args == null)
+    {
       args = noargs;
     }
 
     // Replace placeholders with arguments
     //
-    if (message != null) {
+    if (message != null)
+    {
       message = MessageFormat.format(message, args);
     }
 

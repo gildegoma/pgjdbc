@@ -34,7 +34,8 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class AddPaddingZeros {
+public class AddPaddingZeros
+{
 
   @Param({"1000", "1000000", "100000000"})
   int nanos;
@@ -46,12 +47,14 @@ public class AddPaddingZeros {
   StringBuffer sb = new StringBuffer();
 
   @Setup
-  public void init() {
+  public void init()
+  {
     ts.setNanos(nanos);
   }
 
   @Benchmark
-  public void charArray() {
+  public void charArray()
+  {
     sb.setLength(0);
     int nanos = ts.getNanos();
     char[] decimalStr = {'0', '0', '0', '0', '0', '0', '0', '0', '0'};
@@ -61,18 +64,21 @@ public class AddPaddingZeros {
   }
 
   @Benchmark
-  public void insert() {
+  public void insert()
+  {
     sb.setLength(0);
     int len = sb.length();
     int nanos = ts.getNanos();
     sb.append(nanos / 1000);
     int needZeros = 6 - (sb.length() - len);
-    if (needZeros > 0) {
+    if (needZeros > 0)
+    {
       sb.insert(len, ZEROS, 0, needZeros);
     }
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(AddPaddingZeros.class.getSimpleName())
         .addProfiler(GCProfiler.class)

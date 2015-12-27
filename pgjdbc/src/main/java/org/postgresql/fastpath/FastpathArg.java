@@ -21,7 +21,8 @@ import java.sql.SQLException;
  * Each fastpath call requires an array of arguments, the number and type dependent on the function
  * being called.
  */
-public class FastpathArg {
+public class FastpathArg
+{
   /**
    * Encoded byte value of argument.
    */
@@ -34,7 +35,8 @@ public class FastpathArg {
    *
    * @param value int value to set
    */
-  public FastpathArg(int value) {
+  public FastpathArg(int value)
+  {
     bytes = new byte[4];
     bytes[3] = (byte) (value);
     bytes[2] = (byte) (value >> 8);
@@ -49,7 +51,8 @@ public class FastpathArg {
    *
    * @param value int value to set
    */
-  public FastpathArg(long value) {
+  public FastpathArg(long value)
+  {
     bytes = new byte[8];
     bytes[7] = (byte) (value);
     bytes[6] = (byte) (value >> 8);
@@ -68,7 +71,8 @@ public class FastpathArg {
    *
    * @param bytes array to store
    */
-  public FastpathArg(byte bytes[]) {
+  public FastpathArg(byte bytes[])
+  {
     this(bytes, 0, bytes.length);
   }
 
@@ -79,7 +83,8 @@ public class FastpathArg {
    * @param off offset within array
    * @param len length of data to include
    */
-  public FastpathArg(byte buf[], int off, int len) {
+  public FastpathArg(byte buf[], int off, int len)
+  {
     this.bytes = buf;
     this.bytesStart = off;
     this.bytesLength = len;
@@ -90,14 +95,18 @@ public class FastpathArg {
    *
    * @param s String to store
    */
-  public FastpathArg(String s) {
+  public FastpathArg(String s)
+  {
     this(s.getBytes());
   }
 
-  void populateParameter(ParameterList params, int index) throws SQLException {
-    if (bytes == null) {
+  void populateParameter(ParameterList params, int index) throws SQLException
+  {
+    if (bytes == null)
+    {
       params.setNull(index, 0);
-    } else {
+    } else
+    {
       params.setBytea(index, bytes, bytesStart, bytesLength);
     }
   }

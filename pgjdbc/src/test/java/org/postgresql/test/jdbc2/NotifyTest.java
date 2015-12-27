@@ -17,22 +17,27 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class NotifyTest extends TestCase {
+public class NotifyTest extends TestCase
+{
   private Connection conn;
 
-  public NotifyTest(String name) {
+  public NotifyTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     conn = TestUtil.openDB();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     TestUtil.closeDB(conn);
   }
 
-  public void testNotify() throws SQLException {
+  public void testNotify() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     stmt.executeUpdate("LISTEN mynotification");
     stmt.executeUpdate("NOTIFY mynotification");
@@ -46,8 +51,10 @@ public class NotifyTest extends TestCase {
     stmt.close();
   }
 
-  public void testNotifyArgument() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(conn, "9.0") || TestUtil.isProtocolVersion(conn, 2)) {
+  public void testNotifyArgument() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(conn, "9.0") || TestUtil.isProtocolVersion(conn, 2))
+    {
       return;
     }
 
@@ -64,24 +71,29 @@ public class NotifyTest extends TestCase {
     stmt.close();
   }
 
-  public void testAsyncNotify() throws Exception {
+  public void testAsyncNotify() throws Exception
+  {
     Statement stmt = conn.createStatement();
     stmt.executeUpdate("LISTEN mynotification");
 
     // Notify on a separate connection to get an async notify on the first.
     Connection conn2 = TestUtil.openDB();
-    try {
+    try
+    {
       Statement stmt2 = conn2.createStatement();
       stmt2.executeUpdate("NOTIFY mynotification");
       stmt2.close();
-    } finally {
+    } finally
+    {
       conn2.close();
     }
 
     // Wait a bit to let the notify come through..
-    try {
+    try
+    {
       Thread.sleep(2000);
-    } catch (InterruptedException ie) {
+    } catch (InterruptedException ie)
+    {
     }
 
     PGNotification notifications[] = ((org.postgresql.PGConnection) conn).getNotifications();

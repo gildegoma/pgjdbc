@@ -5,14 +5,17 @@ import org.postgresql.core.Utils;
 
 import junit.framework.TestCase;
 
-public class VersionTest extends TestCase {
+public class VersionTest extends TestCase
+{
 
   @Override
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     super.setUp();
   }
 
-  public void testVersionParsing() {
+  public void testVersionParsing()
+  {
     assertNotNull(Utils.class);
     System.out.println(Utils.class.getProtectionDomain().getCodeSource().getLocation());
     /* Boring versions */
@@ -39,26 +42,32 @@ public class VersionTest extends TestCase {
     assertEquals(102010, Utils.parseServerVersionStr("10.20.10"));
 
     /* Out-of-range versions */
-    try {
+    try
+    {
       Utils.parseServerVersionStr("9.20.100");
       fail("Should've rejected three-digit minor version");
-    } catch (NumberFormatException ex) {
+    } catch (NumberFormatException ex)
+    {
     }
 
-    try {
+    try
+    {
       Utils.parseServerVersionStr("10.100.10");
       fail("Should've rejected three-digit second part of major version");
-    } catch (NumberFormatException ex) {
+    } catch (NumberFormatException ex)
+    {
     }
 
     /* Big first part is OK */
     assertEquals(1232010, Utils.parseServerVersionStr("123.20.10"));
 
     /* But not too big */
-    try {
+    try
+    {
       Utils.parseServerVersionStr("12345.1.1");
       fail("Should've rejected five-digit second part of major version");
-    } catch (NumberFormatException ex) {
+    } catch (NumberFormatException ex)
+    {
     }
 
     /* Large numeric inputs are taken as already parsed */

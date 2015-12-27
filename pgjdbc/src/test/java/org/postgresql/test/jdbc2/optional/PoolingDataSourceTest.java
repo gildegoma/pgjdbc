@@ -21,18 +21,22 @@ import java.sql.Statement;
  *
  * @author Aaron Mulder (ammulder@chariotsolutions.com)
  */
-public class PoolingDataSourceTest extends BaseDataSourceTest {
+public class PoolingDataSourceTest extends BaseDataSourceTest
+{
   private final static String DS_NAME = "JDBC 2 SE Test DataSource";
 
   /**
    * Constructor required by JUnit
    */
-  public PoolingDataSourceTest(String name) {
+  public PoolingDataSourceTest(String name)
+  {
     super(name);
   }
 
-  protected void tearDown() throws Exception {
-    if (bds instanceof PoolingDataSource) {
+  protected void tearDown() throws Exception
+  {
+    if (bds instanceof PoolingDataSource)
+    {
       ((PoolingDataSource) bds).close();
     }
     super.tearDown();
@@ -41,8 +45,10 @@ public class PoolingDataSourceTest extends BaseDataSourceTest {
   /**
    * Creates and configures a new SimpleDataSource.
    */
-  protected void initializeDataSource() {
-    if (bds == null) {
+  protected void initializeDataSource()
+  {
+    if (bds == null)
+    {
       bds = new PoolingDataSource();
       setupDataSource(bds);
       ((PoolingDataSource) bds).setDataSourceName(DS_NAME);
@@ -54,7 +60,8 @@ public class PoolingDataSourceTest extends BaseDataSourceTest {
   /**
    * In this case, we *do* want it to be pooled.
    */
-  public void testNotPooledConnection() throws SQLException {
+  public void testNotPooledConnection() throws SQLException
+  {
     con = getDataSourceConnection();
     String name = con.toString();
     con.close();
@@ -67,7 +74,8 @@ public class PoolingDataSourceTest extends BaseDataSourceTest {
   /**
    * In this case, the desired behavior is dereferencing.
    */
-  protected void compareJndiDataSource(BaseDataSource oldbds, BaseDataSource bds) {
+  protected void compareJndiDataSource(BaseDataSource oldbds, BaseDataSource bds)
+  {
     assertTrue("DataSource was serialized or recreated, should have been dereferenced",
         bds == oldbds);
   }
@@ -75,20 +83,24 @@ public class PoolingDataSourceTest extends BaseDataSourceTest {
   /**
    * Check that 2 DS instances can't use the same name.
    */
-  public void testCantReuseName() {
+  public void testCantReuseName()
+  {
     initializeDataSource();
     PoolingDataSource pds = new PoolingDataSource();
-    try {
+    try
+    {
       pds.setDataSourceName(DS_NAME);
       fail("Should have denied 2nd DataSource with same name");
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e)
+    {
     }
   }
 
   /**
    * Closing a Connection twice is not an error.
    */
-  public void testDoubleConnectionClose() throws SQLException {
+  public void testDoubleConnectionClose() throws SQLException
+  {
     con = getDataSourceConnection();
     con.close();
     con.close();
@@ -97,7 +109,8 @@ public class PoolingDataSourceTest extends BaseDataSourceTest {
   /**
    * Closing a Statement twice is not an error.
    */
-  public void testDoubleStatementClose() throws SQLException {
+  public void testDoubleStatementClose() throws SQLException
+  {
     con = getDataSourceConnection();
     Statement stmt = con.createStatement();
     stmt.close();
@@ -105,7 +118,8 @@ public class PoolingDataSourceTest extends BaseDataSourceTest {
     con.close();
   }
 
-  public void testConnectionObjectMethods() throws SQLException {
+  public void testConnectionObjectMethods() throws SQLException
+  {
     con = getDataSourceConnection();
 
     Connection conRef = con;
@@ -119,7 +133,8 @@ public class PoolingDataSourceTest extends BaseDataSourceTest {
     assertEquals(hc1, hc2);
   }
 
-  public void testStatementObjectMethods() throws SQLException {
+  public void testStatementObjectMethods() throws SQLException
+  {
     con = getDataSourceConnection();
 
     Statement stmt = con.createStatement();

@@ -18,7 +18,8 @@ import java.sql.SQLException;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-interface V3ParameterList extends ParameterList {
+interface V3ParameterList extends ParameterList
+{
   /**
    * Ensure that all parameters in this list have been assigned values. Return silently if all is
    * well, otherwise throw an appropriate exception.

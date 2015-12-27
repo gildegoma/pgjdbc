@@ -25,15 +25,18 @@ import java.sql.Statement;
 /*
  * Test case for Statement.batchExecute()
  */
-public class BatchExecuteTest extends BaseTest {
+public class BatchExecuteTest extends BaseTest
+{
 
-  public BatchExecuteTest(String name) {
+  public BatchExecuteTest(String name)
+  {
     super(name);
   }
 
   // Set up the fixture for this testcase: a connection to a database with
   // a table for this test.
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     super.setUp();
     Statement stmt = con.createStatement();
 
@@ -52,19 +55,22 @@ public class BatchExecuteTest extends BaseTest {
   }
 
   // Tear down the fixture for this test case.
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     con.setAutoCommit(true);
 
     TestUtil.dropTable(con, "testbatch");
     super.tearDown();
   }
 
-  public void testSupportsBatchUpdates() throws Exception {
+  public void testSupportsBatchUpdates() throws Exception
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertTrue(dbmd.supportsBatchUpdates());
   }
 
-  public void testEmptyClearBatch() throws Exception {
+  public void testEmptyClearBatch() throws Exception
+  {
     Statement stmt = con.createStatement();
     stmt.clearBatch(); // No-op.
 
@@ -72,7 +78,8 @@ public class BatchExecuteTest extends BaseTest {
     ps.clearBatch(); // No-op.
   }
 
-  private void assertCol1HasValue(int expected) throws Exception {
+  private void assertCol1HasValue(int expected) throws Exception
+  {
     Statement getCol1 = con.createStatement();
 
     ResultSet rs =
@@ -89,7 +96,8 @@ public class BatchExecuteTest extends BaseTest {
     getCol1.close();
   }
 
-  public void testExecuteEmptyBatch() throws Exception {
+  public void testExecuteEmptyBatch() throws Exception
+  {
     Statement stmt = con.createStatement();
     int[] updateCount = stmt.executeBatch();
     assertEquals(0, updateCount.length);
@@ -101,7 +109,8 @@ public class BatchExecuteTest extends BaseTest {
     stmt.close();
   }
 
-  public void testClearBatch() throws Exception {
+  public void testClearBatch() throws Exception
+  {
     Statement stmt = con.createStatement();
 
     stmt.addBatch("UPDATE testbatch SET col1 = col1 + 1 WHERE pk = 1");
@@ -120,21 +129,25 @@ public class BatchExecuteTest extends BaseTest {
     stmt.close();
   }
 
-  public void testSelectThrowsException() throws Exception {
+  public void testSelectThrowsException() throws Exception
+  {
     Statement stmt = con.createStatement();
 
     stmt.addBatch("UPDATE testbatch SET col1 = col1 + 1 WHERE pk = 1");
     stmt.addBatch("SELECT col1 FROM testbatch WHERE pk = 1");
     stmt.addBatch("UPDATE testbatch SET col1 = col1 + 2 WHERE pk = 1");
 
-    try {
+    try
+    {
       stmt.executeBatch();
       fail("Should raise a BatchUpdateException because of the SELECT");
-    } catch (BatchUpdateException e) {
+    } catch (BatchUpdateException e)
+    {
       int[] updateCounts = e.getUpdateCounts();
       assertEquals(1, updateCounts.length);
       assertEquals(1, updateCounts[0]);
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       fail("Should throw a BatchUpdateException instead of "
           + "a generic SQLException: " + e);
     }
@@ -142,24 +155,28 @@ public class BatchExecuteTest extends BaseTest {
     stmt.close();
   }
 
-  public void testStringAddBatchOnPreparedStatement() throws Exception {
+  public void testStringAddBatchOnPreparedStatement() throws Exception
+  {
     PreparedStatement pstmt =
         con.prepareStatement("UPDATE testbatch SET col1 = col1 + ? WHERE PK = ?");
     pstmt.setInt(1, 1);
     pstmt.setInt(2, 1);
     pstmt.addBatch();
 
-    try {
+    try
+    {
       pstmt.addBatch("UPDATE testbatch SET col1 = 3");
       fail(
           "Should have thrown an exception about using the string addBatch method on a prepared statement.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
     }
 
     pstmt.close();
   }
 
-  public void testPreparedStatement() throws Exception {
+  public void testPreparedStatement() throws Exception
+  {
     PreparedStatement pstmt = con.prepareStatement(
         "UPDATE testbatch SET col1 = col1 + ? WHERE PK = ?");
 
@@ -198,7 +215,8 @@ public class BatchExecuteTest extends BaseTest {
     pstmt.close();
   }
 
-  public void testTransactionalBehaviour() throws Exception {
+  public void testTransactionalBehaviour() throws Exception
+  {
     Statement stmt = con.createStatement();
 
     stmt.addBatch("UPDATE testbatch SET col1 = col1 + 1 WHERE pk = 1");
@@ -228,7 +246,8 @@ public class BatchExecuteTest extends BaseTest {
     stmt.close();
   }
 
-  public void testWarningsAreCleared() throws SQLException {
+  public void testWarningsAreCleared() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.addBatch("CREATE TEMP TABLE unused (a int primary key)");
     stmt.executeBatch();
@@ -238,7 +257,8 @@ public class BatchExecuteTest extends BaseTest {
     stmt.close();
   }
 
-  public void testBatchEscapeProcessing() throws SQLException {
+  public void testBatchEscapeProcessing() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.execute("CREATE TEMP TABLE batchescape (d date)");
 
@@ -261,7 +281,8 @@ public class BatchExecuteTest extends BaseTest {
     stmt.close();
   }
 
-  public void testBatchWithEmbeddedNulls() throws SQLException {
+  public void testBatchWithEmbeddedNulls() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.execute("CREATE TEMP TABLE batchstring (a text)");
 
@@ -269,7 +290,8 @@ public class BatchExecuteTest extends BaseTest {
 
     PreparedStatement pstmt = con.prepareStatement("INSERT INTO batchstring VALUES (?)");
 
-    try {
+    try
+    {
       pstmt.setString(1, "a");
       pstmt.addBatch();
       pstmt.setString(1, "\u0000");
@@ -278,7 +300,8 @@ public class BatchExecuteTest extends BaseTest {
       pstmt.addBatch();
       pstmt.executeBatch();
       fail("Should have thrown an exception.");
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
       con.rollback();
     }
     pstmt.close();
@@ -290,8 +313,10 @@ public class BatchExecuteTest extends BaseTest {
     stmt.close();
   }
 
-  public void testMixedBatch() throws SQLException {
-    try {
+  public void testMixedBatch() throws SQLException
+  {
+    try
+    {
       Statement st = con.createStatement();
       st.executeUpdate("DELETE FROM prep;");
       st.close();
@@ -308,7 +333,8 @@ public class BatchExecuteTest extends BaseTest {
       assertEquals(1, batchResult[2]);
       assertEquals(0, batchResult[3]);
       assertEquals(2, batchResult[4]);
-    } catch (SQLException ex) {
+    } catch (SQLException ex)
+    {
       ex.getNextException().printStackTrace();
       throw ex;
     }
@@ -364,10 +390,12 @@ public class BatchExecuteTest extends BaseTest {
    * castable types; for example, using Integer in JDBC and bigint in the Pg
    * table will do it.
    */
-  public void testBatchReturningMixedNulls() throws SQLException {
+  public void testBatchReturningMixedNulls() throws SQLException
+  {
     String[] testData = new String[]{null, "test", null, null, null};
 
-    try {
+    try
+    {
       Statement setup = con.createStatement();
       setup.execute("DROP TABLE IF EXISTS mixednulltest;");
       // It's significant that "value' is 'text' not 'varchar' here;
@@ -381,7 +409,8 @@ public class BatchExecuteTest extends BaseTest {
           "INSERT INTO mixednulltest (value) VALUES (?)",
           new String[]{"key"});
 
-      for (String val : testData) {
+      for (String val : testData)
+      {
         /*
          * This is the crucial bit. It's set to null first time around,
 				 * so the RETURNING clause's type oid is undefined.
@@ -396,12 +425,14 @@ public class BatchExecuteTest extends BaseTest {
       }
       st.executeBatch();
       ResultSet rs = st.getGeneratedKeys();
-      for (int i = 1; i <= testData.length; i++) {
+      for (int i = 1; i <= testData.length; i++)
+      {
         rs.next();
         assertEquals(i, rs.getInt(1));
       }
       assertTrue(!rs.next());
-    } catch (SQLException ex) {
+    } catch (SQLException ex)
+    {
       ex.getNextException().printStackTrace();
       throw ex;
     }
@@ -412,8 +443,10 @@ public class BatchExecuteTest extends BaseTest {
    * another. Change of the datatypes causes re-prepare server-side statement, thus exactly the same
    * query object might have different statement names.
    */
-  public void testBatchWithAlternatingTypes() throws SQLException {
-    try {
+  public void testBatchWithAlternatingTypes() throws SQLException
+  {
+    try
+    {
       Statement s = con.createStatement();
       s.execute("BEGIN");
       PreparedStatement ps;
@@ -435,7 +468,8 @@ public class BatchExecuteTest extends BaseTest {
       ps.executeBatch();
       ps.close();
       s.execute("COMMIT");
-    } catch (BatchUpdateException e) {
+    } catch (BatchUpdateException e)
+    {
       throw e.getNextException();
     }
         /*

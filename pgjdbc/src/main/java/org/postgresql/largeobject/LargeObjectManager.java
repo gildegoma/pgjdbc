@@ -58,7 +58,8 @@ import java.sql.Statement;
  * @see java.sql.PreparedStatement#setBinaryStream
  * @see java.sql.PreparedStatement#setUnicodeStream
  */
-public class LargeObjectManager {
+public class LargeObjectManager
+{
   // the fastpath api for this connection
   private Fastpath fp;
   private BaseConnection conn;
@@ -81,7 +82,8 @@ public class LargeObjectManager {
   /**
    * This prevents us being created by mere mortals
    */
-  private LargeObjectManager() {
+  private LargeObjectManager()
+  {
   }
 
   /**
@@ -96,7 +98,8 @@ public class LargeObjectManager {
    * @param conn connection
    * @throws SQLException if something wrong happens
    */
-  public LargeObjectManager(BaseConnection conn) throws SQLException {
+  public LargeObjectManager(BaseConnection conn) throws SQLException
+  {
     this.conn = conn;
     // We need Fastpath to do anything
     this.fp = conn.getFastpathAPI();
@@ -106,11 +109,13 @@ public class LargeObjectManager {
     // This is an example of Fastpath.addFunctions();
     //
     String sql;
-    if (conn.getMetaData().supportsSchemasInTableDefinitions()) {
+    if (conn.getMetaData().supportsSchemasInTableDefinitions())
+    {
       sql = "SELECT p.proname,p.oid "
           + " FROM pg_catalog.pg_proc p, pg_catalog.pg_namespace n "
           + " WHERE p.pronamespace=n.oid AND n.nspname='pg_catalog' AND (";
-    } else {
+    } else
+    {
       sql = "SELECT proname,oid FROM pg_proc WHERE ";
     }
     sql += " proname = 'lo_open'"
@@ -126,14 +131,16 @@ public class LargeObjectManager {
         + " or proname = 'lo_truncate'"
         + " or proname = 'lo_truncate64'";
 
-    if (conn.getMetaData().supportsSchemasInTableDefinitions()) {
+    if (conn.getMetaData().supportsSchemasInTableDefinitions())
+    {
       sql += ")";
     }
 
     Statement stmt = conn.createStatement();
     ResultSet res = stmt.executeQuery(sql);
 
-    if (res == null) {
+    if (res == null)
+    {
       throw new PSQLException(GT.tr("Failed to initialize LargeObject API"),
           PSQLState.SYSTEM_ERROR);
     }
@@ -154,7 +161,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    * @deprecated As of 8.3, replaced by {@link #open(long)}
    */
-  public LargeObject open(int oid) throws SQLException {
+  public LargeObject open(int oid) throws SQLException
+  {
     return open((long) oid, false);
   }
 
@@ -169,7 +177,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    */
 
-  public LargeObject open(int oid, boolean commitOnClose) throws SQLException {
+  public LargeObject open(int oid, boolean commitOnClose) throws SQLException
+  {
     return open((long) oid, commitOnClose);
   }
 
@@ -181,7 +190,8 @@ public class LargeObjectManager {
    * @return LargeObject instance providing access to the object
    * @throws SQLException on error
    */
-  public LargeObject open(long oid) throws SQLException {
+  public LargeObject open(long oid) throws SQLException
+  {
     return open(oid, READWRITE, false);
   }
 
@@ -195,7 +205,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    */
 
-  public LargeObject open(long oid, boolean commitOnClose) throws SQLException {
+  public LargeObject open(long oid, boolean commitOnClose) throws SQLException
+  {
     return open((long) oid, READWRITE, commitOnClose);
   }
 
@@ -208,7 +219,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    * @deprecated As of 8.3, replaced by {@link #open(long, int)}
    */
-  public LargeObject open(int oid, int mode) throws SQLException {
+  public LargeObject open(int oid, int mode) throws SQLException
+  {
     return open((long) oid, mode, false);
   }
 
@@ -223,7 +235,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    */
 
-  public LargeObject open(int oid, int mode, boolean commitOnClose) throws SQLException {
+  public LargeObject open(int oid, int mode, boolean commitOnClose) throws SQLException
+  {
     return open((long) oid, mode, commitOnClose);
   }
 
@@ -235,7 +248,8 @@ public class LargeObjectManager {
    * @return LargeObject instance providing access to the object
    * @throws SQLException on error
    */
-  public LargeObject open(long oid, int mode) throws SQLException {
+  public LargeObject open(long oid, int mode) throws SQLException
+  {
     return open((long) oid, mode, false);
   }
 
@@ -248,8 +262,10 @@ public class LargeObjectManager {
    * @return LargeObject instance providing access to the object
    * @throws SQLException on error
    */
-  public LargeObject open(long oid, int mode, boolean commitOnClose) throws SQLException {
-    if (conn.getAutoCommit()) {
+  public LargeObject open(long oid, int mode, boolean commitOnClose) throws SQLException
+  {
+    if (conn.getAutoCommit())
+    {
       throw new PSQLException(GT.tr("Large Objects may not be used in auto-commit mode."),
           PSQLState.NO_ACTIVE_SQL_TRANSACTION);
     }
@@ -265,7 +281,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    * @deprecated As of 8.3, replaced by {@link #createLO()}
    */
-  public int create() throws SQLException {
+  public int create() throws SQLException
+  {
     return create(READWRITE);
   }
 
@@ -277,7 +294,8 @@ public class LargeObjectManager {
    * @return oid of new object
    * @throws SQLException if something wrong happens
    */
-  public long createLO() throws SQLException {
+  public long createLO() throws SQLException
+  {
     return createLO(READWRITE);
   }
 
@@ -288,8 +306,10 @@ public class LargeObjectManager {
    * @return oid of new object
    * @throws SQLException on error
    */
-  public long createLO(int mode) throws SQLException {
-    if (conn.getAutoCommit()) {
+  public long createLO(int mode) throws SQLException
+  {
+    if (conn.getAutoCommit())
+    {
       throw new PSQLException(GT.tr("Large Objects may not be used in auto-commit mode."),
           PSQLState.NO_ACTIVE_SQL_TRANSACTION);
     }
@@ -306,7 +326,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    * @deprecated As of 8.3, replaced by {@link #createLO(int)}
    */
-  public int create(int mode) throws SQLException {
+  public int create(int mode) throws SQLException
+  {
     long oid = createLO(mode);
     return (int) oid;
   }
@@ -317,7 +338,8 @@ public class LargeObjectManager {
    * @param oid describing object to delete
    * @throws SQLException on error
    */
-  public void delete(long oid) throws SQLException {
+  public void delete(long oid) throws SQLException
+  {
     FastpathArg args[] = new FastpathArg[1];
     args[0] = Fastpath.createOIDArg(oid);
     fp.fastpath("lo_unlink", args);
@@ -332,7 +354,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    * @deprecated As of 8.3, replaced by {@link #unlink(long)}
    */
-  public void unlink(int oid) throws SQLException {
+  public void unlink(int oid) throws SQLException
+  {
     delete((long) oid);
   }
 
@@ -344,7 +367,8 @@ public class LargeObjectManager {
    * @param oid describing object to delete
    * @throws SQLException on error
    */
-  public void unlink(long oid) throws SQLException {
+  public void unlink(long oid) throws SQLException
+  {
     delete(oid);
   }
 
@@ -355,7 +379,8 @@ public class LargeObjectManager {
    * @throws SQLException on error
    * @deprecated As of 8.3, replaced by {@link #delete(long)}
    */
-  public void delete(int oid) throws SQLException {
+  public void delete(int oid) throws SQLException
+  {
     delete((long) oid);
   }
 }

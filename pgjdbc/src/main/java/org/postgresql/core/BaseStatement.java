@@ -18,7 +18,8 @@ import java.util.List;
 /**
  * Driver-internal statement interface. Application code should not use this interface.
  */
-public interface BaseStatement extends PGStatement, Statement {
+public interface BaseStatement extends PGStatement, Statement
+{
   /**
    * Create a synthetic resultset from data provided by the driver.
    *

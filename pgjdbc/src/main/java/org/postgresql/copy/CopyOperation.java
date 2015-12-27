@@ -14,7 +14,8 @@ import java.sql.SQLException;
  * Exchange bulk data between client and PostgreSQL database tables. See CopyIn and CopyOut for full
  * interfaces for corresponding copy directions.
  */
-public interface CopyOperation {
+public interface CopyOperation
+{
 
   /**
    * @return number of fields in each row for this operation

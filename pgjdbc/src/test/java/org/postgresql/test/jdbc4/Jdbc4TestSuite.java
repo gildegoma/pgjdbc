@@ -20,12 +20,14 @@ import java.sql.Statement;
 /*
  * Executes all known tests for JDBC4
  */
-public class Jdbc4TestSuite extends TestSuite {
+public class Jdbc4TestSuite extends TestSuite
+{
 
   /*
    * The main entry point for JUnit
    */
-  public static TestSuite suite() throws Exception {
+  public static TestSuite suite() throws Exception
+  {
     Class.forName("org.postgresql.Driver");
     TestSuite suite = new TestSuite();
 
@@ -40,14 +42,18 @@ public class Jdbc4TestSuite extends TestSuite {
     suite.addTestSuite(BinaryStreamTest.class);
 
     Connection connection = TestUtil.openDB();
-    try {
-      if (TestUtil.haveMinimumServerVersion(connection, "8.3")) {
+    try
+    {
+      if (TestUtil.haveMinimumServerVersion(connection, "8.3"))
+      {
         suite.addTestSuite(UUIDTest.class);
-        if (isXmlEnabled(connection)) {
+        if (isXmlEnabled(connection))
+        {
           suite.addTestSuite(XmlTest.class);
         }
       }
-    } finally {
+    } finally
+    {
       connection.close();
     }
 
@@ -57,14 +63,17 @@ public class Jdbc4TestSuite extends TestSuite {
   /**
    * Not all servers will have been complied --with-libxml.
    */
-  private static boolean isXmlEnabled(Connection conn) {
-    try {
+  private static boolean isXmlEnabled(Connection conn)
+  {
+    try
+    {
       Statement stmt = conn.createStatement();
       ResultSet rs = stmt.executeQuery("SELECT '<a>b</a>'::xml");
       rs.close();
       stmt.close();
       return true;
-    } catch (SQLException sqle) {
+    } catch (SQLException sqle)
+    {
       return false;
     }
   }

@@ -29,18 +29,21 @@ import java.util.Map;
  *
  */
 
-public class DatabaseMetaDataTest extends TestCase {
+public class DatabaseMetaDataTest extends TestCase
+{
 
   private Connection con;
 
   /*
    * Constructor
    */
-  public DatabaseMetaDataTest(String name) {
+  public DatabaseMetaDataTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, "metadatatest",
         "id int4, name text, updated timestamptz, colour text, quest text");
@@ -59,11 +62,13 @@ public class DatabaseMetaDataTest extends TestCase {
 
     stmt.execute(
         "CREATE OR REPLACE FUNCTION f1(int, varchar) RETURNS int AS 'SELECT 1;' LANGUAGE SQL");
-    if (TestUtil.haveMinimumServerVersion(con, "8.0")) {
+    if (TestUtil.haveMinimumServerVersion(con, "8.0"))
+    {
       stmt.execute(
           "CREATE OR REPLACE FUNCTION f2(a int, b varchar) RETURNS int AS 'SELECT 1;' LANGUAGE SQL");
     }
-    if (TestUtil.haveMinimumServerVersion(con, "8.1")) {
+    if (TestUtil.haveMinimumServerVersion(con, "8.1"))
+    {
       stmt.execute(
           "CREATE OR REPLACE FUNCTION f3(IN a int, INOUT b varchar, OUT c timestamptz) AS $f$ BEGIN b := 'a'; c := now(); return; END; $f$ LANGUAGE plpgsql");
     }
@@ -72,14 +77,16 @@ public class DatabaseMetaDataTest extends TestCase {
     stmt.execute(
         "CREATE OR REPLACE FUNCTION f5() RETURNS TABLE (i int) LANGUAGE sql AS 'SELECT 1'");
 
-    if (TestUtil.haveMinimumServerVersion(con, "7.3")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       stmt.execute("CREATE DOMAIN nndom AS int not null");
       stmt.execute("CREATE TABLE domaintable (id nndom)");
     }
     stmt.close();
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     // Drop function first because it depends on the
     // metadatatest table's type
     Statement stmt = con.createStatement();
@@ -94,13 +101,16 @@ public class DatabaseMetaDataTest extends TestCase {
     TestUtil.dropTable(con, "arraytable");
 
     stmt.execute("DROP FUNCTION f1(int, varchar)");
-    if (TestUtil.haveMinimumServerVersion(con, "8.0")) {
+    if (TestUtil.haveMinimumServerVersion(con, "8.0"))
+    {
       stmt.execute("DROP FUNCTION f2(int, varchar)");
     }
-    if (TestUtil.haveMinimumServerVersion(con, "8.1")) {
+    if (TestUtil.haveMinimumServerVersion(con, "8.1"))
+    {
       stmt.execute("DROP FUNCTION f3(int, varchar)");
     }
-    if (TestUtil.haveMinimumServerVersion(con, "7.3")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       stmt.execute("DROP TABLE domaintable");
       stmt.execute("DROP DOMAIN nndom");
     }
@@ -108,7 +118,8 @@ public class DatabaseMetaDataTest extends TestCase {
     TestUtil.closeDB(con);
   }
 
-  public void testTables() throws Exception {
+  public void testTables() throws Exception
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -139,7 +150,8 @@ public class DatabaseMetaDataTest extends TestCase {
     assertEquals(java.sql.Types.TIMESTAMP, rs.getInt("DATA_TYPE"));
   }
 
-  public void testCrossReference() throws Exception {
+  public void testCrossReference() throws Exception
+  {
     Connection con1 = TestUtil.openDB();
 
     TestUtil.createTable(con1, "vv", "a int not null, b int not null, primary key ( a, b )");
@@ -153,7 +165,8 @@ public class DatabaseMetaDataTest extends TestCase {
 
     ResultSet rs = dbmd.getCrossReference(null, "", "vv", null, "", "ww");
 
-    for (int j = 1; rs.next(); j++) {
+    for (int j = 1; rs.next(); j++)
+    {
 
       String pkTableName = rs.getString("PKTABLE_NAME");
       assertEquals("vv", pkTableName);
@@ -168,11 +181,14 @@ public class DatabaseMetaDataTest extends TestCase {
       assertTrue(fkColumnName.equals("m") || fkColumnName.equals("n"));
 
       String fkName = rs.getString("FK_NAME");
-      if (TestUtil.haveMinimumServerVersion(con1, "8.0")) {
+      if (TestUtil.haveMinimumServerVersion(con1, "8.0"))
+      {
         assertEquals("ww_m_fkey", fkName);
-      } else if (TestUtil.haveMinimumServerVersion(con1, "7.3")) {
+      } else if (TestUtil.haveMinimumServerVersion(con1, "7.3"))
+      {
         assertTrue(fkName.startsWith("$1"));
-      } else {
+      } else
+      {
         assertTrue(fkName.startsWith("<unnamed>"));
       }
 
@@ -189,7 +205,8 @@ public class DatabaseMetaDataTest extends TestCase {
     TestUtil.closeDB(con1);
   }
 
-  public void testForeignKeyActions() throws Exception {
+  public void testForeignKeyActions() throws Exception
+  {
     Connection conn = TestUtil.openDB();
     TestUtil.createTable(conn, "pkt", "id int primary key");
     TestUtil.createTable(conn, "fkt1",
@@ -216,8 +233,10 @@ public class DatabaseMetaDataTest extends TestCase {
     TestUtil.closeDB(conn);
   }
 
-  public void testForeignKeysToUniqueIndexes() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.4")) {
+  public void testForeignKeysToUniqueIndexes() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.4"))
+    {
       return;
     }
 
@@ -230,7 +249,8 @@ public class DatabaseMetaDataTest extends TestCase {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getImportedKeys("", "", "fkt");
     int j = 0;
-    for (; rs.next(); j++) {
+    for (; rs.next(); j++)
+    {
       assertTrue("pkt".equals(rs.getString("PKTABLE_NAME")));
       assertTrue("fkt".equals(rs.getString("FKTABLE_NAME")));
       assertTrue("pkt_un_b".equals(rs.getString("PK_NAME")));
@@ -243,7 +263,8 @@ public class DatabaseMetaDataTest extends TestCase {
     con1.close();
   }
 
-  public void testMultiColumnForeignKeys() throws Exception {
+  public void testMultiColumnForeignKeys() throws Exception
+  {
     Connection con1 = TestUtil.openDB();
     TestUtil.createTable(con1, "pkt",
         "a int not null, b int not null, CONSTRAINT pkt_pk PRIMARY KEY (a,b)");
@@ -253,14 +274,17 @@ public class DatabaseMetaDataTest extends TestCase {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getImportedKeys("", "", "fkt");
     int j = 0;
-    for (; rs.next(); j++) {
+    for (; rs.next(); j++)
+    {
       assertTrue("pkt".equals(rs.getString("PKTABLE_NAME")));
       assertTrue("fkt".equals(rs.getString("FKTABLE_NAME")));
       assertTrue(j + 1 == rs.getInt("KEY_SEQ"));
-      if (j == 0) {
+      if (j == 0)
+      {
         assertTrue("b".equals(rs.getString("PKCOLUMN_NAME")));
         assertTrue("c".equals(rs.getString("FKCOLUMN_NAME")));
-      } else {
+      } else
+      {
         assertTrue("a".equals(rs.getString("PKCOLUMN_NAME")));
         assertTrue("d".equals(rs.getString("FKCOLUMN_NAME")));
       }
@@ -272,7 +296,8 @@ public class DatabaseMetaDataTest extends TestCase {
     con1.close();
   }
 
-  public void testSameTableForeignKeys() throws Exception {
+  public void testSameTableForeignKeys() throws Exception
+  {
     Connection con1 = TestUtil.openDB();
 
     TestUtil.createTable(con1, "person", "FIRST_NAME character varying(100) NOT NULL," +
@@ -297,7 +322,8 @@ public class DatabaseMetaDataTest extends TestCase {
     final List<String> fkNames = new ArrayList<String>();
 
     int lastFieldCount = -1;
-    while (rs.next()) {
+    while (rs.next())
+    {
       // destination table (all foreign keys point to the same)
       String pkTableName = rs.getString("PKTABLE_NAME");
       assertEquals("person", pkTableName);
@@ -314,13 +340,15 @@ public class DatabaseMetaDataTest extends TestCase {
       String fkName = rs.getString("FK_NAME");
       // sequence number within the foreign key
       int seq = rs.getInt("KEY_SEQ");
-      if (seq == 1) {
+      if (seq == 1)
+      {
         // begin new foreign key
         assertFalse(fkNames.contains(fkName));
         fkNames.add(fkName);
         // all foreign keys have 2 fields
         assertTrue(lastFieldCount < 0 || lastFieldCount == 2);
-      } else {
+      } else
+      {
         // continue foreign key, i.e. fkName matches the last foreign key
         assertEquals(fkNames.get(fkNames.size() - 1), fkName);
         // see always increases by 1
@@ -337,7 +365,8 @@ public class DatabaseMetaDataTest extends TestCase {
 
   }
 
-  public void testForeignKeys() throws Exception {
+  public void testForeignKeys() throws Exception
+  {
     Connection con1 = TestUtil.openDB();
     TestUtil.createTable(con1, "people", "id int4 primary key, name text");
     TestUtil.createTable(con1, "policy", "id int4 primary key, name text");
@@ -352,7 +381,8 @@ public class DatabaseMetaDataTest extends TestCase {
 
     ResultSet rs = dbmd.getImportedKeys(null, "", "users");
     int j = 0;
-    for (; rs.next(); j++) {
+    for (; rs.next(); j++)
+    {
 
       String pkTableName = rs.getString("PKTABLE_NAME");
       assertTrue(pkTableName.equals("people") || pkTableName.equals("policy"));
@@ -396,7 +426,8 @@ public class DatabaseMetaDataTest extends TestCase {
     TestUtil.closeDB(con1);
   }
 
-  public void testColumns() throws SQLException {
+  public void testColumns() throws SQLException
+  {
     // At the moment just test that no exceptions are thrown KJ
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
@@ -404,8 +435,10 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testDroppedColumns() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(con, "8.4")) {
+  public void testDroppedColumns() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "8.4"))
+    {
       return;
     }
 
@@ -439,18 +472,23 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testSerialColumns() throws SQLException {
+  public void testSerialColumns() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getColumns(null, null, "sercoltest", null);
     int rownum = 0;
-    while (rs.next()) {
+    while (rs.next())
+    {
       assertEquals("sercoltest", rs.getString("TABLE_NAME"));
       assertEquals(rownum + 1, rs.getInt("ORDINAL_POSITION"));
-      if (rownum == 0) {
+      if (rownum == 0)
+      {
         assertEquals("int4", rs.getString("TYPE_NAME"));
-      } else if (rownum == 1) {
+      } else if (rownum == 1)
+      {
         assertEquals("serial", rs.getString("TYPE_NAME"));
-      } else if (rownum == 2) {
+      } else if (rownum == 2)
+      {
         assertEquals("bigserial", rs.getString("TYPE_NAME"));
       }
       rownum++;
@@ -459,7 +497,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testColumnPrivileges() throws SQLException {
+  public void testColumnPrivileges() throws SQLException
+  {
     // At the moment just test that no exceptions are thrown KJ
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
@@ -467,14 +506,17 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testTablePrivileges() throws SQLException {
+  public void testTablePrivileges() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
     ResultSet rs = dbmd.getTablePrivileges(null, null, "metadatatest");
     boolean l_foundSelect = false;
-    while (rs.next()) {
+    while (rs.next())
+    {
       if (rs.getString("GRANTEE").equals(TestUtil.getUser())
-          && rs.getString("PRIVILEGE").equals("SELECT")) {
+          && rs.getString("PRIVILEGE").equals("SELECT"))
+      {
         l_foundSelect = true;
       }
     }
@@ -484,7 +526,8 @@ public class DatabaseMetaDataTest extends TestCase {
         l_foundSelect);
   }
 
-  public void testNoTablePrivileges() throws SQLException {
+  public void testNoTablePrivileges() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.execute("REVOKE ALL ON metadatatest FROM PUBLIC");
     stmt.execute("REVOKE ALL ON metadatatest FROM " + TestUtil.getUser());
@@ -493,7 +536,8 @@ public class DatabaseMetaDataTest extends TestCase {
     assertTrue(!rs.next());
   }
 
-  public void testPrimaryKeys() throws SQLException {
+  public void testPrimaryKeys() throws SQLException
+  {
     // At the moment just test that no exceptions are thrown KJ
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
@@ -501,12 +545,14 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testIndexInfo() throws SQLException {
+  public void testIndexInfo() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.execute("create index idx_id on metadatatest (id)");
     stmt.execute("create index idx_func_single on metadatatest (upper(colour))");
     stmt.execute("create unique index idx_un_id on metadatatest(id)");
-    if (TestUtil.haveMinimumServerVersion(con, "7.4")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.4"))
+    {
       stmt.execute("create index idx_func_multi on metadatatest (upper(colour), upper(quest))");
       stmt.execute("create index idx_func_mixed on metadatatest (colour, upper(quest))");
     }
@@ -521,7 +567,8 @@ public class DatabaseMetaDataTest extends TestCase {
     assertEquals("id", rs.getString("COLUMN_NAME"));
     assertTrue(!rs.getBoolean("NON_UNIQUE"));
 
-    if (TestUtil.haveMinimumServerVersion(con, "7.4")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.4"))
+    {
       assertTrue(rs.next());
       assertEquals("idx_func_mixed", rs.getString("INDEX_NAME"));
       assertEquals(1, rs.getInt("ORDINAL_POSITION"));
@@ -559,8 +606,10 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testNotNullDomainColumn() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.3")) {
+  public void testNotNullDomainColumn() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       return;
     }
 
@@ -572,8 +621,10 @@ public class DatabaseMetaDataTest extends TestCase {
     assertTrue(!rs.next());
   }
 
-  public void testAscDescIndexInfo() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(con, "8.3")) {
+  public void testAscDescIndexInfo() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "8.3"))
+    {
       return;
     }
 
@@ -595,7 +646,8 @@ public class DatabaseMetaDataTest extends TestCase {
     assertEquals("D", rs.getString("ASC_OR_DESC"));
   }
 
-  public void testPartialIndexInfo() throws SQLException {
+  public void testPartialIndexInfo() throws SQLException
+  {
     Statement stmt = con.createStatement();
     stmt.execute("create index idx_p_name_id on metadatatest (name) where id > 5");
     stmt.close();
@@ -613,7 +665,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testTableTypes() throws SQLException {
+  public void testTableTypes() throws SQLException
+  {
     // At the moment just test that no exceptions are thrown KJ
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
@@ -621,7 +674,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testFuncWithoutNames() throws SQLException {
+  public void testFuncWithoutNames() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
     ResultSet rs = dbmd.getProcedureColumns(null, null, "f1", null);
@@ -645,8 +699,10 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testFuncWithNames() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(con, "8.0")) {
+  public void testFuncWithNames() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "8.0"))
+    {
       return;
     }
 
@@ -666,8 +722,10 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testFuncWithDirection() throws SQLException {
-    if (!TestUtil.haveMinimumServerVersion(con, "8.1")) {
+  public void testFuncWithDirection() throws SQLException
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "8.1"))
+    {
       return;
     }
 
@@ -692,7 +750,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testFuncReturningComposite() throws SQLException {
+  public void testFuncReturningComposite() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getProcedureColumns(null, null, "f4", null);
 
@@ -730,7 +789,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testFuncReturningTable() throws Exception {
+  public void testFuncReturningTable() throws Exception
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getProcedureColumns(null, null, "f5", null);
     assertTrue(rs.next());
@@ -745,7 +805,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testVersionColumns() throws SQLException {
+  public void testVersionColumns() throws SQLException
+  {
     // At the moment just test that no exceptions are thrown KJ
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
@@ -753,7 +814,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testBestRowIdentifier() throws SQLException {
+  public void testBestRowIdentifier() throws SQLException
+  {
     // At the moment just test that no exceptions are thrown KJ
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
@@ -762,7 +824,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testProcedures() throws SQLException {
+  public void testProcedures() throws SQLException
+  {
     // At the moment just test that no exceptions are thrown KJ
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
@@ -770,7 +833,8 @@ public class DatabaseMetaDataTest extends TestCase {
     rs.close();
   }
 
-  public void testCatalogs() throws SQLException {
+  public void testCatalogs() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getCatalogs();
     assertTrue(rs.next());
@@ -778,7 +842,8 @@ public class DatabaseMetaDataTest extends TestCase {
     assertTrue(!rs.next());
   }
 
-  public void testSchemas() throws Exception {
+  public void testSchemas() throws Exception
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     assertNotNull(dbmd);
 
@@ -788,23 +853,29 @@ public class DatabaseMetaDataTest extends TestCase {
     boolean foundPGCatalog = false;
     int count;
 
-    for (count = 0; rs.next(); count++) {
+    for (count = 0; rs.next(); count++)
+    {
       String schema = rs.getString("TABLE_SCHEM");
-      if ("public".equals(schema)) {
+      if ("public".equals(schema))
+      {
         foundPublic = true;
-      } else if ("".equals(schema)) {
+      } else if ("".equals(schema))
+      {
         foundEmpty = true;
-      } else if ("pg_catalog".equals(schema)) {
+      } else if ("pg_catalog".equals(schema))
+      {
         foundPGCatalog = true;
       }
     }
     rs.close();
-    if (TestUtil.haveMinimumServerVersion(con, "7.3")) {
+    if (TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       assertTrue(count >= 2);
       assertTrue(foundPublic);
       assertTrue(foundPGCatalog);
       assertTrue(!foundEmpty);
-    } else {
+    } else
+    {
       assertEquals(count, 1);
       assertTrue(foundEmpty);
       assertTrue(!foundPublic);
@@ -812,7 +883,8 @@ public class DatabaseMetaDataTest extends TestCase {
     }
   }
 
-  public void testEscaping() throws SQLException {
+  public void testEscaping() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getTables(null, null, "a'", new String[]{"TABLE"});
     assertTrue(rs.next());
@@ -822,7 +894,8 @@ public class DatabaseMetaDataTest extends TestCase {
     assertTrue(!rs.next());
   }
 
-  public void testSearchStringEscape() throws Exception {
+  public void testSearchStringEscape() throws Exception
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     String pattern = dbmd.getSearchStringEscape() + "_";
     PreparedStatement pstmt = con.prepareStatement("SELECT 'a' LIKE ?, '_' LIKE ?");
@@ -836,13 +909,16 @@ public class DatabaseMetaDataTest extends TestCase {
     pstmt.close();
   }
 
-  public void testGetUDTQualified() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.3")) {
+  public void testGetUDTQualified() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       return;
     }
 
     Statement stmt = null;
-    try {
+    try
+    {
       stmt = con.createStatement();
       stmt.execute("create schema jdbc");
       stmt.execute("create type jdbc.testint8 as (i int8)");
@@ -875,26 +951,33 @@ public class DatabaseMetaDataTest extends TestCase {
       baseType = rs.getInt("base_type");
       this.assertEquals("type name ", "testint8", typeName);
       this.assertEquals("schema name ", "jdbc", schema);
-    } finally {
-      try {
-        if (stmt != null) {
+    } finally
+    {
+      try
+      {
+        if (stmt != null)
+        {
           stmt.close();
         }
         stmt = con.createStatement();
         stmt.execute("drop type jdbc.testint8");
         stmt.execute("drop schema jdbc");
-      } catch (Exception ex) {
+      } catch (Exception ex)
+      {
       }
     }
 
   }
 
-  public void testGetUDT1() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.3")) {
+  public void testGetUDT1() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       return;
     }
 
-    try {
+    try
+    {
       Statement stmt = con.createStatement();
       stmt.execute("create domain testint8 as int8");
       stmt.execute("comment on domain testint8 is 'jdbc123'");
@@ -918,22 +1001,28 @@ public class DatabaseMetaDataTest extends TestCase {
       this.assertEquals("type name ", "testint8", typeName);
       this.assertEquals("remarks", "jdbc123", remarks);
 
-    } finally {
-      try {
+    } finally
+    {
+      try
+      {
         Statement stmt = con.createStatement();
         stmt.execute("drop domain testint8");
-      } catch (Exception ex) {
+      } catch (Exception ex)
+      {
       }
     }
   }
 
 
-  public void testGetUDT2() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.3")) {
+  public void testGetUDT2() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       return;
     }
 
-    try {
+    try
+    {
       Statement stmt = con.createStatement();
       stmt.execute("create domain testint8 as int8");
       stmt.execute("comment on domain testint8 is 'jdbc123'");
@@ -958,21 +1047,27 @@ public class DatabaseMetaDataTest extends TestCase {
       this.assertEquals("type name ", "testint8", typeName);
       this.assertEquals("remarks", "jdbc123", remarks);
 
-    } finally {
-      try {
+    } finally
+    {
+      try
+      {
         Statement stmt = con.createStatement();
         stmt.execute("drop domain testint8");
-      } catch (Exception ex) {
+      } catch (Exception ex)
+      {
       }
     }
   }
 
-  public void testGetUDT3() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.3")) {
+  public void testGetUDT3() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       return;
     }
 
-    try {
+    try
+    {
       Statement stmt = con.createStatement();
       stmt.execute("create domain testint8 as int8");
       stmt.execute("comment on domain testint8 is 'jdbc123'");
@@ -997,21 +1092,27 @@ public class DatabaseMetaDataTest extends TestCase {
       this.assertEquals("type name ", "testint8", typeName);
       this.assertEquals("remarks", "jdbc123", remarks);
 
-    } finally {
-      try {
+    } finally
+    {
+      try
+      {
         Statement stmt = con.createStatement();
         stmt.execute("drop domain testint8");
-      } catch (Exception ex) {
+      } catch (Exception ex)
+      {
       }
     }
   }
 
-  public void testGetUDT4() throws Exception {
-    if (!TestUtil.haveMinimumServerVersion(con, "7.3")) {
+  public void testGetUDT4() throws Exception
+  {
+    if (!TestUtil.haveMinimumServerVersion(con, "7.3"))
+    {
       return;
     }
 
-    try {
+    try
+    {
       Statement stmt = con.createStatement();
       stmt.execute("create type testint8 as (i int8)");
       DatabaseMetaData dbmd = con.getMetaData();
@@ -1033,11 +1134,14 @@ public class DatabaseMetaDataTest extends TestCase {
       this.assertEquals("data type", Types.STRUCT, dataType);
       this.assertEquals("type name ", "testint8", typeName);
 
-    } finally {
-      try {
+    } finally
+    {
+      try
+      {
         Statement stmt = con.createStatement();
         stmt.execute("drop type testint8");
-      } catch (Exception ex) {
+      } catch (Exception ex)
+      {
       }
     }
   }
@@ -1098,48 +1202,61 @@ public class DatabaseMetaDataTest extends TestCase {
       "void",
   };
 
-  public void testTypes() throws SQLException {
+  public void testTypes() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getTypeInfo();
     Map<String, Boolean> types = new HashMap<String, Boolean>();
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       types.put(rs.getString("TYPE_NAME"), true);
     }
-    for (String typeName : typeArray) {
+    for (String typeName : typeArray)
+    {
       assertTrue(types.containsKey(typeName));
     }
 
   }
 
-  public void testTypeInfoSigned() throws SQLException {
+  public void testTypeInfoSigned() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getTypeInfo();
-    while (rs.next()) {
-      if ("int4".equals(rs.getString("TYPE_NAME"))) {
+    while (rs.next())
+    {
+      if ("int4".equals(rs.getString("TYPE_NAME")))
+      {
         assertEquals(false, rs.getBoolean("UNSIGNED_ATTRIBUTE"));
-      } else if ("float8".equals(rs.getString("TYPE_NAME"))) {
+      } else if ("float8".equals(rs.getString("TYPE_NAME")))
+      {
         assertEquals(false, rs.getBoolean("UNSIGNED_ATTRIBUTE"));
-      } else if ("text".equals(rs.getString("TYPE_NAME"))) {
+      } else if ("text".equals(rs.getString("TYPE_NAME")))
+      {
         assertEquals(true, rs.getBoolean("UNSIGNED_ATTRIBUTE"));
       }
     }
   }
 
-  public void testTypeInfoQuoting() throws SQLException {
+  public void testTypeInfoQuoting() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getTypeInfo();
-    while (rs.next()) {
-      if ("int4".equals(rs.getString("TYPE_NAME"))) {
+    while (rs.next())
+    {
+      if ("int4".equals(rs.getString("TYPE_NAME")))
+      {
         assertNull(rs.getString("LITERAL_PREFIX"));
-      } else if ("text".equals(rs.getString("TYPE_NAME"))) {
+      } else if ("text".equals(rs.getString("TYPE_NAME")))
+      {
         assertEquals("'", rs.getString("LITERAL_PREFIX"));
         assertEquals("'", rs.getString("LITERAL_SUFFIX"));
       }
     }
   }
 
-  public void testInformationAboutArrayTypes() throws SQLException {
+  public void testInformationAboutArrayTypes() throws SQLException
+  {
     DatabaseMetaData dbmd = con.getMetaData();
     ResultSet rs = dbmd.getColumns("", "", "arraytable", "");
     assertTrue(rs.next());

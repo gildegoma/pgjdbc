@@ -17,38 +17,47 @@ import java.sql.ResultSet;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-public class ResultWrapper {
-  public ResultWrapper(ResultSet rs) {
+public class ResultWrapper
+{
+  public ResultWrapper(ResultSet rs)
+  {
     this.rs = rs;
     this.updateCount = -1;
     this.insertOID = -1;
   }
 
-  public ResultWrapper(int updateCount, long insertOID) {
+  public ResultWrapper(int updateCount, long insertOID)
+  {
     this.rs = null;
     this.updateCount = updateCount;
     this.insertOID = insertOID;
   }
 
-  public ResultSet getResultSet() {
+  public ResultSet getResultSet()
+  {
     return rs;
   }
 
-  public int getUpdateCount() {
+  public int getUpdateCount()
+  {
     return updateCount;
   }
 
-  public long getInsertOID() {
+  public long getInsertOID()
+  {
     return insertOID;
   }
 
-  public ResultWrapper getNext() {
+  public ResultWrapper getNext()
+  {
     return next;
   }
 
-  public void append(ResultWrapper newResult) {
+  public void append(ResultWrapper newResult)
+  {
     ResultWrapper tail = this;
-    while (tail.next != null) {
+    while (tail.next != null)
+    {
       tail = tail.next;
     }
 

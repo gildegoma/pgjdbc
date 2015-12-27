@@ -29,7 +29,8 @@ import java.sql.SQLException;
 /**
  * API for PostgreSQL COPY bulk data transfer
  */
-public class CopyManager {
+public class CopyManager
+{
   // I don't know what the best buffer size is, so we let people specify it if
   // they want, and if they don't know, we don't make them guess, so that if we
   // do figure it out we can just set it here and they reap the rewards.
@@ -41,30 +42,37 @@ public class CopyManager {
   private final QueryExecutor queryExecutor;
   private final BaseConnection connection;
 
-  public CopyManager(BaseConnection connection) throws SQLException {
+  public CopyManager(BaseConnection connection) throws SQLException
+  {
     this.encoding = connection.getEncoding();
     this.queryExecutor = connection.getQueryExecutor();
     this.connection = connection;
   }
 
-  public CopyIn copyIn(String sql) throws SQLException {
+  public CopyIn copyIn(String sql) throws SQLException
+  {
     CopyOperation op = null;
-    try {
+    try
+    {
       op = queryExecutor.startCopy(sql, connection.getAutoCommit());
       return (CopyIn) op;
-    } catch (ClassCastException cce) {
+    } catch (ClassCastException cce)
+    {
       op.cancelCopy();
       throw new PSQLException(GT.tr("Requested CopyIn but got {0}", op.getClass().getName()),
           PSQLState.WRONG_OBJECT_TYPE, cce);
     }
   }
 
-  public CopyOut copyOut(String sql) throws SQLException {
+  public CopyOut copyOut(String sql) throws SQLException
+  {
     CopyOperation op = null;
-    try {
+    try
+    {
       op = queryExecutor.startCopy(sql, connection.getAutoCommit());
       return (CopyOut) op;
-    } catch (ClassCastException cce) {
+    } catch (ClassCastException cce)
+    {
       op.cancelCopy();
       throw new PSQLException(GT.tr("Requested CopyOut but got {0}", op.getClass().getName()),
           PSQLState.WRONG_OBJECT_TYPE, cce);
@@ -80,27 +88,37 @@ public class CopyManager {
    * @throws SQLException on database usage errors
    * @throws IOException  upon writer or database connection failure
    */
-  public long copyOut(final String sql, Writer to) throws SQLException, IOException {
+  public long copyOut(final String sql, Writer to) throws SQLException, IOException
+  {
     byte[] buf;
     CopyOut cp = copyOut(sql);
-    try {
-      while ((buf = cp.readFromCopy()) != null) {
+    try
+    {
+      while ((buf = cp.readFromCopy()) != null)
+      {
         to.write(encoding.decode(buf));
       }
       return cp.getHandledRowCount();
-    } catch (IOException ioEX) {
+    } catch (IOException ioEX)
+    {
       // if not handled this way the close call will hang, at least in 8.2
-      if (cp.isActive()) {
+      if (cp.isActive())
+      {
         cp.cancelCopy();
       }
-      try {  // read until excausted or operation cancelled SQLException
-        while ((buf = cp.readFromCopy()) != null) {
+      try
+      {  // read until excausted or operation cancelled SQLException
+        while ((buf = cp.readFromCopy()) != null)
+        {
         }
-      } catch (SQLException sqlEx) {
+      } catch (SQLException sqlEx)
+      {
       } // typically after several kB
       throw ioEX;
-    } finally { // see to it that we do not leave the connection locked
-      if (cp.isActive()) {
+    } finally
+    { // see to it that we do not leave the connection locked
+      if (cp.isActive())
+      {
         cp.cancelCopy();
       }
     }
@@ -115,27 +133,37 @@ public class CopyManager {
    * @throws SQLException on database usage errors
    * @throws IOException  upon output stream or database connection failure
    */
-  public long copyOut(final String sql, OutputStream to) throws SQLException, IOException {
+  public long copyOut(final String sql, OutputStream to) throws SQLException, IOException
+  {
     byte[] buf;
     CopyOut cp = copyOut(sql);
-    try {
-      while ((buf = cp.readFromCopy()) != null) {
+    try
+    {
+      while ((buf = cp.readFromCopy()) != null)
+      {
         to.write(buf);
       }
       return cp.getHandledRowCount();
-    } catch (IOException ioEX) {
+    } catch (IOException ioEX)
+    {
       // if not handled this way the close call will hang, at least in 8.2
-      if (cp.isActive()) {
+      if (cp.isActive())
+      {
         cp.cancelCopy();
       }
-      try {  // read until excausted or operation cancelled SQLException
-        while ((buf = cp.readFromCopy()) != null) {
+      try
+      {  // read until excausted or operation cancelled SQLException
+        while ((buf = cp.readFromCopy()) != null)
+        {
         }
-      } catch (SQLException sqlEx) {
+      } catch (SQLException sqlEx)
+      {
       } // typically after several kB
       throw ioEX;
-    } finally { // see to it that we do not leave the connection locked
-      if (cp.isActive()) {
+    } finally
+    { // see to it that we do not leave the connection locked
+      if (cp.isActive())
+      {
         cp.cancelCopy();
       }
     }
@@ -150,7 +178,8 @@ public class CopyManager {
    * @throws SQLException on database usage issues
    * @throws IOException  upon reader or database connection failure
    */
-  public long copyIn(final String sql, Reader from) throws SQLException, IOException {
+  public long copyIn(final String sql, Reader from) throws SQLException, IOException
+  {
     return copyIn(sql, from, DEFAULT_BUFFER_SIZE);
   }
 
@@ -165,20 +194,26 @@ public class CopyManager {
    * @throws IOException  upon reader or database connection failure
    */
   public long copyIn(final String sql, Reader from, int bufferSize)
-      throws SQLException, IOException {
+      throws SQLException, IOException
+  {
     char[] cbuf = new char[bufferSize];
     int len;
     CopyIn cp = copyIn(sql);
-    try {
-      while ((len = from.read(cbuf)) >= 0) {
-        if (len > 0) {
+    try
+    {
+      while ((len = from.read(cbuf)) >= 0)
+      {
+        if (len > 0)
+        {
           byte[] buf = encoding.encode(new String(cbuf, 0, len));
           cp.writeToCopy(buf, 0, buf.length);
         }
       }
       return cp.endCopy();
-    } finally { // see to it that we do not leave the connection locked
-      if (cp.isActive()) {
+    } finally
+    { // see to it that we do not leave the connection locked
+      if (cp.isActive())
+      {
         cp.cancelCopy();
       }
     }
@@ -193,7 +228,8 @@ public class CopyManager {
    * @throws SQLException on database usage issues
    * @throws IOException  upon input stream or database connection failure
    */
-  public long copyIn(final String sql, InputStream from) throws SQLException, IOException {
+  public long copyIn(final String sql, InputStream from) throws SQLException, IOException
+  {
     return copyIn(sql, from, DEFAULT_BUFFER_SIZE);
   }
 
@@ -208,19 +244,25 @@ public class CopyManager {
    * @throws IOException  upon input stream or database connection failure
    */
   public long copyIn(final String sql, InputStream from, int bufferSize)
-      throws SQLException, IOException {
+      throws SQLException, IOException
+  {
     byte[] buf = new byte[bufferSize];
     int len;
     CopyIn cp = copyIn(sql);
-    try {
-      while ((len = from.read(buf)) >= 0) {
-        if (len > 0) {
+    try
+    {
+      while ((len = from.read(buf)) >= 0)
+      {
+        if (len > 0)
+        {
           cp.writeToCopy(buf, 0, len);
         }
       }
       return cp.endCopy();
-    } finally { // see to it that we do not leave the connection locked
-      if (cp.isActive()) {
+    } finally
+    { // see to it that we do not leave the connection locked
+      if (cp.isActive())
+      {
         cp.cancelCopy();
       }
     }

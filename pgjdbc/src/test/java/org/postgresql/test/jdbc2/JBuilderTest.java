@@ -21,14 +21,17 @@ import java.sql.Statement;
  * stay working
  *
  */
-public class JBuilderTest extends TestCase {
+public class JBuilderTest extends TestCase
+{
 
-  public JBuilderTest(String name) {
+  public JBuilderTest(String name)
+  {
     super(name);
   }
 
   // Set up the fixture for this testcase: the tables for this test.
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     Connection con = TestUtil.openDB();
 
     TestUtil.createTable(con, "test_c",
@@ -38,7 +41,8 @@ public class JBuilderTest extends TestCase {
   }
 
   // Tear down the fixture for this test case.
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     Connection con = TestUtil.openDB();
     TestUtil.dropTable(con, "test_c");
     TestUtil.closeDB(con);
@@ -47,14 +51,16 @@ public class JBuilderTest extends TestCase {
   /*
    * This tests that Money types work. JDBCExplorer barfs if this fails.
    */
-  public void testMoney() throws Exception {
+  public void testMoney() throws Exception
+  {
     Connection con = TestUtil.openDB();
 
     Statement st = con.createStatement();
     ResultSet rs = st.executeQuery("select cost from test_c");
     assertNotNull(rs);
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       rs.getDouble(1);
     }
 

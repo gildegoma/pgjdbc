@@ -20,16 +20,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class LoginTimeoutTest extends TestCase {
-  public LoginTimeoutTest(String name) {
+public class LoginTimeoutTest extends TestCase
+{
+  public LoginTimeoutTest(String name)
+  {
     super(name);
   }
 
-  public void setUp() throws Exception {
+  public void setUp() throws Exception
+  {
     TestUtil.initDriver(); // Set up log levels, etc.
   }
 
-  public void testIntTimeout() throws Exception {
+  public void testIntTimeout() throws Exception
+  {
     Properties props = new Properties();
     props.setProperty("user", TestUtil.getUser());
     props.setProperty("password", TestUtil.getPassword());
@@ -39,7 +43,8 @@ public class LoginTimeoutTest extends TestCase {
     conn.close();
   }
 
-  public void testFloatTimeout() throws Exception {
+  public void testFloatTimeout() throws Exception
+  {
     Properties props = new Properties();
     props.setProperty("user", TestUtil.getUser());
     props.setProperty("password", TestUtil.getPassword());
@@ -49,7 +54,8 @@ public class LoginTimeoutTest extends TestCase {
     conn.close();
   }
 
-  public void testZeroTimeout() throws Exception {
+  public void testZeroTimeout() throws Exception
+  {
     Properties props = new Properties();
     props.setProperty("user", TestUtil.getUser());
     props.setProperty("password", TestUtil.getPassword());
@@ -59,7 +65,8 @@ public class LoginTimeoutTest extends TestCase {
     conn.close();
   }
 
-  public void testNegativeTimeout() throws Exception {
+  public void testNegativeTimeout() throws Exception
+  {
     Properties props = new Properties();
     props.setProperty("user", TestUtil.getUser());
     props.setProperty("password", TestUtil.getPassword());
@@ -69,7 +76,8 @@ public class LoginTimeoutTest extends TestCase {
     conn.close();
   }
 
-  public void testBadTimeout() throws Exception {
+  public void testBadTimeout() throws Exception
+  {
     Properties props = new Properties();
     props.setProperty("user", TestUtil.getUser());
     props.setProperty("password", TestUtil.getPassword());
@@ -79,44 +87,58 @@ public class LoginTimeoutTest extends TestCase {
     conn.close();
   }
 
-  private static class TimeoutHelper implements Runnable {
-    TimeoutHelper() throws IOException {
+  private static class TimeoutHelper implements Runnable
+  {
+    TimeoutHelper() throws IOException
+    {
       InetAddress localAddr;
-      try {
+      try
+      {
         localAddr = InetAddress.getLocalHost();
-      } catch (java.net.UnknownHostException ex) {
+      } catch (java.net.UnknownHostException ex)
+      {
         System.err.println("WARNING: Could not resolve local host name, trying 'localhost'. " + ex);
         localAddr = InetAddress.getByName("localhost");
       }
       this.listenSocket = new ServerSocket(0, 1, localAddr);
     }
 
-    String getHost() {
+    String getHost()
+    {
       return listenSocket.getInetAddress().getHostAddress();
     }
 
-    int getPort() {
+    int getPort()
+    {
       return listenSocket.getLocalPort();
     }
 
-    public void run() {
-      try {
+    public void run()
+    {
+      try
+      {
         Socket newSocket = listenSocket.accept();
-        try {
+        try
+        {
           Thread.sleep(30000);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException e)
+        {
           // Ignore it.
         }
         newSocket.close();
-      } catch (IOException e) {
+      } catch (IOException e)
+      {
         // Ignore it.
       }
     }
 
-    void kill() {
-      try {
+    void kill()
+    {
+      try
+      {
         listenSocket.close();
-      } catch (IOException e) {
+      } catch (IOException e)
+      {
       }
     }
 
@@ -124,13 +146,15 @@ public class LoginTimeoutTest extends TestCase {
   }
 
 
-  public void testTimeoutOccurs() throws Exception {
+  public void testTimeoutOccurs() throws Exception
+  {
     // Spawn a helper thread to accept a connection and do nothing with it;
     // this should trigger a timeout.
     TimeoutHelper helper = new TimeoutHelper();
     new Thread(helper, "timeout listen helper").start();
 
-    try {
+    try
+    {
       String url = "jdbc:postgresql://" + helper.getHost() + ":" + helper.getPort() + "/dummy";
       Properties props = new Properties();
       props.setProperty("user", "dummy");
@@ -140,20 +164,25 @@ public class LoginTimeoutTest extends TestCase {
       // "can't connect" from "timed out".
       long startTime = System.currentTimeMillis();
       Connection conn = null;
-      try {
+      try
+      {
         conn = java.sql.DriverManager.getConnection(url, props);
         fail("connection was unexpectedly successful");
-      } catch (SQLException e) {
+      } catch (SQLException e)
+      {
         // Ignored.
-      } finally {
-        if (conn != null) {
+      } finally
+      {
+        if (conn != null)
+        {
           conn.close();
         }
       }
 
       long endTime = System.currentTimeMillis();
       assertTrue(endTime > startTime + 2500);
-    } finally {
+    } finally
+    {
       helper.kill();
     }
   }

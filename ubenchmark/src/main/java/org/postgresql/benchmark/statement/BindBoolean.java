@@ -44,12 +44,14 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class BindBoolean {
+public class BindBoolean
+{
   private Connection connection;
   private PreparedStatement ps;
 
   @Setup(Level.Trial)
-  public void setUp() throws SQLException {
+  public void setUp() throws SQLException
+  {
     Properties props = ConnectionUtil.getProperties();
 
     connection = DriverManager.getConnection(ConnectionUtil.getURL(), props);
@@ -57,30 +59,35 @@ public class BindBoolean {
   }
 
   @TearDown(Level.Trial)
-  public void tearDown() throws SQLException {
+  public void tearDown() throws SQLException
+  {
     ps.close();
     connection.close();
   }
 
   @Benchmark
-  public Statement boolAsInt() throws SQLException {
+  public Statement boolAsInt() throws SQLException
+  {
     ps.setObject(1, 1, Types.BOOLEAN);
     return ps;
   }
 
   @Benchmark
-  public Statement boolAsBoolean() throws SQLException {
+  public Statement boolAsBoolean() throws SQLException
+  {
     ps.setObject(1, true, Types.BOOLEAN);
     return ps;
   }
 
   @Benchmark
-  public Statement bindBoolean() throws SQLException {
+  public Statement bindBoolean() throws SQLException
+  {
     ps.setBoolean(1, true);
     return ps;
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(BindBoolean.class.getSimpleName())
         .addProfiler(GCProfiler.class)

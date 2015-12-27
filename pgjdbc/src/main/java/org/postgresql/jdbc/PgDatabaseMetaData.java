@@ -32,9 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public class PgDatabaseMetaData implements DatabaseMetaData {
+public class PgDatabaseMetaData implements DatabaseMetaData
+{
 
-  public PgDatabaseMetaData(PgConnection conn) {
+  public PgDatabaseMetaData(PgConnection conn)
+  {
     this.connection = conn;
   }
 
@@ -53,17 +55,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   private int NAMEDATALEN = 0; // length for name datatype
   private int INDEX_MAX_KEYS = 0; // maximum number of keys in an index.
 
-  protected int getMaxIndexKeys() throws SQLException {
-    if (INDEX_MAX_KEYS == 0) {
+  protected int getMaxIndexKeys() throws SQLException
+  {
+    if (INDEX_MAX_KEYS == 0)
+    {
       String sql;
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_0)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_0))
+      {
         sql = "SELECT setting FROM pg_catalog.pg_settings WHERE name='max_index_keys'";
-      } else {
+      } else
+      {
         String from;
-        if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+        if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+        {
           from =
               "pg_catalog.pg_namespace n, pg_catalog.pg_type t1, pg_catalog.pg_type t2 WHERE t1.typnamespace=n.oid AND n.nspname='pg_catalog' AND ";
-        } else {
+        } else
+        {
           from = "pg_type t1, pg_type t2 WHERE ";
         }
         sql = "SELECT t1.typlen/t2.typlen FROM " + from
@@ -71,7 +79,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       }
       Statement stmt = connection.createStatement();
       ResultSet rs = stmt.executeQuery(sql);
-      if (!rs.next()) {
+      if (!rs.next())
+      {
         stmt.close();
         throw new PSQLException(GT.tr(
             "Unable to determine a value for MaxIndexKeys due to missing system catalog data."),
@@ -84,18 +93,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     return INDEX_MAX_KEYS;
   }
 
-  protected int getMaxNameLength() throws SQLException {
-    if (NAMEDATALEN == 0) {
+  protected int getMaxNameLength() throws SQLException
+  {
+    if (NAMEDATALEN == 0)
+    {
       String sql;
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql =
             "SELECT t.typlen FROM pg_catalog.pg_type t, pg_catalog.pg_namespace n WHERE t.typnamespace=n.oid AND t.typname='name' AND n.nspname='pg_catalog'";
-      } else {
+      } else
+      {
         sql = "SELECT typlen FROM pg_type WHERE typname='name'";
       }
       Statement stmt = connection.createStatement();
       ResultSet rs = stmt.executeQuery(sql);
-      if (!rs.next()) {
+      if (!rs.next())
+      {
         throw new PSQLException(GT.tr("Unable to find name datatype in the system catalogs."),
             PSQLState.UNEXPECTED_ERROR);
       }
@@ -107,39 +121,48 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
 
-  public boolean allProceduresAreCallable() throws SQLException {
+  public boolean allProceduresAreCallable() throws SQLException
+  {
     return true;  // For now...
   }
 
-  public boolean allTablesAreSelectable() throws SQLException {
+  public boolean allTablesAreSelectable() throws SQLException
+  {
     return true;  // For now...
   }
 
-  public String getURL() throws SQLException {
+  public String getURL() throws SQLException
+  {
     return connection.getURL();
   }
 
-  public String getUserName() throws SQLException {
+  public String getUserName() throws SQLException
+  {
     return connection.getUserName();
   }
 
-  public boolean isReadOnly() throws SQLException {
+  public boolean isReadOnly() throws SQLException
+  {
     return connection.isReadOnly();
   }
 
-  public boolean nullsAreSortedHigh() throws SQLException {
+  public boolean nullsAreSortedHigh() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_2);
   }
 
-  public boolean nullsAreSortedLow() throws SQLException {
+  public boolean nullsAreSortedLow() throws SQLException
+  {
     return false;
   }
 
-  public boolean nullsAreSortedAtStart() throws SQLException {
+  public boolean nullsAreSortedAtStart() throws SQLException
+  {
     return false;
   }
 
-  public boolean nullsAreSortedAtEnd() throws SQLException {
+  public boolean nullsAreSortedAtEnd() throws SQLException
+  {
     return !connection.haveMinimumServerVersion(ServerVersion.v7_2);
   }
 
@@ -150,27 +173,33 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
      * @return the database product name
      * @exception SQLException if a database access error occurs
      */
-  public String getDatabaseProductName() throws SQLException {
+  public String getDatabaseProductName() throws SQLException
+  {
     return "PostgreSQL";
   }
 
-  public String getDatabaseProductVersion() throws SQLException {
+  public String getDatabaseProductVersion() throws SQLException
+  {
     return connection.getDBVersionNumber();
   }
 
-  public String getDriverName() throws SQLException {
+  public String getDriverName() throws SQLException
+  {
     return "PostgreSQL Native Driver";
   }
 
-  public String getDriverVersion() throws SQLException {
+  public String getDriverVersion() throws SQLException
+  {
     return Driver.getVersion();
   }
 
-  public int getDriverMajorVersion() {
+  public int getDriverMajorVersion()
+  {
     return Driver.MAJORVERSION;
   }
 
-  public int getDriverMinorVersion() {
+  public int getDriverMinorVersion()
+  {
     return Driver.MINORVERSION;
   }
 
@@ -180,7 +209,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return true if so
    * @throws SQLException if a database access error occurs
    */
-  public boolean usesLocalFiles() throws SQLException {
+  public boolean usesLocalFiles() throws SQLException
+  {
     return false;
   }
 
@@ -191,7 +221,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return true if so
    * @throws SQLException if a database access error occurs
    */
-  public boolean usesLocalFilePerTable() throws SQLException {
+  public boolean usesLocalFilePerTable() throws SQLException
+  {
     return false;
   }
 
@@ -202,19 +233,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return true if so
    * @throws SQLException if a database access error occurs
    */
-  public boolean supportsMixedCaseIdentifiers() throws SQLException {
+  public boolean supportsMixedCaseIdentifiers() throws SQLException
+  {
     return false;
   }
 
-  public boolean storesUpperCaseIdentifiers() throws SQLException {
+  public boolean storesUpperCaseIdentifiers() throws SQLException
+  {
     return false;
   }
 
-  public boolean storesLowerCaseIdentifiers() throws SQLException {
+  public boolean storesLowerCaseIdentifiers() throws SQLException
+  {
     return true;
   }
 
-  public boolean storesMixedCaseIdentifiers() throws SQLException {
+  public boolean storesMixedCaseIdentifiers() throws SQLException
+  {
     return false;
   }
 
@@ -225,19 +260,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return true if so
    * @throws SQLException if a database access error occurs
    */
-  public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
+  public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException
+  {
     return true;
   }
 
-  public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
+  public boolean storesUpperCaseQuotedIdentifiers() throws SQLException
+  {
     return false;
   }
 
-  public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
+  public boolean storesLowerCaseQuotedIdentifiers() throws SQLException
+  {
     return false;
   }
 
-  public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
+  public boolean storesMixedCaseQuotedIdentifiers() throws SQLException
+  {
     return false;
   }
 
@@ -248,7 +287,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return the quoting string
    * @throws SQLException if a database access error occurs
    */
-  public String getIdentifierQuoteString() throws SQLException {
+  public String getIdentifierQuoteString() throws SQLException
+  {
     return "\"";
   }
 
@@ -264,11 +304,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return a comma separated list of keywords we use
    * @throws SQLException if a database access error occurs
    */
-  public String getSQLKeywords() throws SQLException {
+  public String getSQLKeywords() throws SQLException
+  {
     return keywords;
   }
 
-  public String getNumericFunctions() throws SQLException {
+  public String getNumericFunctions() throws SQLException
+  {
     return EscapedFunctions.ABS + ',' + EscapedFunctions.ACOS
         + ',' + EscapedFunctions.ASIN + ',' + EscapedFunctions.ATAN
         + ',' + EscapedFunctions.ATAN2 + ',' + EscapedFunctions.CEILING
@@ -284,7 +326,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
   }
 
-  public String getStringFunctions() throws SQLException {
+  public String getStringFunctions() throws SQLException
+  {
     String funcs = EscapedFunctions.ASCII + ',' + EscapedFunctions.CHAR
         + ',' + EscapedFunctions.CONCAT
         + ',' + EscapedFunctions.LCASE + ',' + EscapedFunctions.LEFT
@@ -301,24 +344,29 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     //','+EscapedFunctions.INSERT+','+EscapedFunctions.LOCATE+
     //','+EscapedFunctions.RIGHT+
 
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       funcs += ',' + EscapedFunctions.REPLACE;
     }
 
     return funcs;
   }
 
-  public String getSystemFunctions() throws SQLException {
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+  public String getSystemFunctions() throws SQLException
+  {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       return EscapedFunctions.DATABASE + ',' + EscapedFunctions.IFNULL
           + ',' + EscapedFunctions.USER;
-    } else {
+    } else
+    {
       return EscapedFunctions.IFNULL
           + ',' + EscapedFunctions.USER;
     }
   }
 
-  public String getTimeDateFunctions() throws SQLException {
+  public String getTimeDateFunctions() throws SQLException
+  {
     String timeDateFuncs = EscapedFunctions.CURDATE + ',' + EscapedFunctions.CURTIME
         + ',' + EscapedFunctions.DAYNAME + ',' + EscapedFunctions.DAYOFMONTH
         + ',' + EscapedFunctions.DAYOFWEEK + ',' + EscapedFunctions.DAYOFYEAR
@@ -328,7 +376,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
         + ',' + EscapedFunctions.QUARTER + ',' + EscapedFunctions.SECOND
         + ',' + EscapedFunctions.WEEK + ',' + EscapedFunctions.YEAR;
 
-    if (connection.haveMinimumServerVersion(ServerVersion.v8_0)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v8_0))
+    {
       timeDateFuncs += ',' + EscapedFunctions.TIMESTAMPADD;
     }
 
@@ -337,7 +386,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     return timeDateFuncs;
   }
 
-  public String getSearchStringEscape() throws SQLException {
+  public String getSearchStringEscape() throws SQLException
+  {
     // This method originally returned "\\\\" assuming that it
     // would be fed directly into pg's input parser so it would
     // need two backslashes.  This isn't how it's supposed to be
@@ -364,7 +414,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return a string containing the extra characters
    * @throws SQLException if a database access error occurs
    */
-  public String getExtraNameCharacters() throws SQLException {
+  public String getExtraNameCharacters() throws SQLException
+  {
     return "";
   }
 
@@ -373,7 +424,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 6.1+
    */
-  public boolean supportsAlterTableWithAddColumn() throws SQLException {
+  public boolean supportsAlterTableWithAddColumn() throws SQLException
+  {
     return true;
   }
 
@@ -382,35 +434,43 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.3+
    */
-  public boolean supportsAlterTableWithDropColumn() throws SQLException {
+  public boolean supportsAlterTableWithDropColumn() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_3);
   }
 
-  public boolean supportsColumnAliasing() throws SQLException {
+  public boolean supportsColumnAliasing() throws SQLException
+  {
     return true;
   }
 
-  public boolean nullPlusNonNullIsNull() throws SQLException {
+  public boolean nullPlusNonNullIsNull() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsConvert() throws SQLException {
+  public boolean supportsConvert() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsConvert(int fromType, int toType) throws SQLException {
+  public boolean supportsConvert(int fromType, int toType) throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsTableCorrelationNames() throws SQLException {
+  public boolean supportsTableCorrelationNames() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsDifferentTableCorrelationNames() throws SQLException {
+  public boolean supportsDifferentTableCorrelationNames() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsExpressionsInOrderBy() throws SQLException {
+  public boolean supportsExpressionsInOrderBy() throws SQLException
+  {
     return true;
   }
 
@@ -419,11 +479,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 6.4+
    */
-  public boolean supportsOrderByUnrelated() throws SQLException {
+  public boolean supportsOrderByUnrelated() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v6_4);
   }
 
-  public boolean supportsGroupBy() throws SQLException {
+  public boolean supportsGroupBy() throws SQLException
+  {
     return true;
   }
 
@@ -432,7 +494,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 6.4+
    */
-  public boolean supportsGroupByUnrelated() throws SQLException {
+  public boolean supportsGroupByUnrelated() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v6_4);
   }
 
@@ -440,7 +503,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
      * {@inheritDoc}
      * @return true if connected to PostgreSQL 6.4+
      */
-  public boolean supportsGroupByBeyondSelect() throws SQLException {
+  public boolean supportsGroupByBeyondSelect() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v6_4);
   }
 
@@ -448,19 +512,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
      * {@inheritDoc}
      * @return true if connected to PostgreSQL 7.1+
      */
-  public boolean supportsLikeEscapeClause() throws SQLException {
+  public boolean supportsLikeEscapeClause() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_1);
   }
 
-  public boolean supportsMultipleResultSets() throws SQLException {
+  public boolean supportsMultipleResultSets() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsMultipleTransactions() throws SQLException {
+  public boolean supportsMultipleTransactions() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsNonNullableColumns() throws SQLException {
+  public boolean supportsNonNullableColumns() throws SQLException
+  {
     return true;
   }
 
@@ -476,7 +544,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true
    */
-  public boolean supportsMinimumSQLGrammar() throws SQLException {
+  public boolean supportsMinimumSQLGrammar() throws SQLException
+  {
     return true;
   }
 
@@ -486,7 +555,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return false
    * @throws SQLException if a database access error occurs
    */
-  public boolean supportsCoreSQLGrammar() throws SQLException {
+  public boolean supportsCoreSQLGrammar() throws SQLException
+  {
     return false;
   }
 
@@ -497,7 +567,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return false
    * @throws SQLException if a database access error occurs
    */
-  public boolean supportsExtendedSQLGrammar() throws SQLException {
+  public boolean supportsExtendedSQLGrammar() throws SQLException
+  {
     return false;
   }
 
@@ -511,7 +582,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return true if connected to PostgreSQL 7.3+
    * @throws SQLException if a database access error occurs
    */
-  public boolean supportsANSI92EntryLevelSQL() throws SQLException {
+  public boolean supportsANSI92EntryLevelSQL() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_3);
   }
 
@@ -520,7 +592,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return false
    */
-  public boolean supportsANSI92IntermediateSQL() throws SQLException {
+  public boolean supportsANSI92IntermediateSQL() throws SQLException
+  {
     return false;
   }
 
@@ -529,7 +602,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return false
    */
-  public boolean supportsANSI92FullSQL() throws SQLException {
+  public boolean supportsANSI92FullSQL() throws SQLException
+  {
     return false;
   }
 
@@ -540,7 +614,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
      * @return true
      * @exception SQLException if a database access error occurs
      */
-  public boolean supportsIntegrityEnhancementFacility() throws SQLException {
+  public boolean supportsIntegrityEnhancementFacility() throws SQLException
+  {
     return true;
   }
 
@@ -549,7 +624,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.1+
    */
-  public boolean supportsOuterJoins() throws SQLException {
+  public boolean supportsOuterJoins() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_1);
   }
 
@@ -558,7 +634,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.1+
    */
-  public boolean supportsFullOuterJoins() throws SQLException {
+  public boolean supportsFullOuterJoins() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_1);
   }
 
@@ -567,7 +644,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.1+
    */
-  public boolean supportsLimitedOuterJoins() throws SQLException {
+  public boolean supportsLimitedOuterJoins() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_1);
   }
 
@@ -577,7 +655,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return {@code "schema"}
    */
-  public String getSchemaTerm() throws SQLException {
+  public String getSchemaTerm() throws SQLException
+  {
     return "schema";
   }
 
@@ -586,7 +665,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return {@code "function"}
    */
-  public String getProcedureTerm() throws SQLException {
+  public String getProcedureTerm() throws SQLException
+  {
     return "function";
   }
 
@@ -595,15 +675,18 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return {@code "database"}
    */
-  public String getCatalogTerm() throws SQLException {
+  public String getCatalogTerm() throws SQLException
+  {
     return "database";
   }
 
-  public boolean isCatalogAtStart() throws SQLException {
+  public boolean isCatalogAtStart() throws SQLException
+  {
     return true;
   }
 
-  public String getCatalogSeparator() throws SQLException {
+  public String getCatalogSeparator() throws SQLException
+  {
     return ".";
   }
 
@@ -612,7 +695,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.3+
    */
-  public boolean supportsSchemasInDataManipulation() throws SQLException {
+  public boolean supportsSchemasInDataManipulation() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_3);
   }
 
@@ -621,7 +705,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.3+
    */
-  public boolean supportsSchemasInProcedureCalls() throws SQLException {
+  public boolean supportsSchemasInProcedureCalls() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_3);
   }
 
@@ -630,7 +715,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.3+
    */
-  public boolean supportsSchemasInTableDefinitions() throws SQLException {
+  public boolean supportsSchemasInTableDefinitions() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_3);
   }
 
@@ -639,7 +725,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.3+
    */
-  public boolean supportsSchemasInIndexDefinitions() throws SQLException {
+  public boolean supportsSchemasInIndexDefinitions() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_3);
   }
 
@@ -648,27 +735,33 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.3+
    */
-  public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
+  public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_3);
   }
 
-  public boolean supportsCatalogsInDataManipulation() throws SQLException {
+  public boolean supportsCatalogsInDataManipulation() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsCatalogsInProcedureCalls() throws SQLException {
+  public boolean supportsCatalogsInProcedureCalls() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsCatalogsInTableDefinitions() throws SQLException {
+  public boolean supportsCatalogsInTableDefinitions() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
+  public boolean supportsCatalogsInIndexDefinitions() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
+  public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException
+  {
     return false;
   }
 
@@ -678,11 +771,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return false
    * @throws SQLException if a database access error occurs
    */
-  public boolean supportsPositionedDelete() throws SQLException {
+  public boolean supportsPositionedDelete() throws SQLException
+  {
     return false;   // For now...
   }
 
-  public boolean supportsPositionedUpdate() throws SQLException {
+  public boolean supportsPositionedUpdate() throws SQLException
+  {
     return false;   // For now...
   }
 
@@ -691,27 +786,33 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 6.5+
    */
-  public boolean supportsSelectForUpdate() throws SQLException {
+  public boolean supportsSelectForUpdate() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v6_5);
   }
 
-  public boolean supportsStoredProcedures() throws SQLException {
+  public boolean supportsStoredProcedures() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsSubqueriesInComparisons() throws SQLException {
+  public boolean supportsSubqueriesInComparisons() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsSubqueriesInExists() throws SQLException {
+  public boolean supportsSubqueriesInExists() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsSubqueriesInIns() throws SQLException {
+  public boolean supportsSubqueriesInIns() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsSubqueriesInQuantifieds() throws SQLException {
+  public boolean supportsSubqueriesInQuantifieds() throws SQLException
+  {
     return true;
   }
 
@@ -720,7 +821,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.1+
    */
-  public boolean supportsCorrelatedSubqueries() throws SQLException {
+  public boolean supportsCorrelatedSubqueries() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_1);
   }
 
@@ -729,7 +831,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 6.3+
    */
-  public boolean supportsUnion() throws SQLException {
+  public boolean supportsUnion() throws SQLException
+  {
     return true; // since 6.3
   }
 
@@ -738,18 +841,21 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true if connected to PostgreSQL 7.1+
    */
-  public boolean supportsUnionAll() throws SQLException {
+  public boolean supportsUnionAll() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v7_1);
   }
 
   /**
    * {@inheritDoc} In PostgreSQL, Cursors are only open within transactions.
    */
-  public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
+  public boolean supportsOpenCursorsAcrossCommit() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
+  public boolean supportsOpenCursorsAcrossRollback() throws SQLException
+  {
     return false;
   }
 
@@ -760,7 +866,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true
    */
-  public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
+  public boolean supportsOpenStatementsAcrossCommit() throws SQLException
+  {
     return true;
   }
 
@@ -771,35 +878,43 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    *
    * @return true
    */
-  public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
+  public boolean supportsOpenStatementsAcrossRollback() throws SQLException
+  {
     return true;
   }
 
-  public int getMaxCharLiteralLength() throws SQLException {
+  public int getMaxCharLiteralLength() throws SQLException
+  {
     return 0; // no limit
   }
 
-  public int getMaxBinaryLiteralLength() throws SQLException {
+  public int getMaxBinaryLiteralLength() throws SQLException
+  {
     return 0; // no limit
   }
 
-  public int getMaxColumnNameLength() throws SQLException {
+  public int getMaxColumnNameLength() throws SQLException
+  {
     return getMaxNameLength();
   }
 
-  public int getMaxColumnsInGroupBy() throws SQLException {
+  public int getMaxColumnsInGroupBy() throws SQLException
+  {
     return 0; // no limit
   }
 
-  public int getMaxColumnsInIndex() throws SQLException {
+  public int getMaxColumnsInIndex() throws SQLException
+  {
     return getMaxIndexKeys();
   }
 
-  public int getMaxColumnsInOrderBy() throws SQLException {
+  public int getMaxColumnsInOrderBy() throws SQLException
+  {
     return 0; // no limit
   }
 
-  public int getMaxColumnsInSelect() throws SQLException {
+  public int getMaxColumnsInSelect() throws SQLException
+  {
     return 0; // no limit
   }
 
@@ -814,7 +929,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return the max columns
    * @throws SQLException if a database access error occurs
    */
-  public int getMaxColumnsInTable() throws SQLException {
+  public int getMaxColumnsInTable() throws SQLException
+  {
     return 1600;
   }
 
@@ -828,71 +944,90 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return the maximum number of connections
    * @throws SQLException if a database access error occurs
    */
-  public int getMaxConnections() throws SQLException {
+  public int getMaxConnections() throws SQLException
+  {
     return 8192;
   }
 
-  public int getMaxCursorNameLength() throws SQLException {
+  public int getMaxCursorNameLength() throws SQLException
+  {
     return getMaxNameLength();
   }
 
-  public int getMaxIndexLength() throws SQLException {
+  public int getMaxIndexLength() throws SQLException
+  {
     return 0; // no limit (larger than an int anyway)
   }
 
-  public int getMaxSchemaNameLength() throws SQLException {
+  public int getMaxSchemaNameLength() throws SQLException
+  {
     return getMaxNameLength();
   }
 
-  public int getMaxProcedureNameLength() throws SQLException {
+  public int getMaxProcedureNameLength() throws SQLException
+  {
     return getMaxNameLength();
   }
 
-  public int getMaxCatalogNameLength() throws SQLException {
+  public int getMaxCatalogNameLength() throws SQLException
+  {
     return getMaxNameLength();
   }
 
-  public int getMaxRowSize() throws SQLException {
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_1)) {
+  public int getMaxRowSize() throws SQLException
+  {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_1))
+    {
       return 1073741824; // 1 GB
-    } else {
+    } else
+    {
       return 8192;  // XXX could be altered
     }
   }
 
-  public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
+  public boolean doesMaxRowSizeIncludeBlobs() throws SQLException
+  {
     return false;
   }
 
-  public int getMaxStatementLength() throws SQLException {
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_0)) {
+  public int getMaxStatementLength() throws SQLException
+  {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_0))
+    {
       return 0;  // actually whatever fits in size_t
-    } else {
+    } else
+    {
       return 16384;
     }
   }
 
-  public int getMaxStatements() throws SQLException {
+  public int getMaxStatements() throws SQLException
+  {
     return 0;
   }
 
-  public int getMaxTableNameLength() throws SQLException {
+  public int getMaxTableNameLength() throws SQLException
+  {
     return getMaxNameLength();
   }
 
-  public int getMaxTablesInSelect() throws SQLException {
+  public int getMaxTablesInSelect() throws SQLException
+  {
     return 0; // no limit
   }
 
-  public int getMaxUserNameLength() throws SQLException {
+  public int getMaxUserNameLength() throws SQLException
+  {
     return getMaxNameLength();
   }
 
-  public int getDefaultTransactionIsolation() throws SQLException {
+  public int getDefaultTransactionIsolation() throws SQLException
+  {
     return Connection.TRANSACTION_READ_COMMITTED;
   }
 
-  public boolean supportsTransactions() throws SQLException {
+  public boolean supportsTransactions() throws SQLException
+  {
     return true;
   }
 
@@ -900,24 +1035,30 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * {@inheritDoc} <p>We only support TRANSACTION_SERIALIZABLE and TRANSACTION_READ_COMMITTED before
    * 8.0; from 8.0 READ_UNCOMMITTED and REPEATABLE_READ are accepted aliases for READ_COMMITTED.
    */
-  public boolean supportsTransactionIsolationLevel(int level) throws SQLException {
+  public boolean supportsTransactionIsolationLevel(int level) throws SQLException
+  {
     if (level == Connection.TRANSACTION_SERIALIZABLE
-        || level == Connection.TRANSACTION_READ_COMMITTED) {
+        || level == Connection.TRANSACTION_READ_COMMITTED)
+    {
       return true;
     } else if (connection.haveMinimumServerVersion(ServerVersion.v8_0) && (
         level == Connection.TRANSACTION_READ_UNCOMMITTED
-            || level == Connection.TRANSACTION_REPEATABLE_READ)) {
+            || level == Connection.TRANSACTION_REPEATABLE_READ))
+    {
       return true;
-    } else {
+    } else
+    {
       return false;
     }
   }
 
-  public boolean supportsDataDefinitionAndDataManipulationTransactions() throws SQLException {
+  public boolean supportsDataDefinitionAndDataManipulationTransactions() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsDataManipulationTransactionsOnly() throws SQLException {
+  public boolean supportsDataManipulationTransactionsOnly() throws SQLException
+  {
     return false;
   }
 
@@ -940,11 +1081,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return true if so
    * @throws SQLException if a database access error occurs
    */
-  public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
+  public boolean dataDefinitionCausesTransactionCommit() throws SQLException
+  {
     return false;
   }
 
-  public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
+  public boolean dataDefinitionIgnoredInTransactions() throws SQLException
+  {
     return false;
   }
 
@@ -956,10 +1099,12 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @return string literal for direct inclusion into a query
    * @throws SQLException if something wrong happens
    */
-  protected String escapeQuotes(String s) throws SQLException {
+  protected String escapeQuotes(String s) throws SQLException
+  {
     StringBuilder sb = new StringBuilder();
     if (!connection.getStandardConformingStrings() && connection.haveMinimumServerVersion(
-        ServerVersion.v8_1)) {
+        ServerVersion.v8_1))
+    {
       sb.append("E");
     }
     sb.append("'");
@@ -969,18 +1114,22 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getProcedures(String catalog, String schemaPattern,
-      String procedureNamePattern) throws SQLException {
+      String procedureNamePattern) throws SQLException
+  {
     return getProcedures(getJDBCMajorVersion(), catalog, schemaPattern, procedureNamePattern);
   }
 
   protected java.sql.ResultSet getProcedures(int jdbcVersion, String catalog, String schemaPattern,
-      String procedureNamePattern) throws SQLException {
+      String procedureNamePattern) throws SQLException
+  {
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       sql =
           "SELECT NULL AS PROCEDURE_CAT, n.nspname AS PROCEDURE_SCHEM, p.proname AS PROCEDURE_NAME, NULL, NULL, NULL, d.description AS REMARKS, "
               + java.sql.DatabaseMetaData.procedureReturnsResult + " AS PROCEDURE_TYPE ";
-      if (jdbcVersion >= 4) {
+      if (jdbcVersion >= 4)
+      {
         sql += ", p.proname || '_' || p.oid AS SPECIFIC_NAME ";
       }
       sql += " FROM pg_catalog.pg_namespace n, pg_catalog.pg_proc p "
@@ -988,38 +1137,47 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " LEFT JOIN pg_catalog.pg_class c ON (d.classoid=c.oid AND c.relname='pg_proc') "
           + " LEFT JOIN pg_catalog.pg_namespace pn ON (c.relnamespace=pn.oid AND pn.nspname='pg_catalog') "
           + " WHERE p.pronamespace=n.oid ";
-      if (schemaPattern != null && !"".equals(schemaPattern)) {
+      if (schemaPattern != null && !"".equals(schemaPattern))
+      {
         sql += " AND n.nspname LIKE " + escapeQuotes(schemaPattern);
       }
-      if (procedureNamePattern != null) {
+      if (procedureNamePattern != null)
+      {
         sql += " AND p.proname LIKE " + escapeQuotes(procedureNamePattern);
       }
       sql += " ORDER BY PROCEDURE_SCHEM, PROCEDURE_NAME, p.oid::text ";
-    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_1)) {
+    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_1))
+    {
       sql =
           "SELECT NULL AS PROCEDURE_CAT, NULL AS PROCEDURE_SCHEM, p.proname AS PROCEDURE_NAME, NULL, NULL, NULL, d.description AS REMARKS, "
               + java.sql.DatabaseMetaData.procedureReturnsResult + " AS PROCEDURE_TYPE ";
-      if (jdbcVersion >= 4) {
+      if (jdbcVersion >= 4)
+      {
         sql += ", p.proname || '_' || p.oid AS SPECIFIC_NAME ";
       }
       sql += " FROM pg_proc p "
           + " LEFT JOIN pg_description d ON (p.oid=d.objoid) ";
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_2)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_2))
+      {
         sql += " LEFT JOIN pg_class c ON (d.classoid=c.oid AND c.relname='pg_proc') ";
       }
-      if (procedureNamePattern != null) {
+      if (procedureNamePattern != null)
+      {
         sql += " WHERE p.proname LIKE " + escapeQuotes(procedureNamePattern);
       }
       sql += " ORDER BY PROCEDURE_NAME, p.oid::text ";
-    } else {
+    } else
+    {
       sql =
           "SELECT NULL AS PROCEDURE_CAT, NULL AS PROCEDURE_SCHEM, p.proname AS PROCEDURE_NAME, NULL, NULL, NULL, NULL AS REMARKS, "
               + java.sql.DatabaseMetaData.procedureReturnsResult + " AS PROCEDURE_TYPE ";
-      if (jdbcVersion >= 4) {
+      if (jdbcVersion >= 4)
+      {
         sql += ", p.proname || '_' || p.oid AS SPECIFIC_NAME ";
       }
       sql += " FROM pg_proc p ";
-      if (procedureNamePattern != null) {
+      if (procedureNamePattern != null)
+      {
         sql += " WHERE p.proname LIKE " + escapeQuotes(procedureNamePattern);
       }
       sql += " ORDER BY PROCEDURE_NAME, p.oid::text ";
@@ -1028,16 +1186,19 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getProcedureColumns(String catalog, String schemaPattern,
-      String procedureNamePattern, String columnNamePattern) throws SQLException {
+      String procedureNamePattern, String columnNamePattern) throws SQLException
+  {
     return getProcedureColumns(getJDBCMajorVersion(), catalog, schemaPattern, procedureNamePattern,
         columnNamePattern);
   }
 
   protected java.sql.ResultSet getProcedureColumns(int jdbcVersion, String catalog,
       String schemaPattern, String procedureNamePattern, String columnNamePattern)
-      throws SQLException {
+      throws SQLException
+  {
     int columns = 13;
-    if (jdbcVersion >= 4) {
+    if (jdbcVersion >= 4)
+    {
       columns += 7;
     }
     Field f[] = new Field[columns];
@@ -1056,7 +1217,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     f[10] = new Field("RADIX", Oid.INT2);
     f[11] = new Field("NULLABLE", Oid.INT2);
     f[12] = new Field("REMARKS", Oid.VARCHAR);
-    if (jdbcVersion >= 4) {
+    if (jdbcVersion >= 4)
+    {
       f[13] = new Field("COLUMN_DEF", Oid.VARCHAR);
       f[14] = new Field("SQL_DATA_TYPE", Oid.INT4);
       f[15] = new Field("SQL_DATETIME_SUB", Oid.INT4);
@@ -1067,32 +1229,40 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     }
 
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       sql = "SELECT n.nspname,p.proname,p.prorettype,p.proargtypes, t.typtype,t.typrelid ";
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_1)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_1))
+      {
         sql += ", p.proargnames, p.proargmodes, p.proallargtypes  ";
-      } else if (connection.haveMinimumServerVersion(ServerVersion.v8_0)) {
+      } else if (connection.haveMinimumServerVersion(ServerVersion.v8_0))
+      {
         sql += ", p.proargnames, NULL AS proargmodes, NULL AS proallargtypes ";
-      } else {
+      } else
+      {
         sql += ", NULL AS proargnames, NULL AS proargmodes, NULL AS proallargtypes ";
       }
       sql += ", p.oid "
           + " FROM pg_catalog.pg_proc p, pg_catalog.pg_namespace n, pg_catalog.pg_type t "
           + " WHERE p.pronamespace=n.oid AND p.prorettype=t.oid ";
-      if (schemaPattern != null && !"".equals(schemaPattern)) {
+      if (schemaPattern != null && !"".equals(schemaPattern))
+      {
         sql += " AND n.nspname LIKE " + escapeQuotes(schemaPattern);
       }
-      if (procedureNamePattern != null) {
+      if (procedureNamePattern != null)
+      {
         sql += " AND p.proname LIKE " + escapeQuotes(procedureNamePattern);
       }
       sql += " ORDER BY n.nspname, p.proname, p.oid::text ";
-    } else {
+    } else
+    {
       sql =
           "SELECT NULL AS nspname,p.proname,p.prorettype,p.proargtypes,t.typtype,t.typrelid, NULL AS proargnames, NULL AS proargmodes, NULL AS proallargtypes, p.oid "
               + " FROM pg_proc p,pg_type t "
               + " WHERE p.prorettype=t.oid ";
-      if (procedureNamePattern != null) {
+      if (procedureNamePattern != null)
+      {
         sql += " AND p.proname LIKE " + escapeQuotes(procedureNamePattern);
       }
       sql += " ORDER BY p.proname, p.oid::text ";
@@ -1102,7 +1272,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
     Statement stmt = connection.createStatement();
     ResultSet rs = stmt.executeQuery(sql);
-    while (rs.next()) {
+    while (rs.next())
+    {
       byte schema[] = rs.getBytes("nspname");
       byte procedureName[] = rs.getBytes("proname");
       byte specificName[] =
@@ -1114,19 +1285,22 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       String strArgTypes = rs.getString("proargtypes");
       StringTokenizer st = new StringTokenizer(strArgTypes);
       List<Long> argTypes = new ArrayList<Long>();
-      while (st.hasMoreTokens()) {
+      while (st.hasMoreTokens())
+      {
         argTypes.add(new Long(st.nextToken()));
       }
 
       String argNames[] = null;
       Array argNamesArray = rs.getArray("proargnames");
-      if (argNamesArray != null) {
+      if (argNamesArray != null)
+      {
         argNames = (String[]) argNamesArray.getArray();
       }
 
       String argModes[] = null;
       Array argModesArray = rs.getArray("proargmodes");
-      if (argModesArray != null) {
+      if (argModesArray != null)
+      {
         argModes = (String[]) argModesArray.getArray();
       }
 
@@ -1134,17 +1308,21 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
       Long allArgTypes[] = null;
       Array allArgTypesArray = rs.getArray("proallargtypes");
-      if (allArgTypesArray != null) {
+      if (allArgTypesArray != null)
+      {
         // Depending on what the user has selected we'll get
         // either long[] or Long[] back, and there's no
         // obvious way for the driver to override this for
         // it's own usage.
-        if (connection.haveMinimumCompatibleVersion(ServerVersion.v8_3)) {
+        if (connection.haveMinimumCompatibleVersion(ServerVersion.v8_3))
+        {
           allArgTypes = (Long[]) allArgTypesArray.getArray();
-        } else {
+        } else
+        {
           long tempAllArgTypes[] = (long[]) allArgTypesArray.getArray();
           allArgTypes = new Long[tempAllArgTypes.length];
-          for (int i = 0; i < tempAllArgTypes.length; i++) {
+          for (int i = 0; i < tempAllArgTypes.length; i++)
+          {
             allArgTypes[i] = tempAllArgTypes[i];
           }
         }
@@ -1153,7 +1331,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
       // decide if we are returning a single column result.
       if (returnTypeType.equals("b") || returnTypeType.equals("d") || returnTypeType.equals("e")
-          || (returnTypeType.equals("p") && argModesArray == null)) {
+          || (returnTypeType.equals("p") && argModesArray == null))
+      {
         byte[][] tuple = new byte[columns][];
         tuple[0] = null;
         tuple[1] = schema;
@@ -1171,7 +1350,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
         tuple[11] = connection.encodeString(
             Integer.toString(java.sql.DatabaseMetaData.procedureNullableUnknown));
         tuple[12] = null;
-        if (jdbcVersion >= 4) {
+        if (jdbcVersion >= 4)
+        {
           tuple[17] = connection.encodeString(Integer.toString(0));
           tuple[18] = isnullableUnknown;
           tuple[19] = specificName;
@@ -1180,33 +1360,41 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       }
 
       // Add a row for each argument.
-      for (int i = 0; i < numArgs; i++) {
+      for (int i = 0; i < numArgs; i++)
+      {
         byte[][] tuple = new byte[columns][];
         tuple[0] = null;
         tuple[1] = schema;
         tuple[2] = procedureName;
 
-        if (argNames != null) {
+        if (argNames != null)
+        {
           tuple[3] = connection.encodeString(argNames[i]);
-        } else {
+        } else
+        {
           tuple[3] = connection.encodeString("$" + (i + 1));
         }
 
         int columnMode = DatabaseMetaData.procedureColumnIn;
-        if (argModes != null && argModes[i].equals("o")) {
+        if (argModes != null && argModes[i].equals("o"))
+        {
           columnMode = DatabaseMetaData.procedureColumnOut;
-        } else if (argModes != null && argModes[i].equals("b")) {
+        } else if (argModes != null && argModes[i].equals("b"))
+        {
           columnMode = DatabaseMetaData.procedureColumnInOut;
-        } else if (argModes != null && argModes[i].equals("t")) {
+        } else if (argModes != null && argModes[i].equals("t"))
+        {
           columnMode = DatabaseMetaData.procedureColumnReturn;
         }
 
         tuple[4] = connection.encodeString(Integer.toString(columnMode));
 
         int argOid;
-        if (allArgTypes != null) {
+        if (allArgTypes != null)
+        {
           argOid = allArgTypes[i].intValue();
-        } else {
+        } else
+        {
           argOid = argTypes.get(i).intValue();
         }
 
@@ -1220,7 +1408,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
         tuple[11] =
             connection.encodeString(Integer.toString(DatabaseMetaData.procedureNullableUnknown));
         tuple[12] = null;
-        if (jdbcVersion >= 4) {
+        if (jdbcVersion >= 4)
+        {
           tuple[17] = connection.encodeString(Integer.toString(i + 1));
           tuple[18] = isnullableUnknown;
           tuple[19] = specificName;
@@ -1229,16 +1418,19 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       }
 
       // if we are returning a multi-column result.
-      if (returnTypeType.equals("c") || (returnTypeType.equals("p") && argModesArray != null)) {
+      if (returnTypeType.equals("c") || (returnTypeType.equals("p") && argModesArray != null))
+      {
         String columnsql = "SELECT a.attname,a.atttypid FROM ";
-        if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+        if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+        {
           columnsql += "pg_catalog.";
         }
         columnsql += "pg_attribute a WHERE a.attrelid = " + returnTypeRelid
             + " AND a.attnum > 0 ORDER BY a.attnum ";
         Statement columnstmt = connection.createStatement();
         ResultSet columnrs = columnstmt.executeQuery(columnsql);
-        while (columnrs.next()) {
+        while (columnrs.next())
+        {
           int columnTypeOid = (int) columnrs.getLong("atttypid");
           byte[][] tuple = new byte[columns][];
           tuple[0] = null;
@@ -1257,7 +1449,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           tuple[11] = connection.encodeString(
               Integer.toString(java.sql.DatabaseMetaData.procedureNullableUnknown));
           tuple[12] = null;
-          if (jdbcVersion >= 4) {
+          if (jdbcVersion >= 4)
+          {
             tuple[17] = connection.encodeString(Integer.toString(0));
             tuple[18] = isnullableUnknown;
             tuple[19] = specificName;
@@ -1275,11 +1468,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern,
-      String types[]) throws SQLException {
+      String types[]) throws SQLException
+  {
     String select;
     String orderby;
     String useSchemas;
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       useSchemas = "SCHEMAS";
       select = "SELECT NULL AS TABLE_CAT, n.nspname AS TABLE_SCHEM, c.relname AS TABLE_NAME, "
           + " CASE n.nspname ~ '^pg_' OR n.nspname = 'information_schema' "
@@ -1321,11 +1516,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " LEFT JOIN pg_catalog.pg_class dc ON (d.classoid=dc.oid AND dc.relname='pg_class') "
           + " LEFT JOIN pg_catalog.pg_namespace dn ON (dn.oid=dc.relnamespace AND dn.nspname='pg_catalog') "
           + " WHERE c.relnamespace = n.oid ";
-      if (schemaPattern != null && !"".equals(schemaPattern)) {
+      if (schemaPattern != null && !"".equals(schemaPattern))
+      {
         select += " AND n.nspname LIKE " + escapeQuotes(schemaPattern);
       }
       orderby = " ORDER BY TABLE_TYPE,TABLE_SCHEM,TABLE_NAME ";
-    } else {
+    } else
+    {
       useSchemas = "NOSCHEMAS";
       String tableType = ""
           + " CASE c.relname ~ '^pg_' "
@@ -1364,7 +1561,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " ELSE NULL "
           + " END ";
       orderby = " ORDER BY TABLE_TYPE,TABLE_NAME ";
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_2)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_2))
+      {
         select =
             "SELECT NULL AS TABLE_CAT, NULL AS TABLE_SCHEM, c.relname AS TABLE_NAME, " + tableType
                 + " AS TABLE_TYPE, d.description AS REMARKS "
@@ -1372,14 +1570,16 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
                 + " LEFT JOIN pg_description d ON (c.oid=d.objoid AND d.objsubid = 0) "
                 + " LEFT JOIN pg_class dc ON (d.classoid = dc.oid AND dc.relname='pg_class') "
                 + " WHERE true ";
-      } else if (connection.haveMinimumServerVersion(ServerVersion.v7_1)) {
+      } else if (connection.haveMinimumServerVersion(ServerVersion.v7_1))
+      {
         select =
             "SELECT NULL AS TABLE_CAT, NULL AS TABLE_SCHEM, c.relname AS TABLE_NAME, " + tableType
                 + " AS TABLE_TYPE, d.description AS REMARKS "
                 + " FROM pg_class c "
                 + " LEFT JOIN pg_description d ON (c.oid=d.objoid) "
                 + " WHERE true ";
-      } else {
+      } else
+      {
         select =
             "SELECT NULL AS TABLE_CAT, NULL AS TABLE_SCHEM, c.relname AS TABLE_NAME, " + tableType
                 + " AS TABLE_TYPE, NULL AS REMARKS "
@@ -1388,14 +1588,18 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       }
     }
 
-    if (tableNamePattern != null && !"".equals(tableNamePattern)) {
+    if (tableNamePattern != null && !"".equals(tableNamePattern))
+    {
       select += " AND c.relname LIKE " + escapeQuotes(tableNamePattern);
     }
-    if (types != null) {
+    if (types != null)
+    {
       select += " AND (false ";
-      for (String type : types) {
+      for (String type : types)
+      {
         Map<String, String> clauses = tableTypeClauses.get(type);
-        if (clauses != null) {
+        if (clauses != null)
+        {
           String clause = clauses.get(useSchemas);
           select += " OR ( " + clause + " ) ";
         }
@@ -1409,7 +1613,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
   private static final Map<String, Map<String, String>> tableTypeClauses;
 
-  static {
+  static
+  {
     tableTypeClauses = new HashMap<String, Map<String, String>>();
     Map<String, String> ht = new HashMap<String, String>();
     tableTypeClauses.put("TABLE", ht);
@@ -1486,42 +1691,51 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     ht.put("NOSCHEMAS", "c.relkind = 'm'");
   }
 
-  public java.sql.ResultSet getSchemas() throws SQLException {
+  public java.sql.ResultSet getSchemas() throws SQLException
+  {
     return getSchemas(getJDBCMajorVersion(), null, null);
   }
 
   protected ResultSet getSchemas(int jdbcVersion, String catalog, String schemaPattern)
-      throws SQLException {
+      throws SQLException
+  {
     String sql;
     // Show only the users temp schemas, but not other peoples
     // because they can't access any objects in them.
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       // 7.3 can't extract elements from an array returned by
       // a function, so we've got to coerce it to text and then
       // hack it up with a regex.
       String tempSchema =
           "substring(textin(array_out(pg_catalog.current_schemas(true))) from '{(pg_temp_[0-9]+),')";
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_4)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_4))
+      {
         tempSchema = "(pg_catalog.current_schemas(true))[1]";
       }
       sql = "SELECT nspname AS TABLE_SCHEM ";
-      if (jdbcVersion >= 3) {
+      if (jdbcVersion >= 3)
+      {
         sql += ", NULL AS TABLE_CATALOG ";
       }
       sql +=
           " FROM pg_catalog.pg_namespace WHERE nspname <> 'pg_toast' AND (nspname !~ '^pg_temp_' OR nspname = "
               + tempSchema + ") AND (nspname !~ '^pg_toast_temp_' OR nspname = replace("
               + tempSchema + ", 'pg_temp_', 'pg_toast_temp_')) ";
-      if (schemaPattern != null && !"".equals(schemaPattern)) {
+      if (schemaPattern != null && !"".equals(schemaPattern))
+      {
         sql += " AND nspname LIKE " + escapeQuotes(schemaPattern);
       }
       sql += " ORDER BY TABLE_SCHEM";
-    } else {
+    } else
+    {
       sql = "SELECT ''::text AS TABLE_SCHEM ";
-      if (jdbcVersion >= 3) {
+      if (jdbcVersion >= 3)
+      {
         sql += ", NULL AS TABLE_CATALOG ";
       }
-      if (schemaPattern != null) {
+      if (schemaPattern != null)
+      {
         sql += " WHERE ''::text LIKE " + escapeQuotes(schemaPattern);
       }
     }
@@ -1532,7 +1746,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * PostgreSQL does not support multiple catalogs from a single connection, so to reduce confusion
    * we only return the current catalog. {@inheritDoc}
    */
-  public java.sql.ResultSet getCatalogs() throws SQLException {
+  public java.sql.ResultSet getCatalogs() throws SQLException
+  {
     Field f[] = new Field[1];
     List<byte[][]> v = new ArrayList<byte[][]>();
     f[0] = new Field("TABLE_CAT", Oid.VARCHAR);
@@ -1543,11 +1758,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     return (ResultSet) ((BaseStatement) createMetaDataStatement()).createDriverResultSet(f, v);
   }
 
-  public java.sql.ResultSet getTableTypes() throws SQLException {
+  public java.sql.ResultSet getTableTypes() throws SQLException
+  {
     String types[] = new String[tableTypeClauses.size()];
     Iterator<String> e = tableTypeClauses.keySet().iterator();
     int i = 0;
-    while (e.hasNext()) {
+    while (e.hasNext())
+    {
       types[i++] = e.next();
     }
     sortStringArray(types);
@@ -1555,7 +1772,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     Field f[] = new Field[1];
     List<byte[][]> v = new ArrayList<byte[][]>();
     f[0] = new Field("TABLE_TYPE", Oid.VARCHAR);
-    for (i = 0; i < types.length; i++) {
+    for (i = 0; i < types.length; i++)
+    {
       byte[][] tuple = new byte[1][];
       tuple[0] = connection.encodeString(types[i]);
       v.add(tuple);
@@ -1565,13 +1783,17 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   protected java.sql.ResultSet getColumns(int jdbcVersion, String catalog, String schemaPattern,
-      String tableNamePattern, String columnNamePattern) throws SQLException {
+      String tableNamePattern, String columnNamePattern) throws SQLException
+  {
     int numberOfFields;
-    if (jdbcVersion >= 4) {
+    if (jdbcVersion >= 4)
+    {
       numberOfFields = 23;
-    } else if (jdbcVersion >= 3) {
+    } else if (jdbcVersion >= 3)
+    {
       numberOfFields = 22;
-    } else {
+    } else
+    {
       numberOfFields = 18;
     }
     List<byte[][]> v = new ArrayList<byte[][]>();  // The new ResultSet tuple stuff
@@ -1596,19 +1818,22 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     f[16] = new Field("ORDINAL_POSITION", Oid.INT4);
     f[17] = new Field("IS_NULLABLE", Oid.VARCHAR);
 
-    if (jdbcVersion >= 3) {
+    if (jdbcVersion >= 3)
+    {
       f[18] = new Field("SCOPE_CATLOG", Oid.VARCHAR);
       f[19] = new Field("SCOPE_SCHEMA", Oid.VARCHAR);
       f[20] = new Field("SCOPE_TABLE", Oid.VARCHAR);
       f[21] = new Field("SOURCE_DATA_TYPE", Oid.INT2);
     }
 
-    if (jdbcVersion >= 4) {
+    if (jdbcVersion >= 4)
+    {
       f[22] = new Field("IS_AUTOINCREMENT", Oid.VARCHAR);
     }
 
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       // a.attnum isn't decremented when preceding columns are dropped,
       // so the only way to calculate the correct column number is with
       // window functions, new in 8.4.
@@ -1617,18 +1842,22 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       // function as possible (schema/table names), but must leave
       // column name outside so we correctly count the other columns.
       //
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_4)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_4))
+      {
         sql = "SELECT * FROM (";
-      } else {
+      } else
+      {
         sql = "";
       }
 
       sql +=
           "SELECT n.nspname,c.relname,a.attname,a.atttypid,a.attnotnull OR (t.typtype = 'd' AND t.typnotnull) AS attnotnull,a.atttypmod,a.attlen,";
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_4)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_4))
+      {
         sql += "row_number() OVER (PARTITION BY a.attrelid ORDER BY a.attnum) AS attnum, ";
-      } else {
+      } else
+      {
         sql += "a.attnum,";
       }
 
@@ -1644,19 +1873,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
               + " LEFT JOIN pg_catalog.pg_namespace dn ON (dc.relnamespace=dn.oid AND dn.nspname='pg_catalog') "
               + " WHERE c.relkind in ('r','v','f','m') and a.attnum > 0 AND NOT a.attisdropped ";
 
-      if (schemaPattern != null && !"".equals(schemaPattern)) {
+      if (schemaPattern != null && !"".equals(schemaPattern))
+      {
         sql += " AND n.nspname LIKE " + escapeQuotes(schemaPattern);
       }
 
-      if (tableNamePattern != null && !"".equals(tableNamePattern)) {
+      if (tableNamePattern != null && !"".equals(tableNamePattern))
+      {
         sql += " AND c.relname LIKE " + escapeQuotes(tableNamePattern);
       }
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_4)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_4))
+      {
         sql += ") c WHERE true ";
       }
 
-    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_2)) {
+    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_2))
+    {
       sql =
           "SELECT NULL::text AS nspname,c.relname,a.attname,a.atttypid,a.attnotnull,a.atttypmod,a.attlen,a.attnum,pg_get_expr(def.adbin,def.adrelid) AS adsrc,dsc.description,NULL::oid AS typbasetype,t.typtype "
               + " FROM pg_class c "
@@ -1666,7 +1899,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
               + " LEFT JOIN pg_description dsc ON (c.oid=dsc.objoid AND a.attnum = dsc.objsubid) "
               + " LEFT JOIN pg_class dc ON (dc.oid=dsc.classoid AND dc.relname='pg_class') "
               + " WHERE c.relkind in ('r','v','f','m') and a.attnum > 0 ";
-    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_1)) {
+    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_1))
+    {
       sql =
           "SELECT NULL::text AS nspname,c.relname,a.attname,a.atttypid,a.attnotnull,a.atttypmod,a.attlen,a.attnum,def.adsrc,dsc.description,NULL::oid AS typbasetype, 'b' AS typtype  "
               + " FROM pg_class c "
@@ -1674,7 +1908,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
               + " LEFT JOIN pg_attrdef def ON (a.attrelid=def.adrelid AND a.attnum = def.adnum) "
               + " LEFT JOIN pg_description dsc ON (a.oid=dsc.objoid) "
               + " WHERE c.relkind in ('r','v','f','m') and a.attnum > 0 ";
-    } else {
+    } else
+    {
       // if < 7.1 then don't get defaults or descriptions.
       sql =
           "SELECT NULL::text AS nspname,c.relname,a.attname,a.atttypid,a.attnotnull,a.atttypmod,a.attlen,a.attnum,NULL AS adsrc,NULL AS description,NULL AS typbasetype, 'b' AS typtype "
@@ -1683,17 +1918,20 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     }
 
     if (!connection.haveMinimumServerVersion(ServerVersion.v7_3) && tableNamePattern != null
-        && !"".equals(tableNamePattern)) {
+        && !"".equals(tableNamePattern))
+    {
       sql += " AND c.relname LIKE " + escapeQuotes(tableNamePattern);
     }
-    if (columnNamePattern != null && !"".equals(columnNamePattern)) {
+    if (columnNamePattern != null && !"".equals(columnNamePattern))
+    {
       sql += " AND attname LIKE " + escapeQuotes(columnNamePattern);
     }
     sql += " ORDER BY nspname,c.relname,attnum ";
 
     Statement stmt = connection.createStatement();
     ResultSet rs = stmt.executeQuery(sql);
-    while (rs.next()) {
+    while (rs.next())
+    {
       byte[][] tuple = new byte[numberOfFields][];
       int typeOid = (int) rs.getLong("atttypid");
       int typeMod = rs.getInt("atttypmod");
@@ -1705,13 +1943,17 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
       String typtype = rs.getString("typtype");
       int sqlType;
-      if ("c".equals(typtype)) {
+      if ("c".equals(typtype))
+      {
         sqlType = Types.STRUCT;
-      } else if ("d".equals(typtype)) {
+      } else if ("d".equals(typtype))
+      {
         sqlType = Types.DISTINCT;
-      } else if ("e".equals(typtype)) {
+      } else if ("e".equals(typtype))
+      {
         sqlType = Types.VARCHAR;
-      } else {
+      } else
+      {
         sqlType = connection.getTypeInfo().getSQLType(typeOid);
       }
 
@@ -1723,13 +1965,18 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
       String defval = rs.getString("adsrc");
 
-      if (defval != null) {
-        if (pgType.equals("int4")) {
-          if (defval.contains("nextval(")) {
+      if (defval != null)
+      {
+        if (pgType.equals("int4"))
+        {
+          if (defval.contains("nextval("))
+          {
             tuple[5] = connection.encodeString("serial"); // Type name == serial
           }
-        } else if (pgType.equals("int8")) {
-          if (defval.contains("nextval(")) {
+        } else if (pgType.equals("int8"))
+        {
+          if (defval.contains("nextval("))
+          {
             tuple[5] = connection.encodeString("bigserial"); // Type name == bigserial
           }
         }
@@ -1737,7 +1984,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
       int decimalDigits = connection.getTypeInfo().getScale(typeOid, typeMod);
       int columnSize = connection.getTypeInfo().getPrecision(typeOid, typeMod);
-      if (columnSize == 0) {
+      if (columnSize == 0)
+      {
         columnSize = connection.getTypeInfo().getDisplaySize(typeOid, typeMod);
       }
 
@@ -1747,7 +1995,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       // Everything is base 10 unless we override later.
       tuple[9] = connection.encodeString("10");
 
-      if (pgType.equals("bit") || pgType.equals("varbit")) {
+      if (pgType.equals("bit") || pgType.equals("varbit"))
+      {
         tuple[9] = connection.encodeString("2");
       }
 
@@ -1763,7 +2012,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       tuple[17] =
           connection.encodeString(rs.getBoolean("attnotnull") ? "NO" : "YES"); // Is nullable
 
-      if (jdbcVersion >= 3) {
+      if (jdbcVersion >= 3)
+      {
         int baseTypeOid = (int) rs.getLong("typbasetype");
 
         tuple[18] = null; // SCOPE_CATLOG
@@ -1773,9 +2023,11 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
             Integer.toString(connection.getTypeInfo().getSQLType(baseTypeOid))); // SOURCE_DATA_TYPE
       }
 
-      if (jdbcVersion >= 4) {
+      if (jdbcVersion >= 4)
+      {
         String autoinc = "NO";
-        if (defval != null && defval.contains("nextval(")) {
+        if (defval != null && defval.contains("nextval("))
+        {
           autoinc = "YES";
         }
         tuple[22] = connection.encodeString(autoinc);
@@ -1790,21 +2042,25 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getColumns(String catalog, String schemaPattern,
-      String tableNamePattern, String columnNamePattern) throws SQLException {
+      String tableNamePattern, String columnNamePattern) throws SQLException
+  {
     return getColumns(getJDBCMajorVersion(), catalog, schemaPattern, tableNamePattern,
         columnNamePattern);
   }
 
   public java.sql.ResultSet getColumnPrivileges(String catalog, String schema, String table,
-      String columnNamePattern) throws SQLException {
+      String columnNamePattern) throws SQLException
+  {
     Field f[] = new Field[8];
     List<byte[][]> v = new ArrayList<byte[][]>();
 
-    if (table == null) {
+    if (table == null)
+    {
       table = "%";
     }
 
-    if (columnNamePattern == null) {
+    if (columnNamePattern == null)
+    {
       columnNamePattern = "%";
     }
 
@@ -1818,7 +2074,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     f[7] = new Field("IS_GRANTABLE", Oid.VARCHAR);
 
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v8_4)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v8_4))
+    {
       sql = "SELECT n.nspname,c.relname,r.rolname,c.relacl,a.attacl,a.attname "
           + " FROM pg_catalog.pg_namespace n, pg_catalog.pg_class c, pg_catalog.pg_roles r, pg_catalog.pg_attribute a "
           + " WHERE c.relnamespace = n.oid "
@@ -1826,10 +2083,12 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " AND c.oid = a.attrelid "
           + " AND c.relkind = 'r' "
           + " AND a.attnum > 0 AND NOT a.attisdropped ";
-      if (schema != null && !"".equals(schema)) {
+      if (schema != null && !"".equals(schema))
+      {
         sql += " AND n.nspname = " + escapeQuotes(schema);
       }
-    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       sql = "SELECT n.nspname,c.relname,r.rolname,c.relacl,a.attname "
           + " FROM pg_catalog.pg_namespace n, pg_catalog.pg_class c, pg_catalog.pg_roles r, pg_catalog.pg_attribute a "
           + " WHERE c.relnamespace = n.oid "
@@ -1837,10 +2096,12 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " AND c.oid = a.attrelid "
           + " AND c.relkind = 'r' "
           + " AND a.attnum > 0 AND NOT a.attisdropped ";
-      if (schema != null && !"".equals(schema)) {
+      if (schema != null && !"".equals(schema))
+      {
         sql += " AND n.nspname = " + escapeQuotes(schema);
       }
-    } else {
+    } else
+    {
       sql = "SELECT NULL::text AS nspname,c.relname,u.usename,c.relacl,a.attname "
           + "FROM pg_class c, pg_user u,pg_attribute a "
           + " WHERE u.usesysid = c.relowner "
@@ -1850,14 +2111,16 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     }
 
     sql += " AND c.relname = " + escapeQuotes(table);
-    if (columnNamePattern != null && !"".equals(columnNamePattern)) {
+    if (columnNamePattern != null && !"".equals(columnNamePattern))
+    {
       sql += " AND a.attname LIKE " + escapeQuotes(columnNamePattern);
     }
     sql += " ORDER BY attname ";
 
     Statement stmt = connection.createStatement();
     ResultSet rs = stmt.executeQuery(sql);
-    while (rs.next()) {
+    while (rs.next())
+    {
       byte schemaName[] = rs.getBytes("nspname");
       byte tableName[] = rs.getBytes("relname");
       byte column[] = rs.getBytes("attname");
@@ -1866,7 +2129,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
       Map<String, Map<String, List<String[]>>> permissions = parseACL(relAcl, owner);
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_4)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_4))
+      {
         String acl = rs.getString("attacl");
         Map<String, Map<String, List<String[]>>> relPermissions = parseACL(acl, owner);
         permissions.putAll(relPermissions);
@@ -1874,23 +2138,28 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       String permNames[] = new String[permissions.size()];
       Iterator<String> e = permissions.keySet().iterator();
       int i = 0;
-      while (e.hasNext()) {
+      while (e.hasNext())
+      {
         permNames[i++] = e.next();
       }
       sortStringArray(permNames);
-      for (i = 0; i < permNames.length; i++) {
+      for (i = 0; i < permNames.length; i++)
+      {
         byte[] privilege = connection.encodeString(permNames[i]);
         Map<String, List<String[]>> grantees = permissions.get(permNames[i]);
         String granteeUsers[] = new String[grantees.size()];
         Iterator<String> g = grantees.keySet().iterator();
         int k = 0;
-        while (g.hasNext()) {
+        while (g.hasNext())
+        {
           granteeUsers[k++] = g.next();
         }
-        for (int j = 0; j < grantees.size(); j++) {
+        for (int j = 0; j < grantees.size(); j++)
+        {
           List<String[]> grantor = grantees.get(granteeUsers[j]);
           String grantee = granteeUsers[j];
-          for (String[] grants : grantor) {
+          for (String[] grants : grantor)
+          {
             String grantable = owner.equals(grantee) ? "YES" : grants[1];
             byte[][] tuple = new byte[8][];
             tuple[0] = null;
@@ -1913,7 +2182,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getTablePrivileges(String catalog, String schemaPattern,
-      String tableNamePattern) throws SQLException {
+      String tableNamePattern) throws SQLException
+  {
     Field f[] = new Field[7];
     List<byte[][]> v = new ArrayList<byte[][]>();
 
@@ -1926,30 +2196,35 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     f[6] = new Field("IS_GRANTABLE", Oid.VARCHAR);
 
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       sql = "SELECT n.nspname,c.relname,r.rolname,c.relacl "
           + " FROM pg_catalog.pg_namespace n, pg_catalog.pg_class c, pg_catalog.pg_roles r "
           + " WHERE c.relnamespace = n.oid "
           + " AND c.relowner = r.oid "
           + " AND c.relkind = 'r' ";
-      if (schemaPattern != null && !"".equals(schemaPattern)) {
+      if (schemaPattern != null && !"".equals(schemaPattern))
+      {
         sql += " AND n.nspname LIKE " + escapeQuotes(schemaPattern);
       }
-    } else {
+    } else
+    {
       sql = "SELECT NULL::text AS nspname,c.relname,u.usename,c.relacl "
           + "FROM pg_class c, pg_user u "
           + " WHERE u.usesysid = c.relowner "
           + " AND c.relkind = 'r' ";
     }
 
-    if (tableNamePattern != null && !"".equals(tableNamePattern)) {
+    if (tableNamePattern != null && !"".equals(tableNamePattern))
+    {
       sql += " AND c.relname LIKE " + escapeQuotes(tableNamePattern);
     }
     sql += " ORDER BY nspname, relname ";
 
     Statement stmt = connection.createStatement();
     ResultSet rs = stmt.executeQuery(sql);
-    while (rs.next()) {
+    while (rs.next())
+    {
       byte schema[] = rs.getBytes("nspname");
       byte table[] = rs.getBytes("relname");
       String owner = rs.getString("rolname");
@@ -1958,22 +2233,27 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       String permNames[] = new String[permissions.size()];
       Iterator<String> e = permissions.keySet().iterator();
       int i = 0;
-      while (e.hasNext()) {
+      while (e.hasNext())
+      {
         permNames[i++] = e.next();
       }
       sortStringArray(permNames);
-      for (i = 0; i < permNames.length; i++) {
+      for (i = 0; i < permNames.length; i++)
+      {
         byte[] privilege = connection.encodeString(permNames[i]);
         Map<String, List<String[]>> grantees = permissions.get(permNames[i]);
         String granteeUsers[] = new String[grantees.size()];
         Iterator<String> g = grantees.keySet().iterator();
         int k = 0;
-        while (g.hasNext()) {
+        while (g.hasNext())
+        {
           granteeUsers[k++] = g.next();
         }
-        for (String granteeUser : granteeUsers) {
+        for (String granteeUser : granteeUsers)
+        {
           List<String[]> grants = grantees.get(granteeUser);
-          for (String[] grantTuple : grants) {
+          for (String[] grantTuple : grants)
+          {
             // report the owner as grantor if it's missing
             String grantor = grantTuple[0] == null ? owner : grantTuple[0];
             // owner always has grant privileges
@@ -1998,10 +2278,14 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     return (ResultSet) ((BaseStatement) createMetaDataStatement()).createDriverResultSet(f, v);
   }
 
-  private static void sortStringArray(String s[]) {
-    for (int i = 0; i < s.length - 1; i++) {
-      for (int j = i + 1; j < s.length; j++) {
-        if (s[i].compareTo(s[j]) > 0) {
+  private static void sortStringArray(String s[])
+  {
+    for (int i = 0; i < s.length - 1; i++)
+    {
+      for (int j = i + 1; j < s.length; j++)
+      {
+        if (s[i].compareTo(s[j]) > 0)
+        {
           String tmp = s[i];
           s[i] = s[j];
           s[j] = tmp;
@@ -2013,21 +2297,26 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   /**
    * Parse an String of ACLs into a List of ACLs.
    */
-  private static List<String> parseACLArray(String aclString) {
+  private static List<String> parseACLArray(String aclString)
+  {
     List<String> acls = new ArrayList<String>();
-    if (aclString == null || aclString.length() == 0) {
+    if (aclString == null || aclString.length() == 0)
+    {
       return acls;
     }
     boolean inQuotes = false;
     // start at 1 because of leading "{"
     int beginIndex = 1;
     char prevChar = ' ';
-    for (int i = beginIndex; i < aclString.length(); i++) {
+    for (int i = beginIndex; i < aclString.length(); i++)
+    {
 
       char c = aclString.charAt(i);
-      if (c == '"' && prevChar != '\\') {
+      if (c == '"' && prevChar != '\\')
+      {
         inQuotes = !inQuotes;
-      } else if (c == ',' && !inQuotes) {
+      } else if (c == ',' && !inQuotes)
+      {
         acls.add(aclString.substring(beginIndex, i));
         beginIndex = i + 1;
       }
@@ -2037,9 +2326,11 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     acls.add(aclString.substring(beginIndex, aclString.length() - 1));
 
     // Strip out enclosing quotes, if any.
-    for (int i = 0; i < acls.size(); i++) {
+    for (int i = 0; i < acls.size(); i++)
+    {
       String acl = acls.get(i);
-      if (acl.startsWith("\"") && acl.endsWith("\"")) {
+      if (acl.startsWith("\"") && acl.endsWith("\""))
+      {
         acl = acl.substring(1, acl.length() - 1);
         acls.set(i, acl);
       }
@@ -2051,37 +2342,47 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * Add the user described by the given acl to the Lists of users with the privileges described by
    * the acl.
    */
-  private void addACLPrivileges(String acl, Map<String, Map<String, List<String[]>>> privileges) {
+  private void addACLPrivileges(String acl, Map<String, Map<String, List<String[]>>> privileges)
+  {
     int equalIndex = acl.lastIndexOf("=");
     int slashIndex = acl.lastIndexOf("/");
-    if (equalIndex == -1) {
+    if (equalIndex == -1)
+    {
       return;
     }
 
     String user = acl.substring(0, equalIndex);
     String grantor = null;
-    if (user.length() == 0) {
+    if (user.length() == 0)
+    {
       user = "PUBLIC";
     }
     String privs;
-    if (slashIndex != -1) {
+    if (slashIndex != -1)
+    {
       privs = acl.substring(equalIndex + 1, slashIndex);
       grantor = acl.substring(slashIndex + 1, acl.length());
-    } else {
+    } else
+    {
       privs = acl.substring(equalIndex + 1, acl.length());
     }
 
-    for (int i = 0; i < privs.length(); i++) {
+    for (int i = 0; i < privs.length(); i++)
+    {
       char c = privs.charAt(i);
-      if (c != '*') {
+      if (c != '*')
+      {
         String sqlpriv;
         String grantable;
-        if (i < privs.length() - 1 && privs.charAt(i + 1) == '*') {
+        if (i < privs.length() - 1 && privs.charAt(i + 1) == '*')
+        {
           grantable = "YES";
-        } else {
+        } else
+        {
           grantable = "NO";
         }
-        switch (c) {
+        switch (c)
+        {
           case 'a':
             sqlpriv = "INSERT";
             break;
@@ -2127,19 +2428,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
         Map<String, List<String[]>> usersWithPermission = privileges.get(sqlpriv);
         String[] grant = {grantor, grantable};
 
-        if (usersWithPermission == null) {
+        if (usersWithPermission == null)
+        {
           usersWithPermission = new HashMap<String, List<String[]>>();
           List<String[]> permissionByGrantor = new ArrayList<String[]>();
           permissionByGrantor.add(grant);
           usersWithPermission.put(user, permissionByGrantor);
           privileges.put(sqlpriv, usersWithPermission);
-        } else {
+        } else
+        {
           List<String[]> permissionByGrantor = usersWithPermission.get(user);
-          if (permissionByGrantor == null) {
+          if (permissionByGrantor == null)
+          {
             permissionByGrantor = new ArrayList<String[]>();
             permissionByGrantor.add(grant);
             usersWithPermission.put(user, permissionByGrantor);
-          } else {
+          } else
+          {
             permissionByGrantor.add(grant);
           }
         }
@@ -2155,14 +2460,18 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    * @param owner    owner
    * @return a Map mapping the SQL permission name
    */
-  public Map<String, Map<String, List<String[]>>> parseACL(String aclArray, String owner) {
-    if (aclArray == null) {
+  public Map<String, Map<String, List<String[]>>> parseACL(String aclArray, String owner)
+  {
+    if (aclArray == null)
+    {
       //null acl is a shortcut for owner having full privs
       String perms = "arwdRxt";
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_2)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_2))
+      {
         // 8.2 Removed the separate RULE permission
         perms = "arwdxt";
-      } else if (connection.haveMinimumServerVersion(ServerVersion.v8_4)) {
+      } else if (connection.haveMinimumServerVersion(ServerVersion.v8_4))
+      {
         // 8.4 Added a separate TRUNCATE permission
         perms = "arwdDxt";
       }
@@ -2172,14 +2481,16 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     List<String> acls = parseACLArray(aclArray);
     Map<String, Map<String, List<String[]>>> privileges =
         new HashMap<String, Map<String, List<String[]>>>();
-    for (String acl : acls) {
+    for (String acl : acls)
+    {
       addACLPrivileges(acl, privileges);
     }
     return privileges;
   }
 
   public java.sql.ResultSet getBestRowIdentifier(String catalog, String schema, String table,
-      int scope, boolean nullable) throws SQLException {
+      int scope, boolean nullable) throws SQLException
+  {
     Field f[] = new Field[8];
     List<byte[][]> v = new ArrayList<byte[][]>();  // The new ResultSet tuple stuff
 
@@ -2198,7 +2509,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
      */
 
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v8_1)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v8_1))
+    {
       sql = "SELECT a.attname, a.atttypid, atttypmod "
           + "FROM pg_catalog.pg_class ct "
           + "  JOIN pg_catalog.pg_attribute a ON (ct.oid = a.attrelid) "
@@ -2208,20 +2520,25 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + "        FROM pg_catalog.pg_index i) i "
           + "    ON (a.attnum = (i.keys).x AND a.attrelid = i.indrelid) "
           + "WHERE true ";
-      if (schema != null && !"".equals(schema)) {
+      if (schema != null && !"".equals(schema))
+      {
         sql += " AND n.nspname = " + escapeQuotes(schema);
       }
-    } else {
+    } else
+    {
       String from;
       String where = "";
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         from =
             " FROM pg_catalog.pg_namespace n, pg_catalog.pg_class ct, pg_catalog.pg_class ci, pg_catalog.pg_attribute a, pg_catalog.pg_index i ";
         where = " AND ct.relnamespace = n.oid ";
-        if (schema != null && !"".equals(schema)) {
+        if (schema != null && !"".equals(schema))
+        {
           where += " AND n.nspname = " + escapeQuotes(schema);
         }
-      } else {
+      } else
+      {
         from = " FROM pg_class ct, pg_class ci, pg_attribute a, pg_index i ";
       }
       sql = "SELECT a.attname, a.atttypid, a.atttypmod "
@@ -2237,13 +2554,15 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
     Statement stmt = connection.createStatement();
     ResultSet rs = stmt.executeQuery(sql);
-    while (rs.next()) {
+    while (rs.next())
+    {
       byte tuple[][] = new byte[8][];
       int typeOid = (int) rs.getLong("atttypid");
       int typeMod = rs.getInt("atttypmod");
       int decimalDigits = connection.getTypeInfo().getScale(typeOid, typeMod);
       int columnSize = connection.getTypeInfo().getPrecision(typeOid, typeMod);
-      if (columnSize == 0) {
+      if (columnSize == 0)
+      {
         columnSize = connection.getTypeInfo().getDisplaySize(typeOid, typeMod);
       }
       tuple[0] = connection.encodeString(Integer.toString(scope));
@@ -2265,7 +2584,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getVersionColumns(String catalog, String schema, String table)
-      throws SQLException {
+      throws SQLException
+  {
     Field f[] = new Field[8];
     List<byte[][]> v = new ArrayList<byte[][]>();  // The new ResultSet tuple stuff
 
@@ -2309,9 +2629,11 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getPrimaryKeys(String catalog, String schema, String table)
-      throws SQLException {
+      throws SQLException
+  {
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v8_1)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v8_1))
+    {
       sql = "SELECT NULL AS TABLE_CAT, n.nspname AS TABLE_SCHEM, "
           + "  ct.relname AS TABLE_NAME, a.attname AS COLUMN_NAME, "
           + "  (i.keys).n AS KEY_SEQ, ci.relname AS PK_NAME "
@@ -2324,23 +2646,28 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + "    ON (a.attnum = (i.keys).x AND a.attrelid = i.indrelid) "
           + "  JOIN pg_catalog.pg_class ci ON (ci.oid = i.indexrelid) "
           + "WHERE true ";
-      if (schema != null && !"".equals(schema)) {
+      if (schema != null && !"".equals(schema))
+      {
         sql += " AND n.nspname = " + escapeQuotes(schema);
       }
-    } else {
+    } else
+    {
       String select;
       String from;
       String where = "";
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         select = "SELECT NULL AS TABLE_CAT, n.nspname AS TABLE_SCHEM, ";
         from =
             " FROM pg_catalog.pg_namespace n, pg_catalog.pg_class ct, pg_catalog.pg_class ci, pg_catalog.pg_attribute a, pg_catalog.pg_index i ";
         where = " AND ct.relnamespace = n.oid ";
-        if (schema != null && !"".equals(schema)) {
+        if (schema != null && !"".equals(schema))
+        {
           where += " AND n.nspname = " + escapeQuotes(schema);
         }
-      } else {
+      } else
+      {
         select = "SELECT NULL AS TABLE_CAT, NULL AS TABLE_SCHEM, ";
         from = " FROM pg_class ct, pg_class ci, pg_attribute a, pg_index i ";
       }
@@ -2356,7 +2683,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + where;
     }
 
-    if (table != null && !"".equals(table)) {
+    if (table != null && !"".equals(table))
+    {
       sql += " AND ct.relname = " + escapeQuotes(table);
     }
 
@@ -2378,7 +2706,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
    */
   protected java.sql.ResultSet getImportedExportedKeys(String primaryCatalog, String primarySchema,
       String primaryTable, String foreignCatalog, String foreignSchema, String foreignTable)
-      throws SQLException {
+      throws SQLException
+  {
     Field f[] = new Field[14];
 
     f[0] = new Field("PKTABLE_CAT", Oid.VARCHAR);
@@ -2412,7 +2741,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
      *   the PK_NAME field.
      */
 
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_4)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_4))
+    {
       String sql =
           "SELECT NULL::text AS PKTABLE_CAT, pkn.nspname AS PKTABLE_SCHEM, pkc.relname AS PKTABLE_NAME, pka.attname AS PKCOLUMN_NAME, "
               + "NULL::text AS FKTABLE_CAT, fkn.nspname AS FKTABLE_SCHEM, fkc.relname AS FKTABLE_NAME, fka.attname AS FKCOLUMN_NAME, "
@@ -2442,36 +2772,45 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
               + " pg_catalog.pg_namespace pkn, pg_catalog.pg_class pkc, pg_catalog.pg_attribute pka, "
               + " pg_catalog.pg_namespace fkn, pg_catalog.pg_class fkc, pg_catalog.pg_attribute fka, "
               + " pg_catalog.pg_constraint con, ";
-      if (connection.haveMinimumServerVersion(ServerVersion.v8_0)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v8_0))
+      {
         sql += " pg_catalog.generate_series(1, " + getMaxIndexKeys() + ") pos(n), ";
-      } else {
+      } else
+      {
         sql += " information_schema._pg_keypositions() pos(n), ";
       }
       sql += " pg_catalog.pg_depend dep, pg_catalog.pg_class pkic "
           + " WHERE pkn.oid = pkc.relnamespace AND pkc.oid = pka.attrelid AND pka.attnum = con.confkey[pos.n] AND con.confrelid = pkc.oid "
           + " AND fkn.oid = fkc.relnamespace AND fkc.oid = fka.attrelid AND fka.attnum = con.conkey[pos.n] AND con.conrelid = fkc.oid "
           + " AND con.contype = 'f' AND con.oid = dep.objid AND pkic.oid = dep.refobjid AND pkic.relkind = 'i' AND dep.classid = 'pg_constraint'::regclass::oid AND dep.refclassid = 'pg_class'::regclass::oid ";
-      if (primarySchema != null && !"".equals(primarySchema)) {
+      if (primarySchema != null && !"".equals(primarySchema))
+      {
         sql += " AND pkn.nspname = " + escapeQuotes(primarySchema);
       }
-      if (foreignSchema != null && !"".equals(foreignSchema)) {
+      if (foreignSchema != null && !"".equals(foreignSchema))
+      {
         sql += " AND fkn.nspname = " + escapeQuotes(foreignSchema);
       }
-      if (primaryTable != null && !"".equals(primaryTable)) {
+      if (primaryTable != null && !"".equals(primaryTable))
+      {
         sql += " AND pkc.relname = " + escapeQuotes(primaryTable);
       }
-      if (foreignTable != null && !"".equals(foreignTable)) {
+      if (foreignTable != null && !"".equals(foreignTable))
+      {
         sql += " AND fkc.relname = " + escapeQuotes(foreignTable);
       }
 
-      if (primaryTable != null) {
+      if (primaryTable != null)
+      {
         sql += " ORDER BY fkn.nspname,fkc.relname,con.conname,pos.n";
-      } else {
+      } else
+      {
         sql += " ORDER BY pkn.nspname,pkc.relname, con.conname,pos.n";
       }
 
       return createMetaDataStatement().executeQuery(sql);
-    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    } else if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       select = "SELECT DISTINCT n1.nspname as pnspname,n2.nspname as fnspname, ";
       from = " FROM pg_catalog.pg_namespace n1 "
           + " JOIN pg_catalog.pg_class c1 ON (c1.relnamespace = n1.oid) "
@@ -2484,13 +2823,16 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " JOIN pg_catalog.pg_proc p1 ON (t1.tgfoid=p1.oid), "
           + " pg_catalog.pg_trigger t2 "
           + " JOIN pg_catalog.pg_proc p2 ON (t2.tgfoid=p2.oid) ";
-      if (primarySchema != null && !"".equals(primarySchema)) {
+      if (primarySchema != null && !"".equals(primarySchema))
+      {
         where += " AND n1.nspname = " + escapeQuotes(primarySchema);
       }
-      if (foreignSchema != null && !"".equals(foreignSchema)) {
+      if (foreignSchema != null && !"".equals(foreignSchema))
+      {
         where += " AND n2.nspname = " + escapeQuotes(foreignSchema);
       }
-    } else {
+    } else
+    {
       select = "SELECT DISTINCT NULL::text as pnspname, NULL::text as fnspname, ";
       from = " FROM pg_class c1 "
           + " JOIN pg_index i ON (c1.oid=i.indrelid) "
@@ -2532,10 +2874,12 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
         + "AND i.indisprimary "
         + where;
 
-    if (primaryTable != null) {
+    if (primaryTable != null)
+    {
       sql += "AND c1.relname=" + escapeQuotes(primaryTable);
     }
-    if (foreignTable != null) {
+    if (foreignTable != null)
+    {
       sql += "AND c2.relname=" + escapeQuotes(foreignTable);
     }
 
@@ -2546,13 +2890,17 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     // getCrossReference orders by FKTABLE, so this should work for both,
     // since when getting crossreference, primaryTable will be defined
 
-    if (primaryTable != null) {
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (primaryTable != null)
+    {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql += "fnspname,";
       }
       sql += "frelname";
-    } else {
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    } else
+    {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql += "pnspname,";
       }
       sql += "prelname";
@@ -2581,7 +2929,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
     List<byte[][]> tuples = new ArrayList<byte[][]>();
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       byte tuple[][] = new byte[14][];
 
       tuple[1] = rs.getBytes(1); //PKTABLE_SCHEM
@@ -2591,23 +2940,29 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       String fKeyName = rs.getString(5);
       String updateRule = rs.getString(12);
 
-      if (updateRule != null) {
+      if (updateRule != null)
+      {
         // Rules look like this RI_FKey_noaction_del so we want to pull out the part between the 'Key_' and the last '_' s
 
         String rule = updateRule.substring(8, updateRule.length() - 4);
 
         int action = java.sql.DatabaseMetaData.importedKeyNoAction;
 
-        if (rule == null || "noaction".equals(rule)) {
+        if (rule == null || "noaction".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeyNoAction;
         }
-        if ("cascade".equals(rule)) {
+        if ("cascade".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeyCascade;
-        } else if ("setnull".equals(rule)) {
+        } else if ("setnull".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeySetNull;
-        } else if ("setdefault".equals(rule)) {
+        } else if ("setdefault".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeySetDefault;
-        } else if ("restrict".equals(rule)) {
+        } else if ("restrict".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeyRestrict;
         }
 
@@ -2617,18 +2972,23 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
       String deleteRule = rs.getString(13);
 
-      if (deleteRule != null) {
+      if (deleteRule != null)
+      {
 
         String rule = deleteRule.substring(8, deleteRule.length() - 4);
 
         int action = java.sql.DatabaseMetaData.importedKeyNoAction;
-        if ("cascade".equals(rule)) {
+        if ("cascade".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeyCascade;
-        } else if ("setnull".equals(rule)) {
+        } else if ("setnull".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeySetNull;
-        } else if ("setdefault".equals(rule)) {
+        } else if ("setdefault".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeySetDefault;
-        } else if ("restrict".equals(rule)) {
+        } else if ("restrict".equals(rule))
+        {
           action = java.sql.DatabaseMetaData.importedKeyRestrict;
         }
         tuple[10] = connection.encodeString(Integer.toString(action));
@@ -2653,21 +3013,25 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       // we are primarily interested in the column names which are the last items in the string
 
       List<String> tokens = tokenize(targs, "\\000");
-      if (tokens.size() > 0) {
+      if (tokens.size() > 0)
+      {
         fkName = tokens.get(0);
       }
 
-      if (fkName.startsWith("<unnamed>")) {
+      if (fkName.startsWith("<unnamed>"))
+      {
         fkName = targs;
       }
 
       int element = 4 + (keySequence - 1) * 2;
-      if (tokens.size() > element) {
+      if (tokens.size() > element)
+      {
         fkeyColumn = tokens.get(element);
       }
 
       element++;
-      if (tokens.size() > element) {
+      if (tokens.size() > element)
+      {
         pkeyColumn = tokens.get(element);
       }
 
@@ -2683,10 +3047,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       int deferrability = java.sql.DatabaseMetaData.importedKeyNotDeferrable;
       boolean deferrable = rs.getBoolean(8);
       boolean initiallyDeferred = rs.getBoolean(9);
-      if (deferrable) {
-        if (initiallyDeferred) {
+      if (deferrable)
+      {
+        if (initiallyDeferred)
+        {
           deferrability = java.sql.DatabaseMetaData.importedKeyInitiallyDeferred;
-        } else {
+        } else
+        {
           deferrability = java.sql.DatabaseMetaData.importedKeyInitiallyImmediate;
         }
       }
@@ -2701,23 +3068,27 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getImportedKeys(String catalog, String schema, String table)
-      throws SQLException {
+      throws SQLException
+  {
     return getImportedExportedKeys(null, null, null, catalog, schema, table);
   }
 
   public java.sql.ResultSet getExportedKeys(String catalog, String schema, String table)
-      throws SQLException {
+      throws SQLException
+  {
     return getImportedExportedKeys(catalog, schema, table, null, null, null);
   }
 
   public java.sql.ResultSet getCrossReference(String primaryCatalog, String primarySchema,
       String primaryTable, String foreignCatalog, String foreignSchema, String foreignTable)
-      throws SQLException {
+      throws SQLException
+  {
     return getImportedExportedKeys(primaryCatalog, primarySchema, primaryTable, foreignCatalog,
         foreignSchema, foreignTable);
   }
 
-  public java.sql.ResultSet getTypeInfo() throws SQLException {
+  public java.sql.ResultSet getTypeInfo() throws SQLException
+  {
 
     Field f[] = new Field[18];
     List<byte[][]> v = new ArrayList<byte[][]>();  // The new ResultSet tuple stuff
@@ -2742,11 +3113,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     f[17] = new Field("NUM_PREC_RADIX", Oid.INT4);
 
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+    {
       sql = "SELECT t.typname,t.oid FROM pg_catalog.pg_type t"
           + " JOIN pg_catalog.pg_namespace n ON (t.typnamespace = n.oid) "
           + " WHERE n.nspname  != 'pg_toast'";
-    } else {
+    } else
+    {
       sql = "SELECT typname,oid FROM pg_type"
           + " WHERE NOT (typname ~ '^pg_toast_') ";
     }
@@ -2765,7 +3138,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     byte bSearchable[] =
         connection.encodeString(Integer.toString(java.sql.DatabaseMetaData.typeSearchable));
 
-    while (rs.next()) {
+    while (rs.next())
+    {
       byte[][] tuple = new byte[18][];
       String typname = rs.getString(1);
       int typeOid = (int) rs.getLong(2);
@@ -2776,7 +3150,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       tuple[2] = connection.encodeString(
           Integer.toString(connection.getTypeInfo().getMaximumPrecision(typeOid)));
 
-      if (connection.getTypeInfo().requiresQuoting(typeOid)) {
+      if (connection.getTypeInfo().requiresQuoting(typeOid))
+      {
         tuple[3] = bliteral;
         tuple[4] = bliteral;
       }
@@ -2797,13 +3172,15 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       v.add(tuple);
 
       // add pseudo-type serial, bigserial
-      if (typname.equals("int4")) {
+      if (typname.equals("int4"))
+      {
         byte[][] tuple1 = (byte[][]) tuple.clone();
 
         tuple1[0] = connection.encodeString("serial");
         tuple1[11] = bt;
         v.add(tuple1);
-      } else if (typname.equals("int8")) {
+      } else if (typname.equals("int8"))
+      {
         byte[][] tuple1 = (byte[][]) tuple.clone();
 
         tuple1[0] = connection.encodeString("bigserial");
@@ -2819,7 +3196,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public java.sql.ResultSet getIndexInfo(String catalog, String schema, String tableName,
-      boolean unique, boolean approximate) throws SQLException {
+      boolean unique, boolean approximate) throws SQLException
+  {
     /* This is a complicated function because we have three possible
      * situations:
      * <= 7.2 no schemas, single column functional index
@@ -2834,7 +3212,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
      * the function operates on.
      */
     String sql;
-    if (connection.haveMinimumServerVersion(ServerVersion.v8_3)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v8_3))
+    {
       sql = "SELECT NULL AS TABLE_CAT, n.nspname AS TABLE_SCHEM, "
           + "  ct.relname AS TABLE_NAME, NOT i.indisunique AS NON_UNIQUE, "
           + "  NULL AS INDEX_QUALIFIER, ci.relname AS INDEX_NAME, "
@@ -2869,31 +3248,38 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + "  JOIN pg_catalog.pg_am am ON (ci.relam = am.oid) "
           + "WHERE true ";
 
-      if (schema != null && !"".equals(schema)) {
+      if (schema != null && !"".equals(schema))
+      {
         sql += " AND n.nspname = " + escapeQuotes(schema);
       }
-    } else {
+    } else
+    {
       String select;
       String from;
       String where = "";
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         select = "SELECT NULL AS TABLE_CAT, n.nspname AS TABLE_SCHEM, ";
         from =
             " FROM pg_catalog.pg_namespace n, pg_catalog.pg_class ct, pg_catalog.pg_class ci, pg_catalog.pg_attribute a, pg_catalog.pg_am am ";
         where = " AND n.oid = ct.relnamespace ";
 
-        if (!connection.haveMinimumServerVersion(ServerVersion.v7_4)) {
+        if (!connection.haveMinimumServerVersion(ServerVersion.v7_4))
+        {
           from +=
               ", pg_catalog.pg_attribute ai, pg_catalog.pg_index i LEFT JOIN pg_catalog.pg_proc ip ON (i.indproc = ip.oid) ";
           where += " AND ai.attnum = i.indkey[0] AND ai.attrelid = ct.oid ";
-        } else {
+        } else
+        {
           from += ", pg_catalog.pg_index i ";
         }
-        if (schema != null && !"".equals(schema)) {
+        if (schema != null && !"".equals(schema))
+        {
           where += " AND n.nspname = " + escapeQuotes(schema);
         }
-      } else {
+      } else
+      {
         select = "SELECT NULL AS TABLE_CAT, NULL AS TABLE_SCHEM, ";
         from =
             " FROM pg_class ct, pg_class ci, pg_attribute a, pg_am am, pg_attribute ai, pg_index i LEFT JOIN pg_proc ip ON (i.indproc = ip.oid) ";
@@ -2911,10 +3297,12 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " END AS TYPE, "
           + " a.attnum AS ORDINAL_POSITION, ";
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_4)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_4))
+      {
         sql +=
             " CASE WHEN i.indexprs IS NULL THEN a.attname ELSE pg_catalog.pg_get_indexdef(ci.oid,a.attnum,false) END AS COLUMN_NAME, ";
-      } else {
+      } else
+      {
         sql +=
             " CASE i.indproc WHEN 0 THEN a.attname ELSE ip.proname || '(' || ai.attname || ')' END AS COLUMN_NAME, ";
       }
@@ -2924,11 +3312,14 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
           + " ci.reltuples AS CARDINALITY, "
           + " ci.relpages AS PAGES, ";
 
-      if (connection.haveMinimumServerVersion(ServerVersion.v7_3)) {
+      if (connection.haveMinimumServerVersion(ServerVersion.v7_3))
+      {
         sql += " pg_catalog.pg_get_expr(i.indpred, i.indrelid) AS FILTER_CONDITION ";
-      } else if (connection.haveMinimumServerVersion(ServerVersion.v7_2)) {
+      } else if (connection.haveMinimumServerVersion(ServerVersion.v7_2))
+      {
         sql += " pg_get_expr(i.indpred, i.indrelid) AS FILTER_CONDITION ";
-      } else {
+      } else
+      {
         sql += " NULL AS FILTER_CONDITION ";
       }
 
@@ -2939,7 +3330,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
     sql += " AND ct.relname = " + escapeQuotes(tableName);
 
-    if (unique) {
+    if (unique)
+    {
       sql += " AND i.indisunique ";
     }
     sql += " ORDER BY NON_UNIQUE, TYPE, INDEX_NAME, ORDINAL_POSITION ";
@@ -2949,18 +3341,22 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   /**
    * Tokenize based on words not on single characters.
    */
-  private static List<String> tokenize(String input, String delimiter) {
+  private static List<String> tokenize(String input, String delimiter)
+  {
     List<String> result = new ArrayList<String>();
     int start = 0;
     int end = input.length();
     int delimiterSize = delimiter.length();
 
-    while (start < end) {
+    while (start < end)
+    {
       int delimiterIndex = input.indexOf(delimiter, start);
-      if (delimiterIndex < 0) {
+      if (delimiterIndex < 0)
+      {
         result.add(input.substring(start));
         break;
-      } else {
+      } else
+      {
         String token = input.substring(start, delimiterIndex);
         result.add(token);
         start = delimiterIndex + delimiterSize;
@@ -2971,20 +3367,24 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
   // ** JDBC 2 Extensions **
 
-  public boolean supportsResultSetType(int type) throws SQLException {
+  public boolean supportsResultSetType(int type) throws SQLException
+  {
     // The only type we don't support
     return type != java.sql.ResultSet.TYPE_SCROLL_SENSITIVE;
   }
 
 
-  public boolean supportsResultSetConcurrency(int type, int concurrency) throws SQLException {
+  public boolean supportsResultSetConcurrency(int type, int concurrency) throws SQLException
+  {
     // These combinations are not supported!
-    if (type == java.sql.ResultSet.TYPE_SCROLL_SENSITIVE) {
+    if (type == java.sql.ResultSet.TYPE_SCROLL_SENSITIVE)
+    {
       return false;
     }
 
     // We do support Updateable ResultSets
-    if (concurrency == java.sql.ResultSet.CONCUR_UPDATABLE) {
+    if (concurrency == java.sql.ResultSet.CONCUR_UPDATABLE)
+    {
       return true;
     }
 
@@ -2994,44 +3394,54 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
 
   /* lots of unsupported stuff... */
-  public boolean ownUpdatesAreVisible(int type) throws SQLException {
+  public boolean ownUpdatesAreVisible(int type) throws SQLException
+  {
     return true;
   }
 
-  public boolean ownDeletesAreVisible(int type) throws SQLException {
+  public boolean ownDeletesAreVisible(int type) throws SQLException
+  {
     return true;
   }
 
-  public boolean ownInsertsAreVisible(int type) throws SQLException {
+  public boolean ownInsertsAreVisible(int type) throws SQLException
+  {
     // indicates that
     return true;
   }
 
-  public boolean othersUpdatesAreVisible(int type) throws SQLException {
+  public boolean othersUpdatesAreVisible(int type) throws SQLException
+  {
     return false;
   }
 
-  public boolean othersDeletesAreVisible(int i) throws SQLException {
+  public boolean othersDeletesAreVisible(int i) throws SQLException
+  {
     return false;
   }
 
-  public boolean othersInsertsAreVisible(int type) throws SQLException {
+  public boolean othersInsertsAreVisible(int type) throws SQLException
+  {
     return false;
   }
 
-  public boolean updatesAreDetected(int type) throws SQLException {
+  public boolean updatesAreDetected(int type) throws SQLException
+  {
     return false;
   }
 
-  public boolean deletesAreDetected(int i) throws SQLException {
+  public boolean deletesAreDetected(int i) throws SQLException
+  {
     return false;
   }
 
-  public boolean insertsAreDetected(int type) throws SQLException {
+  public boolean insertsAreDetected(int type) throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsBatchUpdates() throws SQLException {
+  public boolean supportsBatchUpdates() throws SQLException
+  {
     return true;
   }
 
@@ -3039,7 +3449,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
       String schemaPattern,
       String typeNamePattern,
       int[] types
-  ) throws SQLException {
+  ) throws SQLException
+  {
     String sql = "select "
         + "null as type_cat, n.nspname as type_schem, t.typname as type_name,  null as class_name, "
         + "CASE WHEN t.typtype='c' then " + java.sql.Types.STRUCT + " else "
@@ -3048,7 +3459,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
         + "as remarks, CASE WHEN t.typtype = 'd' then  (select CASE";
 
     for (Iterator<String> i = connection.getTypeInfo().getPGTypeNamesWithSQLTypes();
-         i.hasNext(); ) {
+         i.hasNext(); )
+    {
       String pgType = i.next();
       int sqlType = connection.getTypeInfo().getSQLType(pgType);
       sql += " when typname = " + escapeQuotes(pgType) + " then " + sqlType;
@@ -3060,10 +3472,13 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
 
     String toAdd = "";
-    if (types != null) {
+    if (types != null)
+    {
       toAdd += " and (false ";
-      for (int type : types) {
-        switch (type) {
+      for (int type : types)
+      {
+        switch (type)
+        {
           case Types.STRUCT:
             toAdd += " or t.typtype = 'c'";
             break;
@@ -3073,23 +3488,28 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
         }
       }
       toAdd += " ) ";
-    } else {
+    } else
+    {
       toAdd += " and t.typtype IN ('c','d') ";
     }
     // spec says that if typeNamePattern is a fully qualified name
     // then the schema and catalog are ignored
 
-    if (typeNamePattern != null) {
+    if (typeNamePattern != null)
+    {
       // search for qualifier
       int firstQualifier = typeNamePattern.indexOf('.');
       int secondQualifier = typeNamePattern.lastIndexOf('.');
 
-      if (firstQualifier != -1) {
+      if (firstQualifier != -1)
+      {
         // if one of them is -1 they both will be
-        if (firstQualifier != secondQualifier) {
+        if (firstQualifier != secondQualifier)
+        {
           // we have a catalog.schema.typename, ignore catalog
           schemaPattern = typeNamePattern.substring(firstQualifier + 1, secondQualifier);
-        } else {
+        } else
+        {
           // we just have a schema.typename
           schemaPattern = typeNamePattern.substring(0, firstQualifier);
         }
@@ -3100,7 +3520,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     }
 
     // schemaPattern may have been modified above
-    if (schemaPattern != null) {
+    if (schemaPattern != null)
+    {
       toAdd += " and n.nspname like " + escapeQuotes(schemaPattern);
     }
     sql += toAdd;
@@ -3111,50 +3532,61 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
 
-  public java.sql.Connection getConnection() throws SQLException {
+  public java.sql.Connection getConnection() throws SQLException
+  {
     return (java.sql.Connection) connection;
   }
 
   /* I don't find these in the spec!?! */
 
-  public boolean rowChangesAreDetected(int type) throws SQLException {
+  public boolean rowChangesAreDetected(int type) throws SQLException
+  {
     return false;
   }
 
-  public boolean rowChangesAreVisible(int type) throws SQLException {
+  public boolean rowChangesAreVisible(int type) throws SQLException
+  {
     return false;
   }
 
-  protected java.sql.Statement createMetaDataStatement() throws SQLException {
+  protected java.sql.Statement createMetaDataStatement() throws SQLException
+  {
     return connection.createStatement(java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE,
         java.sql.ResultSet.CONCUR_READ_ONLY);
   }
 
-  public long getMaxLogicalLobSize() throws SQLException {
+  public long getMaxLogicalLobSize() throws SQLException
+  {
     return 0;
   }
 
-  public boolean supportsRefCursors() throws SQLException {
+  public boolean supportsRefCursors() throws SQLException
+  {
     return false;
   }
 
-  public RowIdLifetime getRowIdLifetime() throws SQLException {
+  public RowIdLifetime getRowIdLifetime() throws SQLException
+  {
     throw org.postgresql.Driver.notImplemented(this.getClass(), "getRowIdLifetime()");
   }
 
-  public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException {
+  public ResultSet getSchemas(String catalog, String schemaPattern) throws SQLException
+  {
     return getSchemas(getJDBCMajorVersion(), catalog, schemaPattern);
   }
 
-  public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
+  public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException
+  {
     return true;
   }
 
-  public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
+  public boolean autoCommitFailureClosesAllResultSets() throws SQLException
+  {
     return false;
   }
 
-  public ResultSet getClientInfoProperties() throws SQLException {
+  public ResultSet getClientInfoProperties() throws SQLException
+  {
     Field f[] = new Field[4];
     f[0] = new Field("NAME", Oid.VARCHAR);
     f[1] = new Field("MAX_LEN", Oid.INT4);
@@ -3163,7 +3595,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
 
     List<byte[][]> v = new ArrayList<byte[][]>();
 
-    if (connection.haveMinimumServerVersion(ServerVersion.v9_0)) {
+    if (connection.haveMinimumServerVersion(ServerVersion.v9_0))
+    {
       byte[][] tuple = new byte[4][];
       tuple[0] = connection.encodeString("ApplicationName");
       tuple[1] = connection.encodeString(Integer.toString(getMaxNameLength()));
@@ -3176,60 +3609,73 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     return (ResultSet) ((BaseStatement) createMetaDataStatement()).createDriverResultSet(f, v);
   }
 
-  public boolean providesQueryObjectGenerator() throws SQLException {
+  public boolean providesQueryObjectGenerator() throws SQLException
+  {
     return false;
   }
 
-  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+  public boolean isWrapperFor(Class<?> iface) throws SQLException
+  {
     return iface.isAssignableFrom(getClass());
   }
 
-  public <T> T unwrap(Class<T> iface) throws SQLException {
-    if (iface.isAssignableFrom(getClass())) {
+  public <T> T unwrap(Class<T> iface) throws SQLException
+  {
+    if (iface.isAssignableFrom(getClass()))
+    {
       return iface.cast(this);
     }
     throw new SQLException("Cannot unwrap to " + iface.getName());
   }
 
   public ResultSet getFunctions(String catalog, String schemaPattern, String functionNamePattern)
-      throws SQLException {
+      throws SQLException
+  {
     return getProcedures(getJDBCMajorVersion(), catalog, schemaPattern, functionNamePattern);
   }
 
   public ResultSet getFunctionColumns(String catalog, String schemaPattern,
-      String functionNamePattern, String columnNamePattern) throws SQLException {
+      String functionNamePattern, String columnNamePattern) throws SQLException
+  {
     return getProcedureColumns(getJDBCMajorVersion(), catalog, schemaPattern, functionNamePattern,
         columnNamePattern);
   }
 
-  public int getJDBCMajorVersion() throws SQLException {
+  public int getJDBCMajorVersion() throws SQLException
+  {
     // FIXME: dependent on JDBC version
     return 4;
   }
 
   public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern,
-      String columnNamePattern) throws SQLException {
+      String columnNamePattern) throws SQLException
+  {
     throw org.postgresql.Driver.notImplemented(this.getClass(),
         "getPseudoColumns(String, String, String, String)");
   }
 
-  public boolean generatedKeyAlwaysReturned() throws SQLException {
+  public boolean generatedKeyAlwaysReturned() throws SQLException
+  {
     return true;
   }
 
-  public boolean supportsSavepoints() throws SQLException {
+  public boolean supportsSavepoints() throws SQLException
+  {
     return connection.haveMinimumServerVersion(ServerVersion.v8_0);
   }
 
-  public boolean supportsNamedParameters() throws SQLException {
+  public boolean supportsNamedParameters() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsMultipleOpenResults() throws SQLException {
+  public boolean supportsMultipleOpenResults() throws SQLException
+  {
     return false;
   }
 
-  public boolean supportsGetGeneratedKeys() throws SQLException {
+  public boolean supportsGetGeneratedKeys() throws SQLException
+  {
     // We don't support returning generated keys by column index,
     // but that should be a rarer case than the ones we do support.
     //
@@ -3237,49 +3683,59 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
   }
 
   public ResultSet getSuperTypes(String catalog, String schemaPattern,
-      String typeNamePattern) throws SQLException {
+      String typeNamePattern) throws SQLException
+  {
     throw org.postgresql.Driver.notImplemented(this.getClass(),
         "getSuperTypes(String,String,String)");
   }
 
   public ResultSet getSuperTables(String catalog, String schemaPattern,
-      String tableNamePattern) throws SQLException {
+      String tableNamePattern) throws SQLException
+  {
     throw org.postgresql.Driver.notImplemented(this.getClass(),
         "getSuperTables(String,String,String,String)");
   }
 
   public ResultSet getAttributes(String catalog, String schemaPattern,
       String typeNamePattern, String attributeNamePattern)
-      throws SQLException {
+      throws SQLException
+  {
     throw org.postgresql.Driver.notImplemented(this.getClass(),
         "getAttributes(String,String,String,String)");
   }
 
-  public boolean supportsResultSetHoldability(int holdability) throws SQLException {
+  public boolean supportsResultSetHoldability(int holdability) throws SQLException
+  {
     return true;
   }
 
-  public int getResultSetHoldability() throws SQLException {
+  public int getResultSetHoldability() throws SQLException
+  {
     return ResultSet.HOLD_CURSORS_OVER_COMMIT;
   }
 
-  public int getDatabaseMajorVersion() throws SQLException {
+  public int getDatabaseMajorVersion() throws SQLException
+  {
     return connection.getServerMajorVersion();
   }
 
-  public int getDatabaseMinorVersion() throws SQLException {
+  public int getDatabaseMinorVersion() throws SQLException
+  {
     return connection.getServerMinorVersion();
   }
 
-  public int getJDBCMinorVersion() throws SQLException {
+  public int getJDBCMinorVersion() throws SQLException
+  {
     return 0; // This class implements JDBC 3.0
   }
 
-  public int getSQLStateType() throws SQLException {
+  public int getSQLStateType() throws SQLException
+  {
     return sqlStateSQL99;
   }
 
-  public boolean locatorsUpdateCopy() throws SQLException {
+  public boolean locatorsUpdateCopy() throws SQLException
+  {
     /*
      * Currently LOB's aren't updateable at all, so it doesn't
      * matter what we return.  We don't throw the notImplemented
@@ -3289,7 +3745,8 @@ public class PgDatabaseMetaData implements DatabaseMetaData {
     return true;
   }
 
-  public boolean supportsStatementPooling() throws SQLException {
+  public boolean supportsStatementPooling() throws SQLException
+  {
     return false;
   }
 }

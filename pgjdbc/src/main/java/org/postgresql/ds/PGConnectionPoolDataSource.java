@@ -36,13 +36,15 @@ import javax.sql.PooledConnection;
  */
 public class PGConnectionPoolDataSource
     extends BaseDataSource
-    implements ConnectionPoolDataSource, Serializable {
+    implements ConnectionPoolDataSource, Serializable
+{
   private boolean defaultAutoCommit = true;
 
   /**
    * Gets a description of this DataSource.
    */
-  public String getDescription() {
+  public String getDescription()
+  {
     return "ConnectionPoolDataSource from " + org.postgresql.Driver.getVersion();
   }
 
@@ -53,7 +55,8 @@ public class PGConnectionPoolDataSource
    * @throws java.sql.SQLException Occurs when the physical database connection cannot be
    *                               established.
    */
-  public PooledConnection getPooledConnection() throws SQLException {
+  public PooledConnection getPooledConnection() throws SQLException
+  {
     return new PGPooledConnection(getConnection(), defaultAutoCommit);
   }
 
@@ -64,7 +67,8 @@ public class PGConnectionPoolDataSource
    * @throws java.sql.SQLException Occurs when the physical database connection cannot be
    *                               established.
    */
-  public PooledConnection getPooledConnection(String user, String password) throws SQLException {
+  public PooledConnection getPooledConnection(String user, String password) throws SQLException
+  {
     return new PGPooledConnection(getConnection(user, password), defaultAutoCommit);
   }
 
@@ -74,7 +78,8 @@ public class PGConnectionPoolDataSource
    *
    * @return true if connections supplied by this pool will have autoCommit
    */
-  public boolean isDefaultAutoCommit() {
+  public boolean isDefaultAutoCommit()
+  {
     return defaultAutoCommit;
   }
 
@@ -84,22 +89,26 @@ public class PGConnectionPoolDataSource
    *
    * @param defaultAutoCommit whether connections supplied by this pool will have autoCommit
    */
-  public void setDefaultAutoCommit(boolean defaultAutoCommit) {
+  public void setDefaultAutoCommit(boolean defaultAutoCommit)
+  {
     this.defaultAutoCommit = defaultAutoCommit;
   }
 
-  private void writeObject(ObjectOutputStream out) throws IOException {
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
     writeBaseObject(out);
     out.writeBoolean(defaultAutoCommit);
   }
 
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
     readBaseObject(in);
     defaultAutoCommit = in.readBoolean();
   }
 
   public java.util.logging.Logger getParentLogger()
-      throws java.sql.SQLFeatureNotSupportedException {
+      throws java.sql.SQLFeatureNotSupportedException
+  {
     throw org.postgresql.Driver.notImplemented(this.getClass(), "getParentLogger()");
   }
 

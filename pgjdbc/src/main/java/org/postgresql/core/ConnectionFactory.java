@@ -24,7 +24,8 @@ import java.util.Properties;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-public abstract class ConnectionFactory {
+public abstract class ConnectionFactory
+{
   /**
    * Protocol version to implementation instance map. If no protocol version is specified, instances
    * are tried in order until an exception is thrown or a non-null connection is returned.
@@ -51,19 +52,23 @@ public abstract class ConnectionFactory {
    * @throws SQLException if the connection could not be established.
    */
   public static ProtocolConnection openConnection(HostSpec[] hostSpecs, String user,
-      String database, Properties info, Logger logger) throws SQLException {
+      String database, Properties info, Logger logger) throws SQLException
+  {
     String protoName = PGProperty.PROTOCOL_VERSION.get(info);
 
-    for (Object[] version : versions) {
+    for (Object[] version : versions)
+    {
       String versionProtoName = (String) version[0];
-      if (protoName != null && !protoName.equals(versionProtoName)) {
+      if (protoName != null && !protoName.equals(versionProtoName))
+      {
         continue;
       }
 
       ConnectionFactory factory = (ConnectionFactory) version[1];
       ProtocolConnection connection =
           factory.openConnectionImpl(hostSpecs, user, database, info, logger);
-      if (connection != null) {
+      if (connection != null)
+      {
         return connection;
       }
     }
@@ -97,11 +102,15 @@ public abstract class ConnectionFactory {
    *
    * @param newStream The stream to close.
    */
-  protected void closeStream(PGStream newStream) {
-    if (newStream != null) {
-      try {
+  protected void closeStream(PGStream newStream)
+  {
+    if (newStream != null)
+    {
+      try
+      {
         newStream.close();
-      } catch (IOException e) {
+      } catch (IOException e)
+      {
       }
     }
   }

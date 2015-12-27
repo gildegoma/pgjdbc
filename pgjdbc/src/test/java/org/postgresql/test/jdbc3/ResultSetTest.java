@@ -17,15 +17,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class ResultSetTest extends TestCase {
+public class ResultSetTest extends TestCase
+{
 
   private Connection _conn;
 
-  public ResultSetTest(String name) {
+  public ResultSetTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     Statement stmt = _conn.createStatement();
     stmt.execute("CREATE TEMP TABLE hold(a int)");
@@ -34,14 +37,16 @@ public class ResultSetTest extends TestCase {
     stmt.close();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("DROP TABLE hold");
     stmt.close();
     TestUtil.closeDB(_conn);
   }
 
-  public void testHoldableResultSet() throws SQLException {
+  public void testHoldableResultSet() throws SQLException
+  {
     Statement stmt = _conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
         ResultSet.HOLD_CURSORS_OVER_COMMIT);
 

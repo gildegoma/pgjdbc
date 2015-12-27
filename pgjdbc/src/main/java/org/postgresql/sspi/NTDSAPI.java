@@ -6,7 +6,8 @@ import com.sun.jna.WString;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.win32.StdCallLibrary;
 
-interface NTDSAPI extends StdCallLibrary {
+interface NTDSAPI extends StdCallLibrary
+{
 
   NTDSAPI instance = (NTDSAPI)
       Native.loadLibrary("NTDSAPI", NTDSAPI.class);

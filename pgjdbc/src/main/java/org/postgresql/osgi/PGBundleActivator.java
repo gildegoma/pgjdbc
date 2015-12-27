@@ -21,10 +21,12 @@ import java.util.Hashtable;
 /**
  * This class is an OSGi Bundle Activator and should only be used internally by the OSGi Framework
  */
-public class PGBundleActivator implements BundleActivator {
+public class PGBundleActivator implements BundleActivator
+{
   private ServiceRegistration<?> _registration;
 
-  public void start(BundleContext context) throws Exception {
+  public void start(BundleContext context) throws Exception
+  {
     Dictionary<String, Object> properties = new Hashtable<String, Object>();
     properties.put(DataSourceFactory.OSGI_JDBC_DRIVER_CLASS, Driver.class.getName());
     properties.put(DataSourceFactory.OSGI_JDBC_DRIVER_NAME, "PostgreSQL JDBC Driver");
@@ -34,13 +36,16 @@ public class PGBundleActivator implements BundleActivator {
         properties);
   }
 
-  public void stop(BundleContext context) throws Exception {
-    if (_registration != null) {
+  public void stop(BundleContext context) throws Exception
+  {
+    if (_registration != null)
+    {
       _registration.unregister();
       _registration = null;
     }
 
-    if (Driver.isRegistered()) {
+    if (Driver.isRegistered())
+    {
       Driver.deregister();
     }
   }

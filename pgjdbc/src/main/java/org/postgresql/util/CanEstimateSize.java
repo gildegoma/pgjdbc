@@ -8,6 +8,7 @@
 
 package org.postgresql.util;
 
-public interface CanEstimateSize {
+public interface CanEstimateSize
+{
   long getSize();
 }

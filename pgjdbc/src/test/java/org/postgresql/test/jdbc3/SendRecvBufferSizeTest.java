@@ -16,15 +16,18 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class SendRecvBufferSizeTest extends TestCase {
+public class SendRecvBufferSizeTest extends TestCase
+{
 
   private Connection _conn;
 
-  public SendRecvBufferSizeTest(String name) {
+  public SendRecvBufferSizeTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     System.setProperty("sendBufferSize", "1024");
     System.setProperty("receiveBufferSize", "1024");
 
@@ -36,7 +39,8 @@ public class SendRecvBufferSizeTest extends TestCase {
     stmt.close();
   }
 
-  protected void tearDown() throws SQLException {
+  protected void tearDown() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("DROP TABLE hold");
     stmt.close();
@@ -45,7 +49,8 @@ public class SendRecvBufferSizeTest extends TestCase {
 
 
   // dummy test
-  public void testSelect() throws SQLException {
+  public void testSelect() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.execute("select * from hold");
     stmt.close();

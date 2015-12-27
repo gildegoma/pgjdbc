@@ -19,17 +19,20 @@ import java.sql.SQLException;
  * PGConnection#setPrepareThreshold(int)} then we'll change to using the binary protocol to save
  * bandwidth and reduce decoding time.
  */
-public class BinaryTest extends TestCase {
+public class BinaryTest extends TestCase
+{
   private Connection connection;
   private ResultSet results;
   private PreparedStatement statement;
 
-  public BinaryTest(String name) {
+  public BinaryTest(String name)
+  {
     super(name);
   }
 
   @Override
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     connection = TestUtil.openDB();
     statement = connection.prepareStatement("select 1");
 
@@ -37,11 +40,13 @@ public class BinaryTest extends TestCase {
   }
 
   @Override
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.closeDB(connection);
   }
 
-  public void testPreparedStatement_3() throws Exception {
+  public void testPreparedStatement_3() throws Exception
+  {
     ((PGStatement) statement).setPrepareThreshold(3);
 
     results = statement.executeQuery();
@@ -59,7 +64,8 @@ public class BinaryTest extends TestCase {
     ((PGStatement) statement).setPrepareThreshold(5);
   }
 
-  public void testPreparedStatement_1() throws Exception {
+  public void testPreparedStatement_1() throws Exception
+  {
     ((PGStatement) statement).setPrepareThreshold(1);
 
     results = statement.executeQuery();
@@ -77,7 +83,8 @@ public class BinaryTest extends TestCase {
     ((PGStatement) statement).setPrepareThreshold(5);
   }
 
-  public void testPreparedStatement_0() throws Exception {
+  public void testPreparedStatement_0() throws Exception
+  {
     ((PGStatement) statement).setPrepareThreshold(0);
 
     results = statement.executeQuery();
@@ -95,7 +102,8 @@ public class BinaryTest extends TestCase {
     ((PGStatement) statement).setPrepareThreshold(5);
   }
 
-  public void testPreparedStatement_negative1() throws Exception {
+  public void testPreparedStatement_negative1() throws Exception
+  {
     ((PGStatement) statement).setPrepareThreshold(-1);
 
     results = statement.executeQuery();
@@ -113,9 +121,11 @@ public class BinaryTest extends TestCase {
     ((PGStatement) statement).setPrepareThreshold(5);
   }
 
-  public void testReceiveBinary() throws Exception {
+  public void testReceiveBinary() throws Exception
+  {
     PreparedStatement ps = connection.prepareStatement("select ?");
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++)
+    {
       ps.setInt(1, 42 + i);
       ResultSet rs = ps.executeQuery();
       assertEquals("One row should be returned", true, rs.next());
@@ -125,7 +135,8 @@ public class BinaryTest extends TestCase {
     ps.close();
   }
 
-  private int getFormat(ResultSet results) throws SQLException {
+  private int getFormat(ResultSet results) throws SQLException
+  {
     return ((PGResultSetMetaData) results.getMetaData()).getFormat(1);
   }
 }

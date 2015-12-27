@@ -15,25 +15,31 @@ import junit.framework.TestSuite;
 /*
  * Executes all known tests for JDBC3
  */
-public class Jdbc3TestSuite extends TestSuite {
+public class Jdbc3TestSuite extends TestSuite
+{
 
   /*
    * The main entry point for JUnit
    */
-  public static TestSuite suite() throws Exception {
+  public static TestSuite suite() throws Exception
+  {
     Class.forName("org.postgresql.Driver");
     TestSuite suite = new TestSuite();
-    try {
+    try
+    {
       java.sql.Connection con = TestUtil.openDB();
 
-      if (TestUtil.haveMinimumServerVersion(con, "8.1") && TestUtil.isProtocolVersion(con, 3)) {
+      if (TestUtil.haveMinimumServerVersion(con, "8.1") && TestUtil.isProtocolVersion(con, 3))
+      {
         suite.addTestSuite(Jdbc3CallableStatementTest.class);
       }
-      if (TestUtil.haveMinimumServerVersion(con, "8.2")) {
+      if (TestUtil.haveMinimumServerVersion(con, "8.2"))
+      {
         suite.addTestSuite(GeneratedKeysTest.class);
       }
       con.close();
-    } catch (Exception ex) {
+    } catch (Exception ex)
+    {
       ex.printStackTrace();
     }
     suite.addTestSuite(CompositeQueryParseTest.class);

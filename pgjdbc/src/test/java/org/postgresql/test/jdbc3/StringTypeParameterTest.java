@@ -19,17 +19,21 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Properties;
 
-public class StringTypeParameterTest extends TestCase {
+public class StringTypeParameterTest extends TestCase
+{
 
   private Connection _conn;
 
-  public StringTypeParameterTest(String name) {
+  public StringTypeParameterTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp(String stringType) throws Exception {
+  protected void setUp(String stringType) throws Exception
+  {
     Properties props = new Properties();
-    if (stringType != null) {
+    if (stringType != null)
+    {
       props.put("stringtype", stringType);
     }
     _conn = TestUtil.openDB(props);
@@ -37,46 +41,57 @@ public class StringTypeParameterTest extends TestCase {
     TestUtil.createTable(_conn, "stringtypetest", "m mood");
   }
 
-  protected void tearDown() throws SQLException {
-    if (_conn != null) {
+  protected void tearDown() throws SQLException
+  {
+    if (_conn != null)
+    {
       TestUtil.dropTable(_conn, "stringtypetest");
       TestUtil.dropType(_conn, "mood");
       TestUtil.closeDB(_conn);
     }
   }
 
-  public void testParameterStringTypeVarchar() throws Exception {
-    if (!TestUtil.isProtocolVersion(_conn, 3)) {
+  public void testParameterStringTypeVarchar() throws Exception
+  {
+    if (!TestUtil.isProtocolVersion(_conn, 3))
+    {
       return;
     }
     testParameterVarchar("varchar");
   }
 
-  public void testParameterStringTypeNotSet() throws Exception {
-    if (!TestUtil.isProtocolVersion(_conn, 3)) {
+  public void testParameterStringTypeNotSet() throws Exception
+  {
+    if (!TestUtil.isProtocolVersion(_conn, 3))
+    {
       return;
     }
     testParameterVarchar(null);
   }
 
-  private void testParameterVarchar(String param) throws Exception {
+  private void testParameterVarchar(String param) throws Exception
+  {
     setUp(param);
 
     PreparedStatement update = _conn.prepareStatement("insert into stringtypetest (m) values (?)");
     update.setString(1, "sad");
-    try {
+    try
+    {
       update.executeUpdate();
       fail("Expected exception thrown");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       // expected
     }
 
     update.clearParameters();
     update.setObject(1, "sad", Types.VARCHAR);
-    try {
+    try
+    {
       update.executeUpdate();
       fail("Expected exception thrown");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       // expected
     }
 
@@ -89,19 +104,23 @@ public class StringTypeParameterTest extends TestCase {
     PreparedStatement query =
         _conn.prepareStatement("select * from stringtypetest where m = ? or m = ?");
     query.setString(1, "sad");
-    try {
+    try
+    {
       query.executeQuery();
       fail("Expected exception thrown");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       // expected
     }
 
     query.clearParameters();
     query.setObject(2, "sad", Types.VARCHAR);
-    try {
+    try
+    {
       query.executeQuery();
       fail("Expected exception thrown");
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       // expected
     }
 
@@ -117,7 +136,8 @@ public class StringTypeParameterTest extends TestCase {
 
   }
 
-  public void testParameterUnspecified() throws Exception {
+  public void testParameterUnspecified() throws Exception
+  {
     setUp("unspecified");
 
     PreparedStatement update = _conn.prepareStatement("insert into stringtypetest (m) values (?)");

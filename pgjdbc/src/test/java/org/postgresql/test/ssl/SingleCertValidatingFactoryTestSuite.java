@@ -24,7 +24,8 @@ import java.util.Collections;
 import java.util.Properties;
 
 @RunWith(Parameterized.class)
-public class SingleCertValidatingFactoryTestSuite {
+public class SingleCertValidatingFactoryTestSuite
+{
   private static String IS_ENABLED_PROP_NAME = "testsinglecertfactory";
 
   /**
@@ -39,14 +40,16 @@ public class SingleCertValidatingFactoryTestSuite {
    * (pulled from system properties).
    */
   @Parameters
-  public static Collection<Object[]> data() throws IOException {
+  public static Collection<Object[]> data() throws IOException
+  {
     Properties props = new Properties();
     File sslTestFile =
         TestUtil.getFile(System.getProperty("ssltest.properties", "ssltest.properties"));
     props.load(new FileInputStream(sslTestFile));
     String testSingleCertFactory = props.getProperty(IS_ENABLED_PROP_NAME);
     boolean skipTest = testSingleCertFactory == null || "".equals(testSingleCertFactory);
-    if (skipTest) {
+    if (skipTest)
+    {
       System.out.println("Skipping SingleCertSocketFactoryTests. To enable set the property "
           + IS_ENABLED_PROP_NAME + "=true in the ssltest.properties file.");
       return Collections.emptyList();
@@ -65,29 +68,35 @@ public class SingleCertValidatingFactoryTestSuite {
   private static final String goodServerCertPath = "certdir/goodroot.crt";
   private static final String badServerCertPath = "certdir/badroot.crt";
 
-  private String getGoodServerCert() {
+  private String getGoodServerCert()
+  {
     return loadFile(goodServerCertPath);
   }
 
-  private String getBadServerCert() {
+  private String getBadServerCert()
+  {
     return loadFile(badServerCertPath);
   }
 
-  protected String getUsername() {
+  protected String getUsername()
+  {
     return System.getProperty("username");
   }
 
-  protected String getPassword() {
+  protected String getPassword()
+  {
     return System.getProperty("password");
   }
 
   private String serverJdbcUrl;
 
-  public SingleCertValidatingFactoryTestSuite(String serverJdbcUrl) {
+  public SingleCertValidatingFactoryTestSuite(String serverJdbcUrl)
+  {
     this.serverJdbcUrl = serverJdbcUrl;
   }
 
-  protected String getServerJdbcUrl() {
+  protected String getServerJdbcUrl()
+  {
     return serverJdbcUrl;
   }
 
@@ -97,13 +106,16 @@ public class SingleCertValidatingFactoryTestSuite {
    *
    * @param info The additional properties to use when creating a connection
    */
-  protected Connection getConnection(Properties info) throws SQLException {
+  protected Connection getConnection(Properties info) throws SQLException
+  {
     String url = getServerJdbcUrl();
     info.setProperty("user", getUsername());
     info.setProperty("password", getPassword());
-    try {
+    try
+    {
       Class.forName("org.postgresql.Driver");
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException e)
+    {
       throw new RuntimeException(e);
     }
     return DriverManager.getConnection(url, info);
@@ -113,17 +125,21 @@ public class SingleCertValidatingFactoryTestSuite {
    * Tests whether a given throwable or one of it's root causes matches of a given class.
    */
   private boolean matchesExpected(Throwable t, Class<? extends Throwable> expectedThrowable)
-      throws SQLException {
-    if (t == null || expectedThrowable == null) {
+      throws SQLException
+  {
+    if (t == null || expectedThrowable == null)
+    {
       return false;
     }
-    if (expectedThrowable.isAssignableFrom(t.getClass())) {
+    if (expectedThrowable.isAssignableFrom(t.getClass()))
+    {
       return true;
     }
     return matchesExpected(t.getCause(), expectedThrowable);
   }
 
-  protected void testConnect(Properties info, boolean sslExpected) throws SQLException {
+  protected void testConnect(Properties info, boolean sslExpected) throws SQLException
+  {
     testConnect(info, sslExpected, null);
   }
 
@@ -132,9 +148,11 @@ public class SingleCertValidatingFactoryTestSuite {
    * is using SSL.
    */
   protected void testConnect(Properties info, boolean sslExpected,
-      Class<? extends Throwable> expectedThrowable) throws SQLException {
+      Class<? extends Throwable> expectedThrowable) throws SQLException
+  {
     Connection conn = null;
-    try {
+    try
+    {
       conn = getConnection(info);
       Statement stmt = conn.createStatement();
       // Basic SELECT test:
@@ -148,29 +166,40 @@ public class SingleCertValidatingFactoryTestSuite {
       boolean sslActual = rs.getBoolean(1);
       Assert.assertEquals(sslExpected, sslActual);
       stmt.close();
-    } catch (Exception e) {
-      if (matchesExpected(e, expectedThrowable)) {
+    } catch (Exception e)
+    {
+      if (matchesExpected(e, expectedThrowable))
+      {
         // do nothing and just suppress the exception
         return;
-      } else {
-        if (e instanceof RuntimeException) {
+      } else
+      {
+        if (e instanceof RuntimeException)
+        {
           throw (RuntimeException) e;
-        } else if (e instanceof SQLException) {
+        } else if (e instanceof SQLException)
+        {
           throw (SQLException) e;
-        } else {
+        } else
+        {
           throw new RuntimeException(e);
         }
       }
-    } finally {
-      if (conn != null) {
-        try {
+    } finally
+    {
+      if (conn != null)
+      {
+        try
+        {
           conn.close();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
         }
       }
     }
 
-    if (expectedThrowable != null) {
+    if (expectedThrowable != null)
+    {
       Assert.fail("Expected exception " + expectedThrowable.getName() + " but it did not occur.");
     }
   }
@@ -180,7 +209,8 @@ public class SingleCertValidatingFactoryTestSuite {
    * it. This connection attempt should *fail* as the client should reject the server.
    */
   @Test
-  public void connectSSLWithValidationNoCert() throws SQLException {
+  public void connectSSLWithValidationNoCert() throws SQLException
+  {
     Properties info = new Properties();
     info.setProperty("ssl", "true");
     testConnect(info, true, javax.net.ssl.SSLHandshakeException.class);
@@ -199,7 +229,8 @@ public class SingleCertValidatingFactoryTestSuite {
    */
   @Test
   public void connectSSLWithValidationWrongCert() throws SQLException,
-      IOException {
+      IOException
+  {
     Properties info = new Properties();
     info.setProperty("ssl", "true");
     info.setProperty("sslfactory", "org.postgresql.ssl.SingleCertValidatingFactory");
@@ -209,7 +240,8 @@ public class SingleCertValidatingFactoryTestSuite {
 
   @Test
   public void fileCertInvalid() throws SQLException,
-      IOException {
+      IOException
+  {
     Properties info = new Properties();
     info.setProperty("ssl", "true");
     info.setProperty("sslfactory", "org.postgresql.ssl.SingleCertValidatingFactory");
@@ -219,7 +251,8 @@ public class SingleCertValidatingFactoryTestSuite {
 
   @Test
   public void stringCertInvalid() throws SQLException,
-      IOException {
+      IOException
+  {
     Properties info = new Properties();
     info.setProperty("ssl", "true");
     info.setProperty("sslfactory", "org.postgresql.ssl.SingleCertValidatingFactory");
@@ -234,7 +267,8 @@ public class SingleCertValidatingFactoryTestSuite {
    */
   @Test
   public void connectSSLWithValidationProperCertFile() throws SQLException,
-      IOException {
+      IOException
+  {
     Properties info = new Properties();
     info.setProperty("ssl", "true");
     info.setProperty("sslfactory", "org.postgresql.ssl.SingleCertValidatingFactory");
@@ -249,7 +283,8 @@ public class SingleCertValidatingFactoryTestSuite {
    */
   @Test
   public void connectSSLWithValidationProperCertString() throws SQLException,
-      IOException {
+      IOException
+  {
     Properties info = new Properties();
     info.setProperty("ssl", "true");
     info.setProperty("sslfactory", "org.postgresql.ssl.SingleCertValidatingFactory");
@@ -263,11 +298,13 @@ public class SingleCertValidatingFactoryTestSuite {
    */
   @Test
   public void connectSSLWithValidationProperCertSysProp() throws SQLException,
-      IOException {
+      IOException
+  {
     // System property name we're using for the SSL cert. This can be anything.
     String sysPropName = "org.postgresql.jdbc.test.sslcert";
 
-    try {
+    try
+    {
       System.setProperty(sysPropName, getGoodServerCert());
 
       Properties info = new Properties();
@@ -275,7 +312,8 @@ public class SingleCertValidatingFactoryTestSuite {
       info.setProperty("sslfactory", "org.postgresql.ssl.SingleCertValidatingFactory");
       info.setProperty("sslfactoryarg", "sys:" + sysPropName);
       testConnect(info, true);
-    } finally {
+    } finally
+    {
       // Clear it out when we're done:
       System.setProperty(sysPropName, "");
     }
@@ -292,9 +330,11 @@ public class SingleCertValidatingFactoryTestSuite {
    */
   @Test
   public void connectSSLWithValidationProperCertEnvVar() throws SQLException,
-      IOException {
+      IOException
+  {
     String envVarName = "DATASOURCE_SSL_CERT";
-    if (System.getenv(envVarName) == null) {
+    if (System.getenv(envVarName) == null)
+    {
       System.out.println(
           "Skipping test connectSSLWithValidationProperCertEnvVar (env variable is not defined)");
       return;
@@ -313,11 +353,13 @@ public class SingleCertValidatingFactoryTestSuite {
    */
   @Test
   public void connectSSLWithValidationMissingSysProp() throws SQLException,
-      IOException {
+      IOException
+  {
     // System property name we're using for the SSL cert. This can be anything.
     String sysPropName = "org.postgresql.jdbc.test.sslcert";
 
-    try {
+    try
+    {
       System.setProperty(sysPropName, "");
 
       Properties info = new Properties();
@@ -325,7 +367,8 @@ public class SingleCertValidatingFactoryTestSuite {
       info.setProperty("sslfactory", "org.postgresql.ssl.SingleCertValidatingFactory");
       info.setProperty("sslfactoryarg", "sys:" + sysPropName);
       testConnect(info, true, java.security.GeneralSecurityException.class);
-    } finally {
+    } finally
+    {
       // Clear it out when we're done:
       System.setProperty(sysPropName, "");
     }
@@ -337,10 +380,12 @@ public class SingleCertValidatingFactoryTestSuite {
    */
   @Test
   public void connectSSLWithValidationMissingEnvVar() throws SQLException,
-      IOException {
+      IOException
+  {
     // Use an environment variable that does *not* exist:
     String envVarName = "MISSING_DATASOURCE_SSL_CERT";
-    if (System.getenv(envVarName) != null) {
+    if (System.getenv(envVarName) != null)
+    {
       System.out.println(
           "Skipping test connectSSLWithValidationMissingEnvVar (env variable is defined)");
       return;
@@ -358,24 +403,32 @@ public class SingleCertValidatingFactoryTestSuite {
   /**
    * Utility function to load a file as a string
    */
-  public static String loadFile(String path) {
+  public static String loadFile(String path)
+  {
     BufferedReader br = null;
-    try {
+    try
+    {
       br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
       StringBuilder sb = new StringBuilder();
       String line = null;
-      while ((line = br.readLine()) != null) {
+      while ((line = br.readLine()) != null)
+      {
         sb.append(line);
         sb.append("\n");
       }
       return sb.toString();
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       throw new RuntimeException(e);
-    } finally {
-      if (br != null) {
-        try {
+    } finally
+    {
+      if (br != null)
+      {
+        try
+        {
           br.close();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
         }
       }
     }

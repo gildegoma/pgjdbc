@@ -22,15 +22,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-public class ResultSetMetaDataTest extends TestCase {
+public class ResultSetMetaDataTest extends TestCase
+{
 
   private Connection conn;
 
-  public ResultSetMetaDataTest(String name) {
+  public ResultSetMetaDataTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     conn = TestUtil.openDB();
     TestUtil.createTable(conn, "rsmd1", "a int primary key, b text, c decimal(10,2)", true);
     TestUtil.createTable(conn, "timetest",
@@ -46,7 +49,8 @@ public class ResultSetMetaDataTest extends TestCase {
     TestUtil.createTable(conn, "compositetest", "col rsmd1");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(conn, "compositetest");
     TestUtil.dropTable(conn, "rsmd1");
     TestUtil.dropTable(conn, "timetest");
@@ -58,7 +62,8 @@ public class ResultSetMetaDataTest extends TestCase {
     TestUtil.closeDB(conn);
   }
 
-  public void testStandardResultSet() throws SQLException {
+  public void testStandardResultSet() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT a,b,c,a+c as total,oid,b as d FROM rsmd1");
     runStandardTests(rs.getMetaData());
@@ -66,8 +71,10 @@ public class ResultSetMetaDataTest extends TestCase {
     stmt.close();
   }
 
-  public void testPreparedResultSet() throws SQLException {
-    if (!TestUtil.isProtocolVersion(conn, 3)) {
+  public void testPreparedResultSet() throws SQLException
+  {
+    if (!TestUtil.isProtocolVersion(conn, 3))
+    {
       return;
     }
 
@@ -77,7 +84,8 @@ public class ResultSetMetaDataTest extends TestCase {
     pstmt.close();
   }
 
-  private void runStandardTests(ResultSetMetaData rsmd) throws SQLException {
+  private void runStandardTests(ResultSetMetaData rsmd) throws SQLException
+  {
     PGResultSetMetaData pgrsmd = (PGResultSetMetaData) rsmd;
 
     assertEquals(6, rsmd.getColumnCount());
@@ -87,7 +95,8 @@ public class ResultSetMetaDataTest extends TestCase {
 
     assertEquals("a", rsmd.getColumnName(1));
     assertEquals("oid", rsmd.getColumnName(5));
-    if (TestUtil.isProtocolVersion(conn, 3)) {
+    if (TestUtil.isProtocolVersion(conn, 3))
+    {
       assertEquals("", pgrsmd.getBaseColumnName(4));
       assertEquals("b", pgrsmd.getBaseColumnName(6));
     }
@@ -104,29 +113,34 @@ public class ResultSetMetaDataTest extends TestCase {
 
     assertEquals("", rsmd.getSchemaName(1));
     assertEquals("", rsmd.getSchemaName(4));
-    if (TestUtil.isProtocolVersion(conn, 3)) {
+    if (TestUtil.isProtocolVersion(conn, 3))
+    {
       assertEquals("public", pgrsmd.getBaseSchemaName(1));
       assertEquals("", pgrsmd.getBaseSchemaName(4));
     }
 
     assertEquals("rsmd1", rsmd.getTableName(1));
     assertEquals("", rsmd.getTableName(4));
-    if (TestUtil.isProtocolVersion(conn, 3)) {
+    if (TestUtil.isProtocolVersion(conn, 3))
+    {
       assertEquals("rsmd1", pgrsmd.getBaseTableName(1));
       assertEquals("", pgrsmd.getBaseTableName(4));
     }
 
-    if (TestUtil.isProtocolVersion(conn, 3)) {
+    if (TestUtil.isProtocolVersion(conn, 3))
+    {
       assertEquals(ResultSetMetaData.columnNoNulls, rsmd.isNullable(1));
       assertEquals(ResultSetMetaData.columnNullable, rsmd.isNullable(2));
       assertEquals(ResultSetMetaData.columnNullableUnknown, rsmd.isNullable(4));
-    } else {
+    } else
+    {
       assertEquals(ResultSetMetaData.columnNullableUnknown, rsmd.isNullable(1));
     }
   }
 
   // verify that a prepared update statement returns no metadata and doesn't execute.
-  public void testPreparedUpdate() throws SQLException {
+  public void testPreparedUpdate() throws SQLException
+  {
     PreparedStatement pstmt = conn.prepareStatement("INSERT INTO rsmd1(a,b) VALUES(?,?)");
     pstmt.setInt(1, 1);
     pstmt.setString(2, "hello");
@@ -143,7 +157,8 @@ public class ResultSetMetaDataTest extends TestCase {
   }
 
 
-  public void testDatabaseMetaDataNames() throws SQLException {
+  public void testDatabaseMetaDataNames() throws SQLException
+  {
     DatabaseMetaData databaseMetaData = conn.getMetaData();
     ResultSet resultSet = databaseMetaData.getTableTypes();
     ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
@@ -152,7 +167,8 @@ public class ResultSetMetaDataTest extends TestCase {
     resultSet.close();
   }
 
-  public void testTimestampInfo() throws SQLException {
+  public void testTimestampInfo() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT tm, tmtz, ts, tstz FROM timetest");
     ResultSetMetaData rsmd = rs.getMetaData();
@@ -174,7 +190,8 @@ public class ResultSetMetaDataTest extends TestCase {
     stmt.close();
   }
 
-  public void testColumnDisplaySize() throws SQLException {
+  public void testColumnDisplaySize() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery(
         "SELECT fixedchar, fixedvarchar, unfixedvarchar, txt, bytearr, num64, num60, num, ip FROM sizetest");
@@ -191,13 +208,15 @@ public class ResultSetMetaDataTest extends TestCase {
     assertEquals(Integer.MAX_VALUE, rsmd.getColumnDisplaySize(9));
   }
 
-  public void testIsAutoIncrement() throws SQLException {
+  public void testIsAutoIncrement() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT c,b,a FROM serialtest");
     ResultSetMetaData rsmd = rs.getMetaData();
 
     assertTrue(!rsmd.isAutoIncrement(1));
-    if (TestUtil.isProtocolVersion(conn, 3)) {
+    if (TestUtil.isProtocolVersion(conn, 3))
+    {
       assertTrue(rsmd.isAutoIncrement(2));
       assertTrue(rsmd.isAutoIncrement(3));
       assertEquals("bigserial", rsmd.getColumnTypeName(2));
@@ -208,19 +227,22 @@ public class ResultSetMetaDataTest extends TestCase {
     stmt.close();
   }
 
-  public void testClassesMatch() throws SQLException {
+  public void testClassesMatch() throws SQLException
+  {
     Statement stmt = conn.createStatement();
     stmt.executeUpdate(
         "INSERT INTO alltypes (bool, i2, i4, i8, num, re, fl, ch, vc, tx, d, t, tz, ts, tsz, bt) VALUES ('t', 2, 4, 8, 3.1, 3.14, 3.141, 'c', 'vc', 'tx', '2004-04-09', '09:01:00', '11:11:00-01','2004-04-09 09:01:00','1999-09-19 14:23:12-09', '\\\\123')");
     ResultSet rs = stmt.executeQuery("SELECT * FROM alltypes");
     ResultSetMetaData rsmd = rs.getMetaData();
     assertTrue(rs.next());
-    for (int i = 0; i < rsmd.getColumnCount(); i++) {
+    for (int i = 0; i < rsmd.getColumnCount(); i++)
+    {
       assertEquals(rs.getObject(i + 1).getClass().getName(), rsmd.getColumnClassName(i + 1));
     }
   }
 
-  public void testComposite() throws Exception {
+  public void testComposite() throws Exception
+  {
     Statement stmt = conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT col FROM compositetest");
     ResultSetMetaData rsmd = rs.getMetaData();
@@ -228,7 +250,8 @@ public class ResultSetMetaDataTest extends TestCase {
     assertEquals("rsmd1", rsmd.getColumnTypeName(1));
   }
 
-  public void testUnexecutedStatement() throws Exception {
+  public void testUnexecutedStatement() throws Exception
+  {
     PreparedStatement pstmt = conn.prepareStatement("SELECT col FROM compositetest");
     // we have not executed the statement but we can still get the metadata
     ResultSetMetaData rsmd = pstmt.getMetaData();
@@ -236,7 +259,8 @@ public class ResultSetMetaDataTest extends TestCase {
     assertEquals("rsmd1", rsmd.getColumnTypeName(1));
   }
 
-  public void testClosedResultSet() throws Exception {
+  public void testClosedResultSet() throws Exception
+  {
     PreparedStatement pstmt = conn.prepareStatement("SELECT col FROM compositetest");
     ResultSet rs = pstmt.executeQuery();
     rs.close();

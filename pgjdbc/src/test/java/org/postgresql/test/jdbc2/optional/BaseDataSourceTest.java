@@ -31,7 +31,8 @@ import javax.naming.NamingException;
  *
  * @author Aaron Mulder (ammulder@chariotsolutions.com)
  */
-public abstract class BaseDataSourceTest extends TestCase {
+public abstract class BaseDataSourceTest extends TestCase
+{
   public static String DATA_SOURCE_JNDI = "BaseDataSource";
   protected Connection con;
   protected BaseDataSource bds;
@@ -39,14 +40,16 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * Constructor required by JUnit
    */
-  public BaseDataSourceTest(String name) {
+  public BaseDataSourceTest(String name)
+  {
     super(name);
   }
 
   /**
    * Creates a test table using a standard connection (not from a DataSource).
    */
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     con = TestUtil.openDB();
     TestUtil.createTable(con, "poolingtest", "id int4 not null primary key, name varchar(50)");
     Statement stmt = con.createStatement();
@@ -58,7 +61,8 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * Removes the test table using a standard connection (not from a DataSource)
    */
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.closeDB(con);
     con = TestUtil.openDB();
     TestUtil.dropTable(con, "poolingtest");
@@ -68,8 +72,10 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * Gets a connection from the current BaseDataSource
    */
-  protected Connection getDataSourceConnection() throws SQLException {
-    if (bds == null) {
+  protected Connection getDataSourceConnection() throws SQLException
+  {
+    if (bds == null)
+    {
       initializeDataSource();
     }
     return bds.getConnection();
@@ -81,7 +87,8 @@ public abstract class BaseDataSourceTest extends TestCase {
    */
   protected abstract void initializeDataSource();
 
-  public static void setupDataSource(BaseDataSource bds) {
+  public static void setupDataSource(BaseDataSource bds)
+  {
     bds.setServerName(TestUtil.getServer());
     bds.setPortNumber(TestUtil.getPort());
     bds.setDatabaseName(TestUtil.getDatabase());
@@ -95,7 +102,8 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * Test to make sure you can instantiate and configure the appropriate DataSource
    */
-  public void testCreateDataSource() {
+  public void testCreateDataSource()
+  {
     initializeDataSource();
   }
 
@@ -103,11 +111,14 @@ public abstract class BaseDataSourceTest extends TestCase {
    * Test to make sure you can get a connection from the DataSource, which in turn means the
    * DataSource was able to open it.
    */
-  public void testGetConnection() {
-    try {
+  public void testGetConnection()
+  {
+    try
+    {
       con = getDataSourceConnection();
       con.close();
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       fail(e.getMessage());
     }
   }
@@ -115,26 +126,33 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * A simple test to make sure you can execute SQL using the Connection from the DataSource
    */
-  public void testUseConnection() {
-    try {
+  public void testUseConnection()
+  {
+    try
+    {
       con = getDataSourceConnection();
       Statement st = con.createStatement();
       ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM poolingtest");
-      if (rs.next()) {
+      if (rs.next())
+      {
         int count = rs.getInt(1);
-        if (rs.next()) {
+        if (rs.next())
+        {
           fail("Should only have one row in SELECT COUNT result set");
         }
-        if (count != 2) {
+        if (count != 2)
+        {
           fail("Count returned " + count + " expecting 2");
         }
-      } else {
+      } else
+      {
         fail("Should have one row in SELECT COUNT result set");
       }
       rs.close();
       st.close();
       con.close();
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       fail(e.getMessage());
     }
   }
@@ -142,12 +160,15 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * A test to make sure you can execute DDL SQL using the Connection from the DataSource.
    */
-  public void testDdlOverConnection() {
-    try {
+  public void testDdlOverConnection()
+  {
+    try
+    {
       con = getDataSourceConnection();
       TestUtil.createTable(con, "poolingtest", "id int4 not null primary key, name varchar(50)");
       con.close();
-    } catch (SQLException e) {
+    } catch (SQLException e)
+    {
       fail(e.getMessage());
     }
   }
@@ -156,7 +177,8 @@ public abstract class BaseDataSourceTest extends TestCase {
    * A test to make sure the connections are not being pooled by the current DataSource. Obviously
    * need to be overridden in the case of a pooling Datasource.
    */
-  public void testNotPooledConnection() throws SQLException {
+  public void testNotPooledConnection() throws SQLException
+  {
     con = getDataSourceConnection();
     String name = con.toString();
     con.close();
@@ -169,12 +191,15 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * Test to make sure that PGConnection methods can be called on the pooled Connection.
    */
-  public void testPGConnection() {
-    try {
+  public void testPGConnection()
+  {
+    try
+    {
       con = getDataSourceConnection();
       ((PGConnection) con).getNotifications();
       con.close();
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       fail(
           "Unable to call PGConnection method on pooled connection due to " + e.getClass().getName()
               + " (" + e.getMessage() + ")");
@@ -184,12 +209,15 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * Uses the mini-JNDI implementation for testing purposes
    */
-  protected InitialContext getInitialContext() {
+  protected InitialContext getInitialContext()
+  {
     Hashtable<String, Object> env = new Hashtable<String, Object>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, MiniJndiContextFactory.class.getName());
-    try {
+    try
+    {
       return new InitialContext(env);
-    } catch (NamingException e) {
+    } catch (NamingException e)
+    {
       fail("Unable to create InitialContext: " + e.getMessage());
       return null;
     }
@@ -200,16 +228,19 @@ public abstract class BaseDataSourceTest extends TestCase {
    * sure it's still usable.  This should ideally test both Serializable and Referenceable
    * mechanisms. Will probably be multiple tests when implemented.
    */
-  public void testJndi() {
+  public void testJndi()
+  {
     initializeDataSource();
     BaseDataSource oldbds = bds;
     InitialContext ic = getInitialContext();
-    try {
+    try
+    {
       ic.rebind(DATA_SOURCE_JNDI, bds);
       bds = (BaseDataSource) ic.lookup(DATA_SOURCE_JNDI);
       assertTrue("Got null looking up DataSource from JNDI!", bds != null);
       compareJndiDataSource(oldbds, bds);
-    } catch (NamingException e) {
+    } catch (NamingException e)
+    {
       fail(e.getMessage());
     }
     oldbds = bds;
@@ -221,7 +252,8 @@ public abstract class BaseDataSourceTest extends TestCase {
   /**
    * Check whether a DS was dereferenced from JNDI or recreated.
    */
-  protected void compareJndiDataSource(BaseDataSource oldbds, BaseDataSource bds) {
+  protected void compareJndiDataSource(BaseDataSource oldbds, BaseDataSource bds)
+  {
     assertTrue("DataSource was dereferenced, should have been serialized or recreated",
         bds != oldbds);
   }

@@ -17,7 +17,8 @@ package org.postgresql.core;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-public interface Query {
+public interface Query
+{
   /**
    * Create a ParameterList suitable for storing parameters associated with this Query. <p> If this
    * query has no parameters, a ParameterList will be returned, but it may be a shared immutable

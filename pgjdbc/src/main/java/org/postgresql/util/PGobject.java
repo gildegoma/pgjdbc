@@ -15,14 +15,16 @@ import java.sql.SQLException;
  * PGobject is a class used to describe unknown types An unknown type is any type that is unknown by
  * JDBC Standards
  */
-public class PGobject implements Serializable, Cloneable {
+public class PGobject implements Serializable, Cloneable
+{
   protected String type;
   protected String value;
 
   /**
    * This is called by org.postgresql.Connection.getObject() to create the object.
    */
-  public PGobject() {
+  public PGobject()
+  {
   }
 
   /**
@@ -32,7 +34,8 @@ public class PGobject implements Serializable, Cloneable {
    *
    * @param type a string describing the type of the object
    */
-  public final void setType(String type) {
+  public final void setType(String type)
+  {
     this.type = type;
   }
 
@@ -42,7 +45,8 @@ public class PGobject implements Serializable, Cloneable {
    * @param value a string representation of the value of the object
    * @throws SQLException thrown if value is invalid for this type
    */
-  public void setValue(String value) throws SQLException {
+  public void setValue(String value) throws SQLException
+  {
     this.value = value;
   }
 
@@ -51,7 +55,8 @@ public class PGobject implements Serializable, Cloneable {
    *
    * @return the type name of this object
    */
-  public final String getType() {
+  public final String getType()
+  {
     return type;
   }
 
@@ -61,7 +66,8 @@ public class PGobject implements Serializable, Cloneable {
    *
    * @return the value of this object
    */
-  public String getValue() {
+  public String getValue()
+  {
     return value;
   }
 
@@ -71,11 +77,14 @@ public class PGobject implements Serializable, Cloneable {
    * @param obj Object to compare with
    * @return true if the two boxes are identical
    */
-  public boolean equals(Object obj) {
-    if (obj instanceof PGobject) {
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof PGobject)
+    {
       final Object otherValue = ((PGobject) obj).getValue();
 
-      if (otherValue == null) {
+      if (otherValue == null)
+      {
         return getValue() == null;
       }
       return otherValue.equals(getValue());
@@ -86,7 +95,8 @@ public class PGobject implements Serializable, Cloneable {
   /**
    * This must be overidden to allow the object to be cloned
    */
-  public Object clone() throws CloneNotSupportedException {
+  public Object clone() throws CloneNotSupportedException
+  {
     return super.clone();
   }
 
@@ -95,7 +105,8 @@ public class PGobject implements Serializable, Cloneable {
    *
    * @return the value of this object, in the syntax expected by org.postgresql
    */
-  public String toString() {
+  public String toString()
+  {
     return getValue();
   }
 
@@ -105,7 +116,8 @@ public class PGobject implements Serializable, Cloneable {
    * @return Value hashcode, 0 if value is null {@link java.util.Objects#hashCode(Object)}
    */
   @Override
-  public int hashCode() {
+  public int hashCode()
+  {
     return getValue() != null ? getValue().hashCode() : 0;
   }
 }

@@ -46,14 +46,16 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class BindTimestamp {
+public class BindTimestamp
+{
   private Connection connection;
   private PreparedStatement ps;
   private Timestamp ts = new Timestamp(System.currentTimeMillis());
   private Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
   @Setup(Level.Trial)
-  public void setUp() throws SQLException {
+  public void setUp() throws SQLException
+  {
     Properties props = ConnectionUtil.getProperties();
 
     connection = DriverManager.getConnection(ConnectionUtil.getURL(), props);
@@ -61,24 +63,28 @@ public class BindTimestamp {
   }
 
   @TearDown(Level.Trial)
-  public void tearDown() throws SQLException {
+  public void tearDown() throws SQLException
+  {
     ps.close();
     connection.close();
   }
 
   @Benchmark
-  public Statement timestampLocal() throws SQLException {
+  public Statement timestampLocal() throws SQLException
+  {
     ps.setTimestamp(1, ts);
     return ps;
   }
 
   @Benchmark
-  public Statement timestampCal() throws SQLException {
+  public Statement timestampCal() throws SQLException
+  {
     ps.setTimestamp(1, ts, cal);
     return ps;
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(BindTimestamp.class.getSimpleName())
         .addProfiler(GCProfiler.class)

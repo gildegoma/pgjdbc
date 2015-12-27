@@ -13,9 +13,11 @@ package org.postgresql.util;
  *
  * @author Mikko Tiihonen
  */
-public class ByteConverter {
+public class ByteConverter
+{
 
-  private ByteConverter() {
+  private ByteConverter()
+  {
     // prevent instantiation of static helper class
   }
 
@@ -26,7 +28,8 @@ public class ByteConverter {
    * @param idx   The starting index of the parse in the byte array.
    * @return parsed long value.
    */
-  public static long int8(byte[] bytes, int idx) {
+  public static long int8(byte[] bytes, int idx)
+  {
     return
         ((long) (bytes[idx + 0] & 255) << 56)
             + ((long) (bytes[idx + 1] & 255) << 48)
@@ -45,7 +48,8 @@ public class ByteConverter {
    * @param idx   The starting index of the parse in the byte array.
    * @return parsed int value.
    */
-  public static int int4(byte[] bytes, int idx) {
+  public static int int4(byte[] bytes, int idx)
+  {
     return
         ((bytes[idx] & 255) << 24)
             + ((bytes[idx + 1] & 255) << 16)
@@ -60,7 +64,8 @@ public class ByteConverter {
    * @param idx   The starting index of the parse in the byte array.
    * @return parsed short value.
    */
-  public static short int2(byte[] bytes, int idx) {
+  public static short int2(byte[] bytes, int idx)
+  {
     return (short)
         (((bytes[idx] & 255) << 8)
             + ((bytes[idx + 1] & 255)));
@@ -73,7 +78,8 @@ public class ByteConverter {
    * @param idx   The starting index of the parse in the byte array.
    * @return parsed float value.
    */
-  public static float float4(byte[] bytes, int idx) {
+  public static float float4(byte[] bytes, int idx)
+  {
     return Float.intBitsToFloat(int4(bytes, idx));
   }
 
@@ -84,7 +90,8 @@ public class ByteConverter {
    * @param idx   The starting index of the parse in the byte array.
    * @return parsed double value.
    */
-  public static double float8(byte[] bytes, int idx) {
+  public static double float8(byte[] bytes, int idx)
+  {
     return Double.longBitsToDouble(int8(bytes, idx));
   }
 
@@ -95,7 +102,8 @@ public class ByteConverter {
    * @param idx    The starting index in the byte array.
    * @param value  The value to encode.
    */
-  public static void int8(byte[] target, int idx, long value) {
+  public static void int8(byte[] target, int idx, long value)
+  {
     target[idx + 0] = (byte) (value >>> 56);
     target[idx + 1] = (byte) (value >>> 48);
     target[idx + 2] = (byte) (value >>> 40);
@@ -113,7 +121,8 @@ public class ByteConverter {
    * @param idx    The starting index in the byte array.
    * @param value  The value to encode.
    */
-  public static void int4(byte[] target, int idx, int value) {
+  public static void int4(byte[] target, int idx, int value)
+  {
     target[idx + 0] = (byte) (value >>> 24);
     target[idx + 1] = (byte) (value >>> 16);
     target[idx + 2] = (byte) (value >>> 8);
@@ -127,7 +136,8 @@ public class ByteConverter {
    * @param idx    The starting index in the byte array.
    * @param value  The value to encode.
    */
-  public static void int2(byte[] target, int idx, int value) {
+  public static void int2(byte[] target, int idx, int value)
+  {
     target[idx + 0] = (byte) (value >>> 8);
     target[idx + 1] = (byte) value;
   }
@@ -139,7 +149,8 @@ public class ByteConverter {
    * @param idx    The starting index in the byte array.
    * @param value  The value to encode.
    */
-  public static void float4(byte[] target, int idx, float value) {
+  public static void float4(byte[] target, int idx, float value)
+  {
     int4(target, idx, Float.floatToRawIntBits(value));
   }
 
@@ -150,7 +161,8 @@ public class ByteConverter {
    * @param idx    The starting index in the byte array.
    * @param value  The value to encode.
    */
-  public static void float8(byte[] target, int idx, double value) {
+  public static void float8(byte[] target, int idx, double value)
+  {
     int8(target, idx, Double.doubleToRawLongBits(value));
   }
 }

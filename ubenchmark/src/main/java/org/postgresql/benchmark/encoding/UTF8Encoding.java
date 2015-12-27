@@ -45,7 +45,8 @@ import java.util.concurrent.TimeUnit;
 @Threads(1)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class UTF8Encoding {
+public class UTF8Encoding
+{
 
   @Param({"1", "5", "10", "50", "100"})
   public int length;
@@ -56,9 +57,11 @@ public class UTF8Encoding {
   private static final Charset UTF_8 = Charset.forName("UTF-8");
 
   @Setup
-  public void setup() {
+  public void setup()
+  {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++)
+    {
       sb.append("Hello мир,");
     }
     source = sb.toString();
@@ -67,7 +70,8 @@ public class UTF8Encoding {
   }
 
   @Benchmark
-  public byte[] utilsEncodeUTF8_old() {
+  public byte[] utilsEncodeUTF8_old()
+  {
     ByteBuffer buf = UTF_8.encode(CharBuffer.wrap(source));
     byte[] b = new byte[buf.limit()];
     buf.get(b, 0, buf.limit());
@@ -75,27 +79,32 @@ public class UTF8Encoding {
   }
 
   @Benchmark
-  public byte[] utilsEncodeUTF8_current() {
+  public byte[] utilsEncodeUTF8_current()
+  {
     return Utils.encodeUTF8(source);
   }
 
   @Benchmark
-  public byte[] string_getBytes() {
+  public byte[] string_getBytes()
+  {
     return source.getBytes(UTF_8);
   }
 
   @Benchmark
-  public ByteBuffer charset_encode() {
+  public ByteBuffer charset_encode()
+  {
     return UTF_8.encode(source);
   }
 
   @Benchmark
-  public Object encoder_byteBufferReuse() throws CharacterCodingException {
+  public Object encoder_byteBufferReuse() throws CharacterCodingException
+  {
     buf.clear();
     return encoder.encode(CharBuffer.wrap(source), buf, true);
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(UTF8Encoding.class.getSimpleName())
         //.addProfiler(GCProfiler.class)

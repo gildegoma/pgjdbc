@@ -22,28 +22,33 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class IntervalTest extends TestCase {
+public class IntervalTest extends TestCase
+{
 
   private Connection _conn;
 
-  public IntervalTest(String name) {
+  public IntervalTest(String name)
+  {
     super(name);
   }
 
-  protected void setUp() throws Exception {
+  protected void setUp() throws Exception
+  {
     _conn = TestUtil.openDB();
     TestUtil.createTable(_conn, "testinterval", "v interval");
     TestUtil.createTable(_conn, "testdate", "v date");
   }
 
-  protected void tearDown() throws Exception {
+  protected void tearDown() throws Exception
+  {
     TestUtil.dropTable(_conn, "testinterval");
     TestUtil.dropTable(_conn, "testdate");
 
     TestUtil.closeDB(_conn);
   }
 
-  public void testOnlineTests() throws SQLException {
+  public void testOnlineTests() throws SQLException
+  {
     PreparedStatement pstmt = _conn.prepareStatement("INSERT INTO testinterval VALUES (?)");
     pstmt.setObject(1, new PGInterval(2004, 13, 28, 0, 0, 43000.9013));
     pstmt.executeUpdate();
@@ -64,7 +69,8 @@ public class IntervalTest extends TestCase {
     stmt.close();
   }
 
-  public void testStringToIntervalCoercion() throws SQLException {
+  public void testStringToIntervalCoercion() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     stmt.executeUpdate(TestUtil.insertSQL("testdate", "'2010-01-01'"));
     stmt.executeUpdate(TestUtil.insertSQL("testdate", "'2010-01-02'"));
@@ -101,7 +107,8 @@ public class IntervalTest extends TestCase {
   }
 
 
-  public void testIntervalToStringCoercion() throws SQLException {
+  public void testIntervalToStringCoercion() throws SQLException
+  {
     PGInterval interval = new PGInterval("1 year 3 months");
     String coercedStringValue = interval.toString();
 
@@ -109,23 +116,27 @@ public class IntervalTest extends TestCase {
   }
 
 
-  public void testDaysHours() throws SQLException {
+  public void testDaysHours() throws SQLException
+  {
     Statement stmt = _conn.createStatement();
     ResultSet rs = stmt.executeQuery("SELECT '101:12:00'::interval");
     assertTrue(rs.next());
     PGInterval i = (PGInterval) rs.getObject(1);
     // 8.1 servers store hours and days separately.
-    if (TestUtil.haveMinimumServerVersion(_conn, "8.1")) {
+    if (TestUtil.haveMinimumServerVersion(_conn, "8.1"))
+    {
       assertEquals(0, i.getDays());
       assertEquals(101, i.getHours());
-    } else {
+    } else
+    {
       assertEquals(4, i.getDays());
       assertEquals(5, i.getHours());
     }
     assertEquals(12, i.getMinutes());
   }
 
-  public void testAddRounding() {
+  public void testAddRounding()
+  {
     PGInterval pgi = new PGInterval(0, 0, 0, 0, 0, 0.6006);
     Calendar cal = Calendar.getInstance();
     long origTime = cal.getTime().getTime();
@@ -138,7 +149,8 @@ public class IntervalTest extends TestCase {
   }
 
   public void testOfflineTests()
-      throws Exception {
+      throws Exception
+  {
     PGInterval pgi = new PGInterval(2004, 4, 20, 15, 57, 12.1);
 
     assertEquals(2004, pgi.getYears());
@@ -177,7 +189,8 @@ public class IntervalTest extends TestCase {
     assertEquals(-12.1, pgi.getSeconds(), 0);
   }
 
-  Calendar getStartCalendar() {
+  Calendar getStartCalendar()
+  {
     Calendar cal = new GregorianCalendar();
     cal.set(Calendar.YEAR, 2005);
     cal.set(Calendar.MONTH, 4);
@@ -191,7 +204,8 @@ public class IntervalTest extends TestCase {
   }
 
   public void testCalendar()
-      throws Exception {
+      throws Exception
+  {
     Calendar cal = getStartCalendar();
 
     PGInterval pgi = new PGInterval("@ 1 year 1 mon 1 day 1 hour 1 minute 1 secs");
@@ -242,7 +256,8 @@ public class IntervalTest extends TestCase {
   }
 
   public void testDate()
-      throws Exception {
+      throws Exception
+  {
     Date date = getStartCalendar().getTime();
     Date date2 = getStartCalendar().getTime();
 
@@ -257,7 +272,8 @@ public class IntervalTest extends TestCase {
   }
 
   public void testISODate()
-      throws Exception {
+      throws Exception
+  {
     Date date = getStartCalendar().getTime();
     Date date2 = getStartCalendar().getTime();
 
@@ -270,7 +286,8 @@ public class IntervalTest extends TestCase {
     assertEquals(date2, date);
   }
 
-  private java.sql.Date makeDate(int y, int m, int d) {
+  private java.sql.Date makeDate(int y, int m, int d)
+  {
     return new java.sql.Date(y - 1900, m - 1, d);
   }
 

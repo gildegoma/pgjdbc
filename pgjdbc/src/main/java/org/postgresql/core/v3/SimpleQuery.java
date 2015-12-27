@@ -24,30 +24,37 @@ import java.lang.ref.PhantomReference;
  *
  * @author Oliver Jowett (oliver@opencloud.com)
  */
-class SimpleQuery implements V3Query {
+class SimpleQuery implements V3Query
+{
 
-  SimpleQuery(NativeQuery query, ProtocolConnectionImpl protoConnection) {
+  SimpleQuery(NativeQuery query, ProtocolConnectionImpl protoConnection)
+  {
     this.nativeQuery = query;
     this.protoConnection = protoConnection;
   }
 
-  public ParameterList createParameterList() {
-    if (nativeQuery.bindPositions.length == 0) {
+  public ParameterList createParameterList()
+  {
+    if (nativeQuery.bindPositions.length == 0)
+    {
       return NO_PARAMETERS;
     }
 
     return new SimpleParameterList(nativeQuery.bindPositions.length, protoConnection);
   }
 
-  public String toString(ParameterList parameters) {
+  public String toString(ParameterList parameters)
+  {
     return nativeQuery.toString(parameters);
   }
 
-  public String toString() {
+  public String toString()
+  {
     return toString(null);
   }
 
-  public void close() {
+  public void close()
+  {
     unprepare();
   }
 
@@ -55,7 +62,8 @@ class SimpleQuery implements V3Query {
   // V3Query
   //
 
-  public SimpleQuery[] getSubqueries() {
+  public SimpleQuery[] getSubqueries()
+  {
     return null;
   }
 
@@ -69,19 +77,25 @@ class SimpleQuery implements V3Query {
    * result is unbounded.
    * @throws IllegalStateException if the query is not described
    */
-  public int getMaxResultRowSize() {
-    if (cachedMaxResultRowSize != null) {
+  public int getMaxResultRowSize()
+  {
+    if (cachedMaxResultRowSize != null)
+    {
       return cachedMaxResultRowSize;
     }
-    if (!this.statementDescribed) {
+    if (!this.statementDescribed)
+    {
       throw new IllegalStateException(
           "Cannot estimate result row size on a statement that is not described");
     }
     int maxResultRowSize = 0;
-    if (fields != null) {
-      for (Field f : fields) {
+    if (fields != null)
+    {
+      for (Field f : fields)
+      {
         final int fieldLength = f.getLength();
-        if (fieldLength < 1 || fieldLength >= 65535) {
+        if (fieldLength < 1 || fieldLength >= 65535)
+        {
           /*
            * Field length unknown or large; we can't make any safe
            * estimates about the result size, so we have to fall back to
@@ -101,35 +115,44 @@ class SimpleQuery implements V3Query {
   // Implementation guts
   //
 
-  String getNativeSql() {
+  String getNativeSql()
+  {
     return nativeQuery.nativeSql;
   }
 
-  void setStatementName(String statementName) {
+  void setStatementName(String statementName)
+  {
     this.statementName = statementName;
     this.encodedStatementName = Utils.encodeUTF8(statementName);
   }
 
-  void setStatementTypes(int[] paramTypes) {
+  void setStatementTypes(int[] paramTypes)
+  {
     this.preparedTypes = paramTypes;
   }
 
-  int[] getStatementTypes() {
+  int[] getStatementTypes()
+  {
     return preparedTypes;
   }
 
-  String getStatementName() {
+  String getStatementName()
+  {
     return statementName;
   }
 
-  boolean isPreparedFor(int[] paramTypes) {
-    if (statementName == null) {
+  boolean isPreparedFor(int[] paramTypes)
+  {
+    if (statementName == null)
+    {
       return false; // Not prepared.
     }
 
     // Check for compatible types.
-    for (int i = 0; i < paramTypes.length; ++i) {
-      if (paramTypes[i] != Oid.UNSPECIFIED && paramTypes[i] != preparedTypes[i]) {
+    for (int i = 0; i < paramTypes.length; ++i)
+    {
+      if (paramTypes[i] != Oid.UNSPECIFIED && paramTypes[i] != preparedTypes[i])
+      {
         return false;
       }
     }
@@ -137,13 +160,17 @@ class SimpleQuery implements V3Query {
     return true;
   }
 
-  boolean hasUnresolvedTypes() {
-    if (preparedTypes == null) {
+  boolean hasUnresolvedTypes()
+  {
+    if (preparedTypes == null)
+    {
       return true;
     }
 
-    for (int preparedType : preparedTypes) {
-      if (preparedType == Oid.UNSPECIFIED) {
+    for (int preparedType : preparedTypes)
+    {
+      if (preparedType == Oid.UNSPECIFIED)
+      {
         return true;
       }
     }
@@ -151,7 +178,8 @@ class SimpleQuery implements V3Query {
     return false;
   }
 
-  byte[] getEncodedStatementName() {
+  byte[] getEncodedStatementName()
+  {
     return encodedStatementName;
   }
 
@@ -160,7 +188,8 @@ class SimpleQuery implements V3Query {
    *
    * @param fields The fields that this query will return.
    */
-  void setFields(Field[] fields) {
+  void setFields(Field[] fields)
+  {
     this.fields = fields;
     this.cachedMaxResultRowSize = null;
     this.needUpdateFieldFormats = fields != null;
@@ -173,7 +202,8 @@ class SimpleQuery implements V3Query {
    *
    * @return the fields that this query will return.
    */
-  Field[] getFields() {
+  Field[] getFields()
+  {
     return fields;
   }
 
@@ -185,8 +215,10 @@ class SimpleQuery implements V3Query {
    *
    * @return true if current query needs field formats be adjusted as per connection configuration
    */
-  boolean needUpdateFieldFormats() {
-    if (needUpdateFieldFormats) {
+  boolean needUpdateFieldFormats()
+  {
+    if (needUpdateFieldFormats)
+    {
       needUpdateFieldFormats = false;
       return true;
     }
@@ -194,49 +226,60 @@ class SimpleQuery implements V3Query {
   }
 
 
-  public boolean hasBinaryFields() {
+  public boolean hasBinaryFields()
+  {
     return hasBinaryFields;
   }
 
-  public void setHasBinaryFields(boolean hasBinaryFields) {
+  public void setHasBinaryFields(boolean hasBinaryFields)
+  {
     this.hasBinaryFields = hasBinaryFields;
   }
 
   // Have we sent a Describe Portal message for this query yet?
-  boolean isPortalDescribed() {
+  boolean isPortalDescribed()
+  {
     return portalDescribed;
   }
 
-  void setPortalDescribed(boolean portalDescribed) {
+  void setPortalDescribed(boolean portalDescribed)
+  {
     this.portalDescribed = portalDescribed;
     this.cachedMaxResultRowSize = null;
   }
 
   // Have we sent a Describe Statement message for this query yet?
   // Note that we might not have need to, so this may always be false.
-  public boolean isStatementDescribed() {
+  public boolean isStatementDescribed()
+  {
     return statementDescribed;
   }
 
-  void setStatementDescribed(boolean statementDescribed) {
+  void setStatementDescribed(boolean statementDescribed)
+  {
     this.statementDescribed = statementDescribed;
     this.cachedMaxResultRowSize = null;
   }
 
-  public boolean isEmpty() {
+  public boolean isEmpty()
+  {
     return getNativeSql().isEmpty();
   }
 
-  void setCleanupRef(PhantomReference<?> cleanupRef) {
-    if (this.cleanupRef != null) {
+  void setCleanupRef(PhantomReference<?> cleanupRef)
+  {
+    if (this.cleanupRef != null)
+    {
       this.cleanupRef.clear();
       this.cleanupRef.enqueue();
     }
     this.cleanupRef = cleanupRef;
   }
 
-  void unprepare() {
-    if (cleanupRef != null) {
+  void unprepare()
+  {
+    if (cleanupRef != null)
+    {
       cleanupRef.clear();
       cleanupRef.enqueue();
       cleanupRef = null;

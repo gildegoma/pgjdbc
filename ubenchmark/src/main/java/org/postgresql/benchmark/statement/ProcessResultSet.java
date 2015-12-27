@@ -41,8 +41,10 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-public class ProcessResultSet {
-  public enum FieldType {
+public class ProcessResultSet
+{
+  public enum FieldType
+  {
     INT,
     BIGINT,
     BIGDECIMAL,
@@ -51,7 +53,8 @@ public class ProcessResultSet {
     TIMESTAMPTZ,
   }
 
-  public enum GetterType {
+  public enum GetterType
+  {
     BEST,
     OBJECT
   }
@@ -78,8 +81,10 @@ public class ProcessResultSet {
   private int cntr;
 
   @Setup(Level.Trial)
-  public void setUp() throws SQLException {
-    if (type == FieldType.TIMESTAMP) {
+  public void setUp() throws SQLException
+  {
+    if (type == FieldType.TIMESTAMP)
+    {
       System.out.println(
           "TimeZone.getDefault().getDisplayName() = " + TimeZone.getDefault().getDisplayName());
     }
@@ -88,23 +93,31 @@ public class ProcessResultSet {
     connection = DriverManager.getConnection(ConnectionUtil.getURL(), props);
     StringBuilder sb = new StringBuilder();
     sb.append("SELECT ");
-    for (int i = 0; i < ncols; i++) {
-      if (i > 0) {
+    for (int i = 0; i < ncols; i++)
+    {
+      if (i > 0)
+      {
         sb.append(", ");
       }
-      if (type == FieldType.INT) {
+      if (type == FieldType.INT)
+      {
         sb.append("t.x");
       }
-      if (type == FieldType.BIGINT) {
+      if (type == FieldType.BIGINT)
+      {
         sb.append("1234567890123456789");
       }
-      if (type == FieldType.BIGDECIMAL) {
+      if (type == FieldType.BIGDECIMAL)
+      {
         sb.append("12345678901234567890123456789");
-      } else if (type == FieldType.STRING) {
+      } else if (type == FieldType.STRING)
+      {
         sb.append("'test string'");
-      } else if (type == FieldType.TIMESTAMP) {
+      } else if (type == FieldType.TIMESTAMP)
+      {
         sb.append("localtimestamp");
-      } else if (type == FieldType.TIMESTAMPTZ) {
+      } else if (type == FieldType.TIMESTAMPTZ)
+      {
         sb.append("current_timestamp");
       }
       sb.append(" c").append(i);
@@ -114,34 +127,46 @@ public class ProcessResultSet {
   }
 
   @TearDown(Level.Trial)
-  public void tearDown() throws SQLException {
+  public void tearDown() throws SQLException
+  {
     connection.close();
   }
 
   @Benchmark
-  public Statement bindExecuteFetch(Blackhole b) throws SQLException {
+  public Statement bindExecuteFetch(Blackhole b) throws SQLException
+  {
     String sql = this.sql;
-    if (unique) {
+    if (unique)
+    {
       sql += " -- " + cntr++;
     }
     PreparedStatement ps = connection.prepareStatement(sql);
     ps.setInt(1, nrows);
     ResultSet rs = ps.executeQuery();
-    while (rs.next()) {
-      for (int i = 1; i <= ncols; i++) {
-        if (getter == GetterType.OBJECT) {
+    while (rs.next())
+    {
+      for (int i = 1; i <= ncols; i++)
+      {
+        if (getter == GetterType.OBJECT)
+        {
           b.consume(rs.getObject(i));
-        } else if (type == FieldType.INT) {
+        } else if (type == FieldType.INT)
+        {
           b.consume(rs.getInt(i));
-        } else if (type == FieldType.BIGINT) {
+        } else if (type == FieldType.BIGINT)
+        {
           b.consume(rs.getBigDecimal(i));
-        } else if (type == FieldType.BIGDECIMAL) {
+        } else if (type == FieldType.BIGDECIMAL)
+        {
           b.consume(rs.getBigDecimal(i));
-        } else if (type == FieldType.STRING) {
+        } else if (type == FieldType.STRING)
+        {
           b.consume(rs.getString(i));
-        } else if (type == FieldType.TIMESTAMP) {
+        } else if (type == FieldType.TIMESTAMP)
+        {
           b.consume(rs.getTimestamp(i));
-        } else if (type == FieldType.TIMESTAMPTZ) {
+        } else if (type == FieldType.TIMESTAMPTZ)
+        {
           b.consume(rs.getTimestamp(i));
         }
       }
@@ -151,7 +176,8 @@ public class ProcessResultSet {
     return ps;
   }
 
-  public static void main(String[] args) throws RunnerException {
+  public static void main(String[] args) throws RunnerException
+  {
     Options opt = new OptionsBuilder()
         .include(ProcessResultSet.class.getSimpleName())
         //.addProfiler(GCProfiler.class)
